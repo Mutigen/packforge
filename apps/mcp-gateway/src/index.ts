@@ -196,13 +196,16 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
     },
     async startProjectFromSpec(input: { specFilePath: string; repositoryPath?: string }) {
       const spec = await parseSpecFile(input.specFilePath)
+      // If no repositoryPath given, default to the directory containing the spec file.
+      // This lets users drop a spec next to package.json and skip the extra argument.
+      const resolvedRepoPath = input.repositoryPath ?? path.dirname(path.resolve(input.specFilePath))
       const analyzeInput: AnalyzeProjectInput = {
         projectId: spec.projectId,
         description: spec.description,
         executionTarget: 'client_workspace',
         customKeywords: [],
         ...spec.overrides,
-        ...(input.repositoryPath ? { repositoryPath: input.repositoryPath } : {}),
+        repositoryPath: resolvedRepoPath,
       }
 
       const ctx = await contextAnalyzer.analyzeProjectContext(AnalyzeProjectInputSchema.parse(analyzeInput))
@@ -355,7 +358,13 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
         'Read a project spec from a Markdown file, analyze the project context, and recommend instruction packs. Returns recommended packs for user validation before activation. This is the primary entry point — the user writes a .md file with their project idea, and this tool does the rest.',
       inputSchema: z.object({
         specFilePath: z.string().min(1).describe('Absolute path to a .md file describing the project to build'),
-        repositoryPath: z.string().min(1).optional().describe('Path to an existing repo for automatic stack detection'),
+        repositoryPath: z
+          .string()
+          .min(1)
+          .optional()
+          .describe(
+            'Path to the project root for automatic stack detection. Defaults to the directory containing specFilePath — place the spec next to package.json to skip this argument',
+          ),
       }),
     },
     async (input) => {
