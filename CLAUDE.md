@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **MCP_AGENT_APP** (256 symbols, 262 relationships, 3 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **MCP_AGENT_APP** (384 symbols, 654 relationships, 26 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
@@ -42,11 +42,8 @@ This project is indexed by GitNexus as **MCP_AGENT_APP** (256 symbols, 262 relat
 | `impact` | Blast radius before editing | `gitnexus_impact({target: "X", direction: "upstream"})` |
 | `detect_changes` | Pre-commit scope check | `gitnexus_detect_changes({scope: "staged"})` |
 | `rename` | Safe multi-file rename | `gitnexus_rename({symbol_name: "old", new_name: "new", dry_run: true})` |
-| `cypher` | Custom graph queries | `gitnexus_cypher({query: "MATCH ..."})` || `list_repos` | List all indexed repos | `gitnexus_list_repos()` |
-| `api_impact` | API endpoint blast radius | `gitnexus_api_impact({endpoint: "/api/users"})` |
-| `route_map` | Visualize call chains | `gitnexus_route_map({from: "A", to: "B"})` |
-| `shape_check` | Validate graph integrity | `gitnexus_shape_check({repo: "MCP_AGENT_APP"})` |
-| `tool_map` | Map tool usage across code | `gitnexus_tool_map({repo: "MCP_AGENT_APP"})` |
+| `cypher` | Custom graph queries | `gitnexus_cypher({query: "MATCH ..."})` |
+
 ## Impact Risk Levels
 
 | Depth | Meaning | Action |
@@ -62,16 +59,8 @@ This project is indexed by GitNexus as **MCP_AGENT_APP** (256 symbols, 262 relat
 | `gitnexus://repo/MCP_AGENT_APP/context` | Codebase overview, check index freshness |
 | `gitnexus://repo/MCP_AGENT_APP/clusters` | All functional areas |
 | `gitnexus://repo/MCP_AGENT_APP/processes` | All execution flows |
-| `gitnexus://repo/MCP_AGENT_APP/process/{name}` | Step-by-step execution trace || `gitnexus://repos` | List all indexed repositories |
-| `gitnexus://repo/MCP_AGENT_APP/schema` | Graph schema (node types, edge types) |
-| `gitnexus://repo/MCP_AGENT_APP/stats` | Index statistics and freshness |
+| `gitnexus://repo/MCP_AGENT_APP/process/{name}` | Step-by-step execution trace |
 
-## MCP Prompts
-
-| Prompt | Purpose | Usage |
-|--------|---------|-------|
-| `detect_impact` | Generate impact analysis report | Use before making changes to critical symbols |
-| `generate_map` | Generate architecture/dependency map | Use to understand codebase structure visually |
 ## Self-Check Before Finishing
 
 Before completing any code modification task, verify:

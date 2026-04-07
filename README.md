@@ -21,29 +21,38 @@
 
 ### Key Features
 
-- **Context-Aware Recommendations** — analyzes `package.json`, file tree, and GitNexus graph to understand your project
-- **17+ Instruction Packs** — covering engineering, quality, ops, product, and documentation workflows
+- **Context-Aware Recommendations** — analyzes `package.json`, file tree, GitNexus graph, and MemPalace memory to understand your project
+- **18 Instruction Packs** — covering engineering, quality, ops, product, and documentation workflows
 - **2-Tool UX** — `start_project_from_spec` → `confirm_activation`. That's it.
 - **GitNexus Integration** — leverages code intelligence graph for deeper context enrichment
-- **Turborepo Monorepo** — modular architecture with shared types, context analyzer, orchestrator, and MCP gateway
+- **MemPalace Integration** — enriches agent context with persistent memory, past decisions, and knowledge graph
+- **Turborepo Monorepo** — 7 apps, 6 shared packages, fully typed with Zod schemas
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│                MCP Gateway                   │
-│         (stdio MCP server, 8 tools)          │
-└──────────────┬──────────────────┬────────────┘
-               │                  │
-    ┌──────────▼──────┐  ┌───────▼─────────┐
-    │ Context Analyzer │  │   Orchestrator   │
-    │  (stack/domain)  │  │ (match + score)  │
-    └──────────┬──────┘  └───────┬─────────┘
-               │                  │
-    ┌──────────▼──────────────────▼─────────┐
-    │           Pack Registry (YAML)         │
-    │   17 packs across 5 categories         │
-    └───────────────────────────────────────┘
+                    ┌──────────────────┐
+                    │   AI Assistant    │
+                    │ (Claude, Cursor)  │
+                    └────────┬─────────┘
+                             │ stdio
+┌────────────────────────────▼──────────────────────────────┐
+│                     MCP Gateway                           │
+│              (stdio MCP server, 8 tools)                  │
+└──┬──────────┬──────────┬──────────┬───────────────────────┘
+   │          │          │          │
+┌──▼───────┐ ┌▼────────┐ ┌▼────────┐ ┌▼──────────────┐
+│ Context  │ │Orchestr.│ │ Policy  │ │   Memory      │
+│ Analyzer │ │(match + │ │ Service │ │   Service     │
+│          │ │ score)  │ │(govern.)│ │(JSON persist.)│
+└──┬───┬───┘ └────┬────┘ └─────────┘ └───────────────┘
+   │   │          │
+┌──▼┐ ┌▼────┐  ┌──▼─────────────────────────────────┐
+│GN │ │ MP  │  │       Pack Registry (YAML)          │
+│   │ │     │  │    18 packs across 5 categories      │
+└───┘ └─────┘  └─────────────────────────────────────┘
+
+GN = GitNexus (code graph)    MP = MemPalace (persistent memory)
 ```
 
 ## Quick Start
@@ -91,19 +100,23 @@ Once connected via MCP, use two tools:
 
 ## Pack Categories
 
-| Category | Packs | Examples |
-|----------|-------|---------|
-| Engineering | 7 | GitNexus Explorer, Refactoring Specialist, Full-Stack Dev |
-| Quality | 4 | GitNexus Debugger, Impact Analyst, PR Reviewer, QA Engineer |
-| Ops | 2 | GitNexus CLI Operator, DevOps Pipeline |
-| Product | 2 | Product Strategist, Growth Analyst |
-| Documentation | 2 | Technical Writer, API Documenter |
+| Category | Count | Packs |
+|----------|-------|-------|
+| Engineering | 5 | backend-architect, frontend-specialist, fullstack-builder, packforge-exploring, packforge-refactoring |
+| Quality | 7 | code-security-analysis, packforge-debugging, packforge-impact-analysis, packforge-memory, packforge-pr-review, security-reviewer, test-strategist |
+| Ops | 2 | packforge-cli, project-excellence |
+| Documentation | 3 | agent-customization, creating-skills, init-project |
+| Product | 1 | ux-designer |
 
 ## Integrations
 
 ### GitNexus
 
-packforge has deep [GitNexus](https://github.com/nicobailon/gitnexus) integration. When a project has a `.gitnexus/` index, the context analyzer reads the knowledge graph (symbol count, clusters, processes) for richer pack matching. Six dedicated GitNexus packs cover exploring, debugging, impact analysis, refactoring, PR review, and CLI operations — each with the correct MCP tool permissions pre-configured.
+packforge has deep [GitNexus](https://github.com/nicobailon/gitnexus) integration. When a project has a `.gitnexus/` index, the context analyzer reads the knowledge graph (symbol count, clusters, processes) for richer pack matching. Six dedicated GitNexus packs cover exploring, debugging, impact analysis, refactoring, PR review, and CLI operations — each with the correct MCP tool permissions pre-configured. Packs that use `mcp_gitnexus_*` tools get a **+25 scoring boost** when a GitNexus index is detected.
+
+### MemPalace
+
+packforge integrates [MemPalace](https://github.com/milla-jovovich/mempalace) as a persistent memory layer. The context analyzer detects `~/.mempalace/palace/` and reads the palace identity and wing count. The dedicated `packforge-memory` pack provides 5 curated MemPalace tools (`mempalace_search`, `mempalace_status`, `mempalace_kg_query`, `mempalace_add_drawer`, `mempalace_diary_write`) while blocking 14 structural modification tools. All compatible packs include a constraint to check MemPalace for past decisions before making architecture choices. Packs using `mempalace_*` tools get a **+15 scoring boost**.
 
 ### Obsidian (Pack Authoring)
 
@@ -113,12 +126,21 @@ Instruction packs can be authored as Obsidian vault blueprints in `vault/`. Each
 
 ```
 apps/
-  context-analyzer/   # Analyzes project stack, domain, phase
+  context-analyzer/   # Analyzes project stack, domain, phase, GitNexus + MemPalace
+  hub-api/            # REST API gateway (alternative to MCP)
+  knowledge-compiler/ # Compiles Obsidian vault blueprints to YAML packs
+  mcp-gateway/        # MCP stdio server (primary entry point, 8 tools)
+  memory-service/     # Activation state persistence (JSON file storage)
   orchestrator/       # Matches and scores packs against context
-  mcp-gateway/        # MCP stdio server (primary entry point)
+  policy-service/     # Governance, approval, and risk evaluation
 packages/
-  shared-types/       # Zod schemas shared across apps
-packs/                # 17 YAML instruction packs
+  pack-validator/     # YAML pack validation and registry builder
+  shared-auth/        # JWT / JWKS auth primitives
+  shared-config/      # Centralized config schemas
+  shared-otel/        # OpenTelemetry instrumentation
+  shared-policy/      # Policy domain models
+  shared-types/       # Canonical Zod schemas (context, packs, activation)
+packs/                # 18 YAML instruction packs across 5 categories
 vault/                # Obsidian blueprints for pack authoring
 scripts/              # Validation and export utilities
 ```
