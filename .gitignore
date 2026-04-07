@@ -1,0 +1,19 @@
+.gitnexus/
+node_modules/
+dist/
+build/
+.turbo/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+.nurfuermich/
+.claude/
+FALLBACK-SPEC.md
+FULL-BUILD-PLAN.md
+MCP-AGENT-PLATFORM-SETUP.md
+TAXONOMY.md
+project-excellence Skill Design.md
+todo.md

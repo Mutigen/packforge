@@ -1,0 +1,42 @@
+# packforge
+
+> AI Agent Instruction Hub — orchestrates context-aware instruction packs for Cursor, Claude Code, Codex, and other MCP-compatible agents.
+
+## Overview
+
+packforge analyzes your project context (stack, domain, phase, risk) and recommends the right instruction packs for your AI coding agent. It works as a Model Context Protocol (MCP) server.
+
+## Architecture
+
+- context-analyzer: analyzes project stack, domain, phase via package.json, file tree, and GitNexus graph
+- orchestrator: matches and scores instruction packs against project context
+- mcp-gateway: MCP stdio server exposing 8 tools
+- shared-types: Zod schemas for packs, context, and activation
+
+## MCP Tools
+
+- start_project_from_spec: describe your project, get pack recommendations
+- confirm_activation: activate packs, receive system prompts and bootstrap steps
+- analyze_project_context: raw context analysis
+- recommend_packs: raw pack matching
+- activate_pack_set: activate specific packs
+- get_activation_status: check current activation
+- get_active_instructions: get active system prompts
+- list_registry_packs: list all available packs
+
+## Instruction Packs
+
+17 packs across 5 categories: engineering, quality, ops, product, documentation.
+
+Each pack contains: system prompt, tool permissions, activation signals, personality config, and execution policy.
+
+## Key Concepts
+
+- Pack: a YAML file defining an AI agent's behavior for a specific task domain
+- Context: analyzed project metadata (stack signals, domain, phase, risk profile)
+- Activation: the process of selecting and configuring packs for a project
+- Bootstrap Steps: initial actions recommended when activating a pack set
+
+## License
+
+PolyForm Noncommercial 1.0.0

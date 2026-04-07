@@ -1,0 +1,63 @@
+{
+  "name": "packforge",
+  "version": "0.1.0",
+  "description": "AI Agent Instruction Hub — orchestrates context-aware instruction packs for Cursor, Claude Code, Codex, and other MCP-compatible agents.",
+  "private": true,
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "author": "Levan-Lomidze (Mamiko) by MUT-i-GEN",
+  "homepage": "https://github.com/mutigen/packforge#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mutigen/packforge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mutigen/packforge/issues"
+  },
+  "keywords": [
+    "mcp",
+    "ai-agents",
+    "instruction-packs",
+    "claude",
+    "cursor",
+    "codex",
+    "gitnexus",
+    "orchestrator",
+    "context-analyzer",
+    "developer-tools"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "npm@10.9.4",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "type-check": "turbo run type-check",
+    "lint": "turbo run lint",
+    "validate:packs": "tsx scripts/validate-packs.ts",
+    "export:registry": "tsx scripts/export-registry.ts",
+    "ci": "npm run lint && npm run type-check && npm run test && npm run validate:packs",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^10.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.19.3",
+    "turbo": "^2.9.3",
+    "typescript": "^5.8.3"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write"
+    ]
+  }
+}

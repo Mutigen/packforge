@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "packforge": {
+      "command": "node",
+      "args": ["apps/mcp-gateway/dist/index.js"],
+      "transportType": "stdio"
+    }
+  }
+}

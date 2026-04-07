@@ -1,0 +1,172 @@
+[
+  {
+    "id": "agent-customization",
+    "version": "1.0.0",
+    "category": "documentation",
+    "riskLevel": "medium",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/documentation/agent-customization.yaml",
+    "description": "Erstellt und wartet Agent-Instruktionen, Skills und Frontmatter sauber und testbar"
+  },
+  {
+    "id": "creating-skills",
+    "version": "1.0.0",
+    "category": "documentation",
+    "riskLevel": "medium",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/documentation/creating-skills.yaml",
+    "description": "Entwickelt robuste SKILL.md-Dateien mit sauberer Frontmatter und klarer Struktur"
+  },
+  {
+    "id": "init-project",
+    "version": "1.0.0",
+    "category": "documentation",
+    "riskLevel": "low",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/documentation/init-project.yaml",
+    "description": "Erstellt verlässliche Projektgrundlage mit CLAUDE.md aus realen Repo-Signalen"
+  },
+  {
+    "id": "backend-architect",
+    "version": "1.0.0",
+    "category": "engineering",
+    "riskLevel": "medium",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/engineering/backend-architect.yaml",
+    "description": "Architektur, API-Verträge und robuste Backend-Entscheidungen"
+  },
+  {
+    "id": "frontend-specialist",
+    "version": "1.0.0",
+    "category": "engineering",
+    "riskLevel": "low",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/engineering/frontend-specialist.yaml",
+    "description": "Specialization for frontend architecture, component design, interaction states, and delivery quality."
+  },
+  {
+    "id": "fullstack-builder",
+    "version": "1.0.0",
+    "category": "engineering",
+    "riskLevel": "low",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/engineering/fullstack-builder.yaml",
+    "description": "Specialization for shipping end-to-end product slices across frontend, backend, and integration boundaries."
+  },
+  {
+    "id": "gitnexus-exploring",
+    "version": "1.0.0",
+    "category": "engineering",
+    "riskLevel": "low",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/engineering/gitnexus-exploring.yaml",
+    "description": "Erkundet Architektur, Execution Flows und zentrale Symbole mit GitNexus"
+  },
+  {
+    "id": "gitnexus-refactoring",
+    "version": "1.0.0",
+    "category": "engineering",
+    "riskLevel": "medium",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/engineering/gitnexus-refactoring.yaml",
+    "description": "Führt sichere Refactorings mit Rename-Preview, Impact-Check und Scope-Kontrolle aus"
+  },
+  {
+    "id": "gitnexus-cli",
+    "version": "1.0.0",
+    "category": "ops",
+    "riskLevel": "low",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/ops/gitnexus-cli.yaml",
+    "description": "Nutzt GitNexus CLI sauber für Analyse, Status, Clean und Wiki-Generierung"
+  },
+  {
+    "id": "project-excellence",
+    "version": "1.0.0",
+    "category": "ops",
+    "riskLevel": "medium",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/ops/project-excellence.yaml",
+    "description": "Hebt Repos auf operativ reifen Standard mit Gap-Report, Dokumenten und Tooling"
+  },
+  {
+    "id": "ux-designer",
+    "version": "1.0.0",
+    "category": "product",
+    "riskLevel": "medium",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/product/ux-designer.yaml",
+    "description": "Trifft UX-Entscheidungen für Nutzerfluss, Friction-Reduktion und Conversion-orientierte Produktgestaltung"
+  },
+  {
+    "id": "code-security-analysis",
+    "version": "1.0.0",
+    "category": "quality",
+    "riskLevel": "high",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/quality/code-security-analysis.yaml",
+    "description": "Führt mehrschichtige Sicherheitsanalyse mit Remediation-Loop und ASVS-Fokus aus"
+  },
+  {
+    "id": "gitnexus-debugging",
+    "version": "1.0.0",
+    "category": "quality",
+    "riskLevel": "medium",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/quality/gitnexus-debugging.yaml",
+    "description": "Lokalisiert Fehlerursachen über Query, Context und Prozess-Traces"
+  },
+  {
+    "id": "gitnexus-impact-analysis",
+    "version": "1.0.0",
+    "category": "quality",
+    "riskLevel": "high",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/quality/gitnexus-impact-analysis.yaml",
+    "description": "Bewertet Blast Radius, Risiko und betroffene Prozesse vor Änderungen"
+  },
+  {
+    "id": "gitnexus-pr-review",
+    "version": "1.0.0",
+    "category": "quality",
+    "riskLevel": "medium",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/quality/gitnexus-pr-review.yaml",
+    "description": "Bewertet Pull Requests mit Fokus auf Risiken, Regressionen und fehlende Tests"
+  },
+  {
+    "id": "security-reviewer",
+    "version": "1.0.0",
+    "category": "quality",
+    "riskLevel": "high",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/quality/security-reviewer.yaml",
+    "description": "Specialization for threat-aware reviews, abuse-case detection, and security control validation before risky changes."
+  },
+  {
+    "id": "test-strategist",
+    "version": "1.0.0",
+    "category": "quality",
+    "riskLevel": "medium",
+    "maturity": "stable",
+    "approvalState": "approved",
+    "filePath": "packs/quality/test-strategist.yaml",
+    "description": "Specialization for coverage planning, risk-based test design, and practical validation strategy across service boundaries."
+  }
+]

@@ -1,0 +1,28 @@
+# packforge — Cursor Rules
+
+## Project Context
+This is a Turborepo monorepo for an AI Agent Instruction Hub. It orchestrates context-aware instruction packs for MCP-compatible agents.
+
+## Stack
+- TypeScript 5.8 with strict mode and `exactOptionalPropertyTypes`
+- Turborepo for monorepo orchestration
+- Zod for schema validation
+- MCP SDK v1.10 for stdio-based gateway
+- Vitest for testing
+
+## Code Conventions
+- Use `exactOptionalPropertyTypes` pattern: `...(val ? { val } : {})` instead of `val ?? undefined`
+- Wrap top-level await in CJS contexts with `(async () => { ... })()`
+- No `any` types — use `unknown` and narrow with Zod
+- Prefer pure functions
+- YAML packs must pass `npm run validate:packs`
+
+## Architecture
+- `apps/context-analyzer` — analyzes project stack, domain, phase, risk
+- `apps/orchestrator` — matches and scores packs against context
+- `apps/mcp-gateway` — MCP stdio server (primary entry point)
+- `packages/shared-types` — Zod schemas shared across apps
+- `packs/` — 17 YAML instruction packs across 5 categories
+
+## GitNexus Integration
+This repo is indexed by GitNexus. Use `mcp_gitnexus_impact` before editing symbols. Use `mcp_gitnexus_detect_changes` before committing.

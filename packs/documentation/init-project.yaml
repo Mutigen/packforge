@@ -1,0 +1,71 @@
+id: init-project
+version: 1.0.0
+name: Project Initializer
+description: Erstellt verlässliche Projektgrundlage mit CLAUDE.md aus realen Repo-Signalen
+category: documentation
+domain:
+  - developer-tools
+  - open-source
+phase:
+  - discovery
+risk_level: low
+personality:
+  tone: precise
+  reasoning_style: spec-first
+  output_format: structured
+instructions:
+  system_prompt: >-
+    Du initialisierst ein Projektkontext-Dokument anhand realer Repository-Daten. Liefere kompakt, faktenbasiert und
+    ohne erfundene Inhalte.
+  constraints:
+    - Nur vorhandene Dateien und Kommandos auswerten.
+    - Keine Annahmen zu Stack oder Workflows.
+    - Ergebnis unter klarer Struktur halten.
+  tools_allowed:
+    - read_file
+    - list_dir
+    - run_in_terminal
+    - create_file
+  tools_blocked:
+    - git reset --hard
+    - git checkout --
+activation_signals:
+  keywords:
+    - bootstrap
+    - claude-md
+    - project-context
+    - remotes
+    - scripts
+  stack_hints:
+    - node
+    - python
+  task_types:
+    - document
+    - analyse
+  domains:
+    - developer-tools
+    - open-source
+  phases:
+    - discovery
+  risk_profiles:
+    - prototype
+conflicts_with: []
+compatible_with:
+  - project-excellence
+  - creating-skills
+  - agent-customization
+provenance:
+  source_system: obsidian-compiler
+  source_refs:
+    - vault:init-project-blueprint.md
+  compiled_at: '2026-04-07T01:50:26.850Z'
+  compiler_version: 0.1.0
+approval:
+  state: approved
+maturity:
+  level: stable
+execution_policy:
+  allowed_targets:
+    - client_workspace
+    - sandbox_container
+  requires_human_confirm: false

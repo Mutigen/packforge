@@ -1,0 +1,105 @@
+import { readdir, readFile } from 'node:fs/promises'
+import path from 'node:path'
+import yaml from 'js-yaml'
+import { InstructionPackSchema, type InstructionPack, type PackRegistryEntry } from '@hub/shared-types'
+
+export async function listPackFiles(rootDir: string): Promise<string[]> {
+  const entries = await readdir(rootDir, { withFileTypes: true })
+  const nested = await Promise.all(
+    entries.map(async (entry) => {
+      const entryPath = path.join(rootDir, entry.name)
+      if (entry.isDirectory()) {
+        return listPackFiles(entryPath)
+      }
+
+      return entry.name.endsWith('.yaml') ? [entryPath] : []
+    }),
+  )
+
+  return nested.flat().sort((left, right) => left.localeCompare(right))
+}
+
+export async function loadPackFile(filePath: string): Promise<unknown> {
+  const source = await readFile(filePath, 'utf8')
+  return yaml.load(source)
+}
+
+export async function validatePackFile(filePath: string): Promise<InstructionPack> {
+  const parsed = await loadPackFile(filePath)
+  return InstructionPackSchema.parse(parsed)
+}
+
+export function validatePackCollection(packs: InstructionPack[]): InstructionPack[] {
+  const seenIds = new Set<string>()
+  const knownIds = new Set(packs.map((pack) => pack.id))
+
+  for (const pack of packs) {
+    if (seenIds.has(pack.id)) {
+      throw new Error(`Duplicate pack id: ${pack.id}`)
+    }
+    seenIds.add(pack.id)
+
+    for (const reference of pack.compatible_with) {
+      if (!knownIds.has(reference)) {
+        throw new Error(`Pack ${pack.id} references unknown compatible_with id ${reference}`)
+      }
+      if (reference === pack.id) {
+        throw new Error(`Pack ${pack.id} cannot reference itself in compatible_with`)
+      }
+    }
+
+    for (const reference of pack.conflicts_with) {
+      if (!knownIds.has(reference)) {
+        throw new Error(`Pack ${pack.id} references unknown conflicts_with id ${reference}`)
+      }
+      if (reference === pack.id) {
+        throw new Error(`Pack ${pack.id} cannot reference itself in conflicts_with`)
+      }
+      if (pack.compatible_with.includes(reference)) {
+        throw new Error(`Pack ${pack.id} cannot mark ${reference} as both compatible and conflicting`)
+      }
+    }
+  }
+
+  return packs
+}
+
+export async function validatePackDirectory(rootDir: string): Promise<InstructionPack[]> {
+  const files = await listPackFiles(rootDir)
+  const packs = await Promise.all(files.map((filePath) => validatePackFile(filePath)))
+
+  validatePackCollection(packs)
+
+  return packs.sort((left, right) => left.id.localeCompare(right.id))
+}
+
+export function getPackRegistryEntry(pack: InstructionPack, filePath: string): PackRegistryEntry {
+  return {
+    id: pack.id,
+    version: pack.version,
+    category: pack.category,
+    riskLevel: pack.risk_level,
+    maturity: pack.maturity.level,
+    approvalState: pack.approval.state,
+    filePath: path.normalize(filePath),
+    description: pack.description,
+  }
+}
+
+export function buildPackRegistry(
+  packs: InstructionPack[],
+  filePathByPackId: Map<string, string>,
+): PackRegistryEntry[] {
+  validatePackCollection(packs)
+
+  return packs
+    .map((pack) => {
+      const filePath = filePathByPackId.get(pack.id)
+      if (!filePath) {
+        throw new Error(`Missing file path for pack ${pack.id}`)
+      }
+
+      return getPackRegistryEntry(pack, filePath)
+    })
+    .sort((left, right) => left.id.localeCompare(right.id))
+}

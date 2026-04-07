@@ -1,0 +1,23 @@
+# packforge — Windsurf Rules
+
+## Project Context
+Turborepo monorepo for an AI Agent Instruction Hub. Orchestrates context-aware instruction packs for MCP-compatible agents.
+
+## Stack
+- TypeScript 5.8 strict mode with `exactOptionalPropertyTypes`
+- Turborepo, Zod, MCP SDK v1.10, Vitest
+
+## Key Conventions
+- Use conditional spread for optional properties: `...(val ? { val } : {})`
+- YAML packs validated via `npm run validate:packs`
+- Run `npm run ci` before committing
+
+## Architecture
+- apps/context-analyzer — project analysis
+- apps/orchestrator — pack matching
+- apps/mcp-gateway — MCP stdio server
+- packages/shared-types — Zod schemas
+- packs/ — 17 YAML instruction packs
+
+## GitNexus
+This repo is indexed. Use impact analysis before editing. Use detect_changes before committing.

@@ -1,0 +1,57 @@
+import { mkdtemp, rm } from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
+import { afterEach, describe, expect, it } from 'vitest'
+import type { ActivationPlan } from '@hub/shared-types'
+import { createMemoryService } from './index.js'
+
+const tempDirs: string[] = []
+
+afterEach(async () => {
+  await Promise.all(tempDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })))
+})
+
+describe('createMemoryService', () => {
+  it('persists activations and feedback', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'memory-service-'))
+    tempDirs.push(dir)
+    const service = createMemoryService({ filePath: path.join(dir, 'memory.json') })
+    const plan: ActivationPlan = {
+      projectId: 'proj',
+      contextSnapshotId: 'ctx-1',
+      executionTarget: 'client_workspace',
+      context: {
+        projectId: 'proj',
+        description: 'test',
+        stack: ['node'],
+        phase: 'mvp',
+        domain: 'saas',
+        taskType: 'build',
+        riskProfile: 'prototype',
+        customKeywords: [],
+        analyzerMode: 'manual',
+        analyzerSources: ['user-form'],
+        confidenceFactor: 1,
+        analyzedAt: new Date().toISOString(),
+        executionTarget: 'client_workspace',
+        hasGitNexusIndex: false,
+        gitNexusClusters: [],
+      },
+      recommendedPacks: [],
+      blockedPacks: [],
+      policyDecision: 'allow',
+      policyReasons: [],
+    }
+
+    const activation = await service.recordActivation({
+      status: 'active',
+      plan,
+    })
+
+    await service.recordFeedback('safe-pack', true, 'helpful')
+    const stored = await service.getActivation(activation.id)
+
+    expect(stored?.id).toBe(activation.id)
+    expect(await service.listActivations()).toHaveLength(1)
+  })
+})
