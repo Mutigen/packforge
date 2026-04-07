@@ -60,33 +60,33 @@
     "description": "Specialization for shipping end-to-end product slices across frontend, backend, and integration boundaries."
   },
   {
-    "id": "gitnexus-exploring",
+    "id": "packforge-exploring",
     "version": "1.0.0",
     "category": "engineering",
     "riskLevel": "low",
     "maturity": "stable",
     "approvalState": "approved",
-    "filePath": "packs/engineering/gitnexus-exploring.yaml",
+    "filePath": "packs/engineering/packforge-exploring.yaml",
     "description": "Erkundet Architektur, Execution Flows und zentrale Symbole mit GitNexus"
   },
   {
-    "id": "gitnexus-refactoring",
+    "id": "packforge-refactoring",
     "version": "1.0.0",
     "category": "engineering",
     "riskLevel": "medium",
     "maturity": "stable",
     "approvalState": "approved",
-    "filePath": "packs/engineering/gitnexus-refactoring.yaml",
+    "filePath": "packs/engineering/packforge-refactoring.yaml",
     "description": "Führt sichere Refactorings mit Rename-Preview, Impact-Check und Scope-Kontrolle aus"
   },
   {
-    "id": "gitnexus-cli",
+    "id": "packforge-cli",
     "version": "1.0.0",
     "category": "ops",
     "riskLevel": "low",
     "maturity": "stable",
     "approvalState": "approved",
-    "filePath": "packs/ops/gitnexus-cli.yaml",
+    "filePath": "packs/ops/packforge-cli.yaml",
     "description": "Nutzt GitNexus CLI sauber für Analyse, Status, Clean und Wiki-Generierung"
   },
   {
@@ -120,33 +120,33 @@
     "description": "Führt mehrschichtige Sicherheitsanalyse mit Remediation-Loop und ASVS-Fokus aus"
   },
   {
-    "id": "gitnexus-debugging",
+    "id": "packforge-debugging",
     "version": "1.0.0",
     "category": "quality",
     "riskLevel": "medium",
     "maturity": "stable",
     "approvalState": "approved",
-    "filePath": "packs/quality/gitnexus-debugging.yaml",
+    "filePath": "packs/quality/packforge-debugging.yaml",
     "description": "Lokalisiert Fehlerursachen über Query, Context und Prozess-Traces"
   },
   {
-    "id": "gitnexus-impact-analysis",
+    "id": "packforge-impact-analysis",
     "version": "1.0.0",
     "category": "quality",
     "riskLevel": "high",
     "maturity": "stable",
     "approvalState": "approved",
-    "filePath": "packs/quality/gitnexus-impact-analysis.yaml",
+    "filePath": "packs/quality/packforge-impact-analysis.yaml",
     "description": "Bewertet Blast Radius, Risiko und betroffene Prozesse vor Änderungen"
   },
   {
-    "id": "gitnexus-pr-review",
+    "id": "packforge-pr-review",
     "version": "1.0.0",
     "category": "quality",
     "riskLevel": "medium",
     "maturity": "stable",
     "approvalState": "approved",
-    "filePath": "packs/quality/gitnexus-pr-review.yaml",
+    "filePath": "packs/quality/packforge-pr-review.yaml",
     "description": "Bewertet Pull Requests mit Fokus auf Risiken, Regressionen und fehlende Tests"
   },
   {
@@ -168,5 +168,15 @@
     "approvalState": "approved",
     "filePath": "packs/quality/test-strategist.yaml",
     "description": "Specialization for coverage planning, risk-based test design, and practical validation strategy across service boundaries."
+  },
+  {
+    "id": "packforge-memory",
+    "version": "1.0.0",
+    "category": "quality",
+    "riskLevel": "low",
+    "maturity": "experimental",
+    "approvalState": "approved",
+    "filePath": "packs/quality/packforge-memory.yaml",
+    "description": "Enriches agent context with persistent memory from MemPalace — search past decisions, query the knowledge graph, and log new insights."
   }
 ]

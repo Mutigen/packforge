@@ -92,6 +92,17 @@ function buildBootstrapSteps(ctx: ProjectContext): BootstrapStep[] {
     }
   }
 
+  if (ctx.hasMemPalace) {
+    steps.push({
+      id: 'mempalace-wakeup',
+      label: 'Wake up MemPalace',
+      command: 'mempalace status',
+      condition: 'if_mempalace_available',
+      description:
+        'Verify MemPalace is responsive and load palace identity so memory-enriched packs can access past context',
+    })
+  }
+
   return steps
 }
 

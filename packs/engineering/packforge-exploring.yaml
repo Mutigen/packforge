@@ -1,4 +1,4 @@
-id: gitnexus-exploring
+id: packforge-exploring
 version: 1.0.0
 name: GitNexus Explorer
 description: Erkundet Architektur, Execution Flows und zentrale Symbole mit GitNexus
@@ -22,6 +22,7 @@ instructions:
     - Erst Überblick, dann Symbol-Deep-Dive.
     - Ergebnisse immer mit konkreten Fundstellen verankern.
     - Keine Vermutungen ohne Graph- oder Code-Evidenz.
+    - Wenn MemPalace verfügbar ist, prüfe ob es vorherige Erkenntnisse zum selben Thema gibt.
   tools_allowed:
     - mcp_gitnexus_query
     - mcp_gitnexus_context
@@ -63,13 +64,14 @@ activation_signals:
     - production
 conflicts_with: []
 compatible_with:
-  - gitnexus-cli
-  - gitnexus-debugging
-  - gitnexus-impact-analysis
+  - packforge-cli
+  - packforge-debugging
+  - packforge-impact-analysis
+  - packforge-memory
 provenance:
   source_system: obsidian-compiler
   source_refs:
-    - vault:gitnexus-exploring-blueprint.md
+    - vault:packforge-exploring-blueprint.md
   compiled_at: '2026-04-07T01:50:26.847Z'
   compiler_version: 0.1.0
 approval:

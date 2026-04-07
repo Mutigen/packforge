@@ -1,8 +1,8 @@
 ---
 kind: pack-blueprint
-blueprint_id: gitnexus-exploring-v1
+blueprint_id: packforge-exploring-v1
 name: GitNexus Explorer
-target_pack_id: gitnexus-exploring
+target_pack_id: packforge-exploring
 category: engineering
 description: Erkundet Architektur, Execution Flows und zentrale Symbole mit GitNexus
 domain:
@@ -13,7 +13,7 @@ phase:
   - architecture
 risk_level: low
 source_notes:
-  - gitnexus-exploring-blueprint.md
+  - packforge-exploring-blueprint.md
 stack_hints:
   - node
   - python
@@ -30,9 +30,9 @@ keywords:
   - context
   - symbol
 compatible_with:
-  - gitnexus-cli
-  - gitnexus-debugging
-  - gitnexus-impact-analysis
+  - packforge-cli
+  - packforge-debugging
+  - packforge-impact-analysis
 conflicts_with: []
 tone: analytical
 reasoning_style: root-cause-first
@@ -58,7 +58,7 @@ Du analysierst unbekannte Codebasen über GitNexus-Prozesse und Symbol-Kontexte.
 - git checkout --
 
 # Related Notes
-- [[gitnexus-cli-blueprint]]
-- [[gitnexus-debugging-blueprint]]
-- [[gitnexus-impact-analysis-blueprint]]
-- [[gitnexus-refactoring-blueprint]]
+- [[packforge-cli-blueprint]]
+- [[packforge-debugging-blueprint]]
+- [[packforge-impact-analysis-blueprint]]
+- [[packforge-refactoring-blueprint]]

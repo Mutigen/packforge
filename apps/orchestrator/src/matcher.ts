@@ -1,7 +1,8 @@
 import type { InstructionPack, ProjectContext } from '@hub/shared-types'
 
 const GITNEXUS_TOOL_PREFIX = 'mcp_gitnexus_'
-const GITNEXUS_CLI_PACK_ID = 'gitnexus-cli'
+const GITNEXUS_CLI_PACK_ID = 'packforge-cli'
+const MEMPALACE_TOOL_PREFIX = 'mempalace_'
 
 export function scorePack(pack: InstructionPack, ctx: ProjectContext): number {
   let score = 0
@@ -28,8 +29,16 @@ export function scorePack(pack: InstructionPack, ctx: ProjectContext): number {
   }
 
   if (!ctx.hasGitNexusIndex && ctx.repositoryPath && pack.id === GITNEXUS_CLI_PACK_ID) {
-    // Repo exists but has no GitNexus index → bootstrap: require gitnexus-cli
+    // Repo exists but has no GitNexus index → bootstrap: require packforge-cli
     score += 40
+  }
+
+  // MemPalace-aware scoring
+  const usesMemPalaceTools = pack.instructions.tools_allowed.some((t) => t.startsWith(MEMPALACE_TOOL_PREFIX))
+
+  if (ctx.hasMemPalace && usesMemPalaceTools) {
+    // User has a MemPalace installation → boost packs that use MemPalace tools
+    score += 15
   }
 
   return Math.min(score, 100)

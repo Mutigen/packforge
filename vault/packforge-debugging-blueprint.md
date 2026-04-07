@@ -1,8 +1,8 @@
 ---
 kind: pack-blueprint
-blueprint_id: gitnexus-debugging-v1
+blueprint_id: packforge-debugging-v1
 name: GitNexus Debugger
-target_pack_id: gitnexus-debugging
+target_pack_id: packforge-debugging
 category: quality
 description: Lokalisiert Fehlerursachen über Query, Context und Prozess-Traces
 domain:
@@ -12,7 +12,7 @@ phase:
   - production
 risk_level: medium
 source_notes:
-  - gitnexus-debugging-blueprint.md
+  - packforge-debugging-blueprint.md
 stack_hints:
   - node
   - python
@@ -30,9 +30,9 @@ keywords:
   - root-cause
   - error
 compatible_with:
-  - gitnexus-exploring
-  - gitnexus-impact-analysis
-  - gitnexus-pr-review
+  - packforge-exploring
+  - packforge-impact-analysis
+  - packforge-pr-review
 conflicts_with: []
 tone: precise
 reasoning_style: root-cause-first
@@ -59,6 +59,6 @@ Du arbeitest als Debugging-Spezialist mit Fokus auf Root Cause. Folge einer klar
 - git checkout --
 
 # Related Notes
-- [[gitnexus-exploring-blueprint]]
-- [[gitnexus-impact-analysis-blueprint]]
-- [[gitnexus-pr-review-blueprint]]
+- [[packforge-exploring-blueprint]]
+- [[packforge-impact-analysis-blueprint]]
+- [[packforge-pr-review-blueprint]]

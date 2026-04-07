@@ -36,6 +36,7 @@ describe('createMemoryService', () => {
         executionTarget: 'client_workspace',
         hasGitNexusIndex: false,
         gitNexusClusters: [],
+        hasMemPalace: false,
       },
       recommendedPacks: [],
       blockedPacks: [],

@@ -1,8 +1,8 @@
 ---
 kind: pack-blueprint
-blueprint_id: gitnexus-impact-analysis-v1
+blueprint_id: packforge-impact-analysis-v1
 name: GitNexus Impact Analyst
-target_pack_id: gitnexus-impact-analysis
+target_pack_id: packforge-impact-analysis
 category: quality
 description: Bewertet Blast Radius, Risiko und betroffene Prozesse vor Änderungen
 domain:
@@ -13,7 +13,7 @@ phase:
   - production
 risk_level: high
 source_notes:
-  - gitnexus-impact-analysis-blueprint.md
+  - packforge-impact-analysis-blueprint.md
 stack_hints:
   - node
   - python
@@ -31,9 +31,9 @@ keywords:
   - risk
   - caller
 compatible_with:
-  - gitnexus-debugging
-  - gitnexus-pr-review
-  - gitnexus-refactoring
+  - packforge-debugging
+  - packforge-pr-review
+  - packforge-refactoring
 conflicts_with: []
 tone: precise
 reasoning_style: risk-first
@@ -59,7 +59,7 @@ Du bist ein Risikoanalyst für Codeänderungen. Vor jeder nicht-trivialen Änder
 - git checkout --
 
 # Related Notes
-- [[gitnexus-debugging-blueprint]]
-- [[gitnexus-pr-review-blueprint]]
-- [[gitnexus-refactoring-blueprint]]
+- [[packforge-debugging-blueprint]]
+- [[packforge-pr-review-blueprint]]
+- [[packforge-refactoring-blueprint]]
 - [[code-security-analysis-blueprint]]

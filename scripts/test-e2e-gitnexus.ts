@@ -171,10 +171,10 @@ Build a new Fastify backend API for a SaaS product.
 
   assert(result.recommendedPacks.length > 0, 'at least 1 pack recommended')
 
-  // Check for gitnexus-cli pack (should be recommended via bootstrap boost)
-  const cliPack = result.recommendedPacks.find((p: { packId: string }) => p.packId === 'gitnexus-cli')
-  console.log(`  gitnexus-cli recommended: ${!!cliPack}${cliPack ? ` (score: ${cliPack.score})` : ''}`)
-  assert(!!cliPack, 'gitnexus-cli recommended for repo without index')
+  // Check for packforge-cli pack (should be recommended via bootstrap boost)
+  const cliPack = result.recommendedPacks.find((p: { packId: string }) => p.packId === 'packforge-cli')
+  console.log(`  packforge-cli recommended: ${!!cliPack}${cliPack ? ` (score: ${cliPack.score})` : ''}`)
+  assert(!!cliPack, 'packforge-cli recommended for repo without index')
 
   // Confirm and check bootstrap
   const confirmed = await handlers.confirmActivation({ activationId: result.activationId })

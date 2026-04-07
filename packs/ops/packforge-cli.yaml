@@ -1,4 +1,4 @@
-id: gitnexus-cli
+id: packforge-cli
 version: 1.0.0
 name: GitNexus CLI Operator
 description: Nutzt GitNexus CLI sauber für Analyse, Status, Clean und Wiki-Generierung
@@ -20,6 +20,7 @@ instructions:
     - Nur echte CLI-Ausgaben als Grundlage verwenden.
     - Vor Analyse den Repo-Kontext prüfen.
     - Index-Staleness immer explizit erwähnen.
+    - Wenn MemPalace verfügbar ist, prüfe ob es vorherige Analyse-Ergebnisse zum selben Repo gibt.
   tools_allowed:
     - run_in_terminal
     - read_file
@@ -68,13 +69,14 @@ activation_signals:
     - production
 conflicts_with: []
 compatible_with:
-  - gitnexus-exploring
-  - gitnexus-debugging
-  - gitnexus-impact-analysis
+  - packforge-exploring
+  - packforge-debugging
+  - packforge-impact-analysis
+  - packforge-memory
 provenance:
   source_system: obsidian-compiler
   source_refs:
-    - vault:gitnexus-cli-blueprint.md
+    - vault:packforge-cli-blueprint.md
   compiled_at: '2026-04-07T01:50:26.847Z'
   compiler_version: 0.1.0
 approval:

@@ -113,6 +113,7 @@ execution_policy:
       executionTarget: 'client_workspace',
       hasGitNexusIndex: false,
       gitNexusClusters: [],
+      hasMemPalace: false,
     })
 
     expect(result.recommendations).toHaveLength(1)

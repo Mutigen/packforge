@@ -1,4 +1,5 @@
 import { readFile, readdir } from 'node:fs/promises'
+import { homedir } from 'node:os'
 import path from 'node:path'
 import yaml from 'js-yaml'
 import {
@@ -99,6 +100,32 @@ async function readGitNexusGraphSummary(repositoryPath: string): Promise<GitNexu
     languages,
     hasProcesses: (meta.stats?.processes ?? 0) > 0,
   }
+}
+
+type MemPalaceSummary = {
+  identity: string | null
+  wingCount: number
+}
+
+async function readMemPalaceSummary(homedir: string): Promise<MemPalaceSummary | null> {
+  const palacePath = path.join(homedir, '.mempalace', 'palace')
+  try {
+    await readdir(palacePath)
+  } catch {
+    return null
+  }
+
+  const identity = await readTextIfExists(path.join(homedir, '.mempalace', 'identity.txt'))
+
+  let wingCount = 0
+  try {
+    const entries = await readdir(palacePath, { withFileTypes: true })
+    wingCount = entries.filter((e) => e.isDirectory() && e.name.startsWith('wing_')).length
+  } catch {
+    // ignore
+  }
+
+  return { identity: identity?.trim() ?? null, wingCount }
 }
 
 async function readTextIfExists(filePath: string): Promise<string | null> {
@@ -303,6 +330,14 @@ export function createContextAnalyzer() {
       analyzerSources.push('gitnexus-graph')
     }
 
+    const mempalace = await readMemPalaceSummary(homedir())
+    if (mempalace) {
+      analyzerSources.push('mempalace-palace')
+      if (mempalace.identity) {
+        analyzerSources.push('mempalace-identity')
+      }
+    }
+
     const description = [parsed.description, readme ?? ''].filter(Boolean).join('\n').trim()
     const stack = await inferStackSignals(repositoryPath, analyzerSources)
     const domain = parsed.domain ?? inferDomain(description, fileList)
@@ -332,6 +367,9 @@ export function createContextAnalyzer() {
       hasGitNexusIndex: Boolean(meta),
       gitNexusSymbolCount: graphSummary?.symbolCount,
       gitNexusClusters: graphSummary?.clusterLabels ?? [],
+      hasMemPalace: Boolean(mempalace),
+      ...(mempalace?.identity ? { mempalaceIdentity: mempalace.identity } : {}),
+      ...(mempalace ? { mempalaceWingCount: mempalace.wingCount } : {}),
     })
   }
 

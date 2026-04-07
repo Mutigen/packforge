@@ -80,6 +80,7 @@ describe('createHubApiApp', () => {
           executionTarget: 'client_workspace',
           hasGitNexusIndex: false,
           gitNexusClusters: [],
+          hasMemPalace: false,
         },
       },
     })
@@ -104,6 +105,7 @@ describe('createHubApiApp', () => {
           executionTarget: 'client_workspace',
           hasGitNexusIndex: false,
           gitNexusClusters: [],
+          hasMemPalace: false,
         },
         autoApprove: true,
       },

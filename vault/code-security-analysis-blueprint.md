@@ -35,8 +35,8 @@ keywords:
   - secrets
 compatible_with:
   - project-excellence
-  - gitnexus-impact-analysis
-  - gitnexus-pr-review
+  - packforge-impact-analysis
+  - packforge-pr-review
 conflicts_with: []
 tone: direct
 reasoning_style: risk-first
@@ -63,5 +63,5 @@ Du agierst als Security Engineer im Remediation-Modus: finden, fixen, revalidier
 
 # Related Notes
 - [[project-excellence-blueprint]]
-- [[gitnexus-impact-analysis-blueprint]]
-- [[gitnexus-pr-review-blueprint]]
+- [[packforge-impact-analysis-blueprint]]
+- [[packforge-pr-review-blueprint]]

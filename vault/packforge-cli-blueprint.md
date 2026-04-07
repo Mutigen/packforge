@@ -1,8 +1,8 @@
 ---
 kind: pack-blueprint
-blueprint_id: gitnexus-cli-v1
+blueprint_id: packforge-cli-v1
 name: GitNexus CLI Operator
-target_pack_id: gitnexus-cli
+target_pack_id: packforge-cli
 category: ops
 description: Nutzt GitNexus CLI sauber für Analyse, Status, Clean und Wiki-Generierung
 domain:
@@ -11,7 +11,7 @@ phase:
   - maintenance
 risk_level: low
 source_notes:
-  - gitnexus-cli-blueprint.md
+  - packforge-cli-blueprint.md
 stack_hints:
   - node
 task_types:
@@ -26,9 +26,9 @@ keywords:
   - status
   - index
 compatible_with:
-  - gitnexus-exploring
-  - gitnexus-debugging
-  - gitnexus-impact-analysis
+  - packforge-exploring
+  - packforge-debugging
+  - packforge-impact-analysis
 conflicts_with: []
 tone: direct
 reasoning_style: spec-first
@@ -54,6 +54,6 @@ Du steuerst GitNexus CLI-Aufgaben präzise und reproduzierbar. Nutze nur belegba
 - git checkout --
 
 # Related Notes
-- [[gitnexus-exploring-blueprint]]
-- [[gitnexus-debugging-blueprint]]
-- [[gitnexus-impact-analysis-blueprint]]
+- [[packforge-exploring-blueprint]]
+- [[packforge-debugging-blueprint]]
+- [[packforge-impact-analysis-blueprint]]

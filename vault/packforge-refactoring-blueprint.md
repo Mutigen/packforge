@@ -1,8 +1,8 @@
 ---
 kind: pack-blueprint
-blueprint_id: gitnexus-refactoring-v1
+blueprint_id: packforge-refactoring-v1
 name: GitNexus Refactoring Specialist
-target_pack_id: gitnexus-refactoring
+target_pack_id: packforge-refactoring
 category: engineering
 description: Führt sichere Refactorings mit Rename-Preview, Impact-Check und Scope-Kontrolle aus
 domain:
@@ -12,7 +12,7 @@ phase:
   - maintenance
 risk_level: medium
 source_notes:
-  - gitnexus-refactoring-blueprint.md
+  - packforge-refactoring-blueprint.md
 stack_hints:
   - node
   - python
@@ -29,9 +29,9 @@ keywords:
   - split
   - migrate
 compatible_with:
-  - gitnexus-impact-analysis
-  - gitnexus-pr-review
-  - gitnexus-exploring
+  - packforge-impact-analysis
+  - packforge-pr-review
+  - packforge-exploring
 conflicts_with: []
 tone: pragmatic
 reasoning_style: trade-off-first
@@ -58,6 +58,6 @@ Du führst Refactorings mit maximaler Sicherheit durch. Nutze graph-basierte Ren
 - git checkout --
 
 # Related Notes
-- [[gitnexus-impact-analysis-blueprint]]
-- [[gitnexus-pr-review-blueprint]]
-- [[gitnexus-exploring-blueprint]]
+- [[packforge-impact-analysis-blueprint]]
+- [[packforge-pr-review-blueprint]]
+- [[packforge-exploring-blueprint]]

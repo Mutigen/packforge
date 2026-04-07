@@ -1,4 +1,4 @@
-id: gitnexus-refactoring
+id: packforge-refactoring
 version: 1.0.0
 name: GitNexus Refactoring Specialist
 description: Führt sichere Refactorings mit Rename-Preview, Impact-Check und Scope-Kontrolle aus
@@ -21,6 +21,7 @@ instructions:
     - Vor Refactoring immer Upstream-Impact prüfen.
     - Keine globale Text-Umbenennung für Symbole.
     - Nach Refactoring Change-Scope validieren.
+    - Wenn MemPalace verfügbar ist, prüfe ob es vorherige Entscheidungen zum selben Refactoring gibt.
   tools_allowed:
     - mcp_gitnexus_rename
     - mcp_gitnexus_impact
@@ -61,13 +62,14 @@ activation_signals:
     - production
 conflicts_with: []
 compatible_with:
-  - gitnexus-impact-analysis
-  - gitnexus-pr-review
-  - gitnexus-exploring
+  - packforge-impact-analysis
+  - packforge-pr-review
+  - packforge-exploring
+  - packforge-memory
 provenance:
   source_system: obsidian-compiler
   source_refs:
-    - vault:gitnexus-refactoring-blueprint.md
+    - vault:packforge-refactoring-blueprint.md
   compiled_at: '2026-04-07T01:50:26.849Z'
   compiler_version: 0.1.0
 approval:

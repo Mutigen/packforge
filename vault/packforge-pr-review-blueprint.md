@@ -1,8 +1,8 @@
 ---
 kind: pack-blueprint
-blueprint_id: gitnexus-pr-review-v1
+blueprint_id: packforge-pr-review-v1
 name: GitNexus PR Reviewer
-target_pack_id: gitnexus-pr-review
+target_pack_id: packforge-pr-review
 category: quality
 description: Bewertet Pull Requests mit Fokus auf Risiken, Regressionen und fehlende Tests
 domain:
@@ -12,7 +12,7 @@ phase:
   - production
 risk_level: medium
 source_notes:
-  - gitnexus-pr-review-blueprint.md
+  - packforge-pr-review-blueprint.md
 stack_hints:
   - node
   - docker
@@ -28,9 +28,9 @@ keywords:
   - coverage
   - merge-risk
 compatible_with:
-  - gitnexus-impact-analysis
-  - gitnexus-debugging
-  - gitnexus-refactoring
+  - packforge-impact-analysis
+  - packforge-debugging
+  - packforge-refactoring
 conflicts_with: []
 tone: direct
 reasoning_style: risk-first
@@ -57,6 +57,6 @@ Du reviewst PRs mit Risiko-Priorisierung. Fokussiere dich auf potenzielle Breaka
 - git checkout --
 
 # Related Notes
-- [[gitnexus-impact-analysis-blueprint]]
-- [[gitnexus-debugging-blueprint]]
-- [[gitnexus-refactoring-blueprint]]
+- [[packforge-impact-analysis-blueprint]]
+- [[packforge-debugging-blueprint]]
+- [[packforge-refactoring-blueprint]]

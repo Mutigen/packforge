@@ -1,0 +1,115 @@
+id: packforge-memory
+version: 1.0.0
+name: MemPalace Memory Layer
+description: Enriches agent context with persistent memory from MemPalace — search past decisions, query the knowledge graph, and log new insights.
+category: quality
+domain:
+  - developer-tools
+phase:
+  - greenfield
+  - growth
+  - maintenance
+  - production
+risk_level: low
+personality:
+  tone: concise
+  reasoning_style: context-first
+  output_format: inline
+instructions:
+  system_prompt: >-
+    Du hast Zugriff auf MemPalace, ein persistentes Gedächtnis-System. Bevor du Architektur-Entscheidungen triffst
+    oder komplexe Probleme löst, prüfe ob es bereits gespeicherte Erkenntnisse zum selben Thema gibt.
+    Nutze mempalace_search für semantische Suche, mempalace_kg_query für strukturierte Zusammenhänge,
+    und mempalace_diary_write um wichtige neue Erkenntnisse festzuhalten.
+  constraints:
+    - Vor Architektur-Entscheidungen immer mempalace_search ausführen.
+    - Nur verifizierte Fakten in MemPalace schreiben — keine Vermutungen.
+    - mempalace_diary_write nur für signifikante Erkenntnisse nutzen, nicht für triviale Notizen.
+    - Palace-Struktur (Wings/Rooms) nicht verändern — nur lesen und Drawer hinzufügen.
+  tools_allowed:
+    - mempalace_search
+    - mempalace_status
+    - mempalace_kg_query
+    - mempalace_add_drawer
+    - mempalace_diary_write
+  tools_blocked:
+    - mempalace_create_wing
+    - mempalace_create_room
+    - mempalace_create_hall
+    - mempalace_create_tunnel
+    - mempalace_create_closet
+    - mempalace_delete_wing
+    - mempalace_delete_room
+    - mempalace_navigate_to
+    - mempalace_move_drawer
+    - mempalace_rename_wing
+    - mempalace_rename_room
+    - mempalace_compact_wing
+    - mempalace_rebuild_index
+    - mempalace_export_palace
+    - mempalace_import_palace
+activation_signals:
+  keywords:
+    - memory
+    - remember
+    - previous decision
+    - past context
+    - knowledge graph
+    - earlier
+    - history
+    - recall
+  stack_hints:
+    - node
+    - python
+    - typescript
+    - react
+    - next
+  task_types:
+    - debug
+    - analyse
+    - build
+    - refactor
+    - review
+  domains:
+    - developer-tools
+    - saas
+    - fintech
+    - health
+    - ecommerce
+    - marketplace
+    - content
+    - internal-tool
+    - open-source
+  phases:
+    - greenfield
+    - growth
+    - maintenance
+    - production
+  risk_profiles:
+    - prototype
+    - production
+    - regulated
+conflicts_with: []
+compatible_with:
+  - packforge-debugging
+  - packforge-exploring
+  - packforge-impact-analysis
+  - packforge-pr-review
+  - packforge-refactoring
+  - packforge-cli
+  - code-security-analysis
+provenance:
+  source_system: obsidian-compiler
+  source_refs:
+    - vault:packforge-memory-blueprint.md
+  compiled_at: '2026-04-07T02:15:00.000Z'
+  compiler_version: 0.1.0
+approval:
+  state: approved
+maturity:
+  level: experimental
+execution_policy:
+  allowed_targets:
+    - client_workspace
+    - sandbox_container
+  requires_human_confirm: false

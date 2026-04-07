@@ -18,6 +18,7 @@ const baseContext: ProjectContext = {
   executionTarget: 'client_workspace',
   hasGitNexusIndex: false,
   gitNexusClusters: [],
+  hasMemPalace: false,
 }
 
 const lowRiskPack: InstructionPack = {
