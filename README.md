@@ -77,19 +77,69 @@ npm test
 
 ### MCP Configuration
 
-Add to your editor's MCP config (e.g. `.cursor/mcp.json` or Claude Desktop):
+> **Prerequisite:** Run `npx turbo build` first — the gateway serves from `apps/mcp-gateway/dist/index.js`.
+
+The gateway defaults its packs directory to `<cwd>/packs`, so `cwd` **must** point to the monorepo root.
+
+<details>
+<summary><strong>VS Code (global — all workspaces)</strong></summary>
+
+Edit `~/.config/Code/User/mcp.json` (Linux) or `~/Library/Application Support/Code/User/mcp.json` (macOS):
+
+```json
+{
+  "servers": {
+    "packforge": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/absolute/path/to/packforge/apps/mcp-gateway/dist/index.js"],
+      "cwd": "/absolute/path/to/packforge"
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>VS Code (per-project)</strong></summary>
+
+Create `.vscode/mcp.json` in any project:
+
+```json
+{
+  "servers": {
+    "packforge": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/absolute/path/to/packforge/apps/mcp-gateway/dist/index.js"],
+      "cwd": "/absolute/path/to/packforge"
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>Claude Desktop / Cursor</strong></summary>
 
 ```json
 {
   "mcpServers": {
     "packforge": {
       "command": "node",
-      "args": ["apps/mcp-gateway/dist/index.js"],
+      "args": ["/absolute/path/to/packforge/apps/mcp-gateway/dist/index.js"],
+      "cwd": "/absolute/path/to/packforge",
       "transportType": "stdio"
     }
   }
 }
 ```
+
+</details>
+
+After adding the config, **reload your editor** (VS Code: `Cmd+Shift+P` → "Reload Window"). You should see 8 packforge tools available.
 
 ## Usage
 
