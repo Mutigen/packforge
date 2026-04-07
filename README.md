@@ -99,6 +99,16 @@ Once connected via MCP, use two tools:
 | Product | 2 | Product Strategist, Growth Analyst |
 | Documentation | 2 | Technical Writer, API Documenter |
 
+## Integrations
+
+### GitNexus
+
+packforge has deep [GitNexus](https://github.com/nicobailon/gitnexus) integration. When a project has a `.gitnexus/` index, the context analyzer reads the knowledge graph (symbol count, clusters, processes) for richer pack matching. Six dedicated GitNexus packs cover exploring, debugging, impact analysis, refactoring, PR review, and CLI operations — each with the correct MCP tool permissions pre-configured.
+
+### Obsidian (Pack Authoring)
+
+Instruction packs can be authored as Obsidian vault blueprints in `vault/`. Each blueprint is a Markdown file with structured sections (personality, constraints, tools, signals) that compiles to a validated YAML pack. This lets you design packs visually in Obsidian and compile them into the pack registry.
+
 ## Project Structure
 
 ```
@@ -109,6 +119,7 @@ apps/
 packages/
   shared-types/       # Zod schemas shared across apps
 packs/                # 17 YAML instruction packs
+vault/                # Obsidian blueprints for pack authoring
 scripts/              # Validation and export utilities
 ```
 
