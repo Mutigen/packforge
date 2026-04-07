@@ -53,9 +53,12 @@ export const ProjectContextSchema = z.object({
   hasGitNexusIndex: z.boolean().default(false),
   gitNexusSymbolCount: z.number().int().min(0).optional(),
   gitNexusClusters: z.array(z.string().min(1)).default([]),
+  gitNexusProcessLabels: z.array(z.string().min(1)).default([]),
   hasMemPalace: z.boolean().default(false),
   mempalaceIdentity: z.string().optional(),
   mempalaceWingCount: z.number().int().min(0).optional(),
+  hasObsidianVault: z.boolean().default(false),
+  obsidianVaults: z.array(z.string().min(1)).default([]),
 })
 
 export const AnalyzeProjectInputSchema = z.object({

@@ -72,7 +72,10 @@ execution_policy:
         executionTarget: 'client_workspace',
         hasGitNexusIndex: false,
         gitNexusClusters: [],
+        gitNexusProcessLabels: [],
         hasMemPalace: false,
+        hasObsidianVault: false,
+        obsidianVaults: [],
       },
     })
 

@@ -18,7 +18,10 @@ const baseContext: ProjectContext = {
   executionTarget: 'client_workspace',
   hasGitNexusIndex: false,
   gitNexusClusters: [],
+  gitNexusProcessLabels: [],
   hasMemPalace: false,
+  hasObsidianVault: false,
+  obsidianVaults: [],
 }
 
 const lowRiskPack: InstructionPack = {

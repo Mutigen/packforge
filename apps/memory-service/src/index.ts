@@ -19,14 +19,17 @@ type MemoryState = {
     note?: string
     createdAt: string
   }>
+  declinedTools: string[]
 }
 
 async function ensureState(filePath: string): Promise<MemoryState> {
   try {
     const source = await readFile(filePath, 'utf8')
-    return JSON.parse(source) as MemoryState
+    const parsed = JSON.parse(source) as MemoryState
+    if (!parsed.declinedTools) parsed.declinedTools = []
+    return parsed
   } catch {
-    return { activations: [], feedback: [] }
+    return { activations: [], feedback: [], declinedTools: [] }
   }
 }
 
@@ -78,6 +81,18 @@ export function createMemoryService(options?: { filePath?: string }) {
     return activation
   }
 
+  async function updateActivationHandoff(
+    id: string,
+    handoff: RuntimeHandoffContract,
+  ): Promise<StoredActivation | null> {
+    const state = await ensureState(filePath)
+    const activation = state.activations.find((a) => a.id === id)
+    if (!activation) return null
+    activation.handoff = handoff
+    await persistState(filePath, state)
+    return activation
+  }
+
   async function listActivations(): Promise<StoredActivation[]> {
     const state = await ensureState(filePath)
     return state.activations
@@ -99,6 +114,19 @@ export function createMemoryService(options?: { filePath?: string }) {
     await persistState(filePath, state)
   }
 
+  async function declineToolSuggestion(tool: string): Promise<void> {
+    const state = await ensureState(filePath)
+    if (!state.declinedTools.includes(tool)) {
+      state.declinedTools.push(tool)
+      await persistState(filePath, state)
+    }
+  }
+
+  async function getDeclinedTools(): Promise<string[]> {
+    const state = await ensureState(filePath)
+    return state.declinedTools
+  }
+
   return {
     service: 'memory-service',
     status: 'ready',
@@ -106,8 +134,11 @@ export function createMemoryService(options?: { filePath?: string }) {
     recordActivation,
     getActivation,
     updateActivationStatus,
+    updateActivationHandoff,
     listActivations,
     recordFeedback,
+    declineToolSuggestion,
+    getDeclinedTools,
   }
 }
 

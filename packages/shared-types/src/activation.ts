@@ -46,6 +46,23 @@ export const BootstrapStepSchema = z.object({
   description: z.string().min(1).optional(),
 })
 
+export const PendingPackSchema = z.object({
+  packId: z.string().min(1),
+  version: z.string().min(1),
+  reason: z.string().min(1),
+  requiredTool: z.enum(['gitnexus', 'mempalace']),
+  instruction: RuntimeInstructionSchema,
+})
+
+export const MissingToolSchema = z.object({
+  tool: z.enum(['gitnexus', 'mempalace', 'obsidian']),
+  label: z.string().min(1),
+  description: z.string().min(1),
+  installGuide: z.string().min(1),
+  benefits: z.array(z.string().min(1)).default([]),
+  impactedPacks: z.array(z.string().min(1)).default([]),
+})
+
 export const RuntimeHandoffContractSchema = z.object({
   contractVersion: z.literal('1.0.0'),
   activationId: z.string().min(1),
@@ -58,6 +75,8 @@ export const RuntimeHandoffContractSchema = z.object({
   }),
   bootstrap: z.array(BootstrapStepSchema).default([]),
   instructions: z.array(RuntimeInstructionSchema).min(1),
+  pendingPacks: z.array(PendingPackSchema).default([]),
+  missingTools: z.array(MissingToolSchema).default([]),
   policy: z.object({
     approvalRequired: z.boolean(),
     maxRiskLevel: z.enum(['low', 'medium', 'high']),
@@ -77,4 +96,6 @@ export type PolicyDecision = z.infer<typeof PolicyDecisionSchema>
 export type ActivationPlan = z.infer<typeof ActivationPlanSchema>
 export type RuntimeInstruction = z.infer<typeof RuntimeInstructionSchema>
 export type BootstrapStep = z.infer<typeof BootstrapStepSchema>
+export type PendingPack = z.infer<typeof PendingPackSchema>
+export type MissingTool = z.infer<typeof MissingToolSchema>
 export type RuntimeHandoffContract = z.infer<typeof RuntimeHandoffContractSchema>

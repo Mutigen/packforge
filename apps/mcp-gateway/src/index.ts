@@ -16,8 +16,11 @@ import {
   type AnalyzeProjectInput,
   type BootstrapStep,
   type InstructionPack,
+  type MissingTool,
+  type PendingPack,
   type ProjectContext,
   type RuntimeHandoffContract,
+  type RuntimeInstruction,
 } from '@hub/shared-types'
 
 function textResult(payload: unknown) {
@@ -106,13 +109,108 @@ function buildBootstrapSteps(ctx: ProjectContext): BootstrapStep[] {
   return steps
 }
 
+const GITNEXUS_TOOL_PREFIX = 'mcp_gitnexus_'
+const MEMPALACE_TOOL_PREFIX = 'mempalace_'
+
+function packToInstruction(pack: InstructionPack): RuntimeInstruction {
+  return {
+    packId: pack.id,
+    version: pack.version,
+    systemPrompt: pack.instructions.system_prompt,
+    constraints: pack.instructions.constraints,
+    toolsAllowed: pack.instructions.tools_allowed,
+    toolsBlocked: pack.instructions.tools_blocked,
+  }
+}
+
 function buildHandoffContract(
   activationId: string,
   plan: ActivationPlan,
   packs: InstructionPack[],
   evaluation: { approvalRequired: boolean; maxRiskLevel: 'low' | 'medium' | 'high' },
+  declinedTools: string[] = [],
 ): RuntimeHandoffContract {
   const bootstrap = buildBootstrapSteps(plan.context)
+  const ctx = plan.context
+
+  const activeInstructions: RuntimeInstruction[] = []
+  const pendingPacks: PendingPack[] = []
+
+  for (const pack of packs) {
+    const usesGitNexus = pack.instructions.tools_allowed.some((t) => t.startsWith(GITNEXUS_TOOL_PREFIX))
+    const usesMemPalace = pack.instructions.tools_allowed.some((t) => t.startsWith(MEMPALACE_TOOL_PREFIX))
+    const instruction = packToInstruction(pack)
+
+    if (usesGitNexus && !ctx.hasGitNexusIndex) {
+      pendingPacks.push({
+        packId: pack.id,
+        version: pack.version,
+        reason: 'Requires GitNexus index — run `npx gitnexus analyze` to enable',
+        requiredTool: 'gitnexus',
+        instruction,
+      })
+    } else if (usesMemPalace && !ctx.hasMemPalace) {
+      pendingPacks.push({
+        packId: pack.id,
+        version: pack.version,
+        reason: 'Requires MemPalace — install and configure to enable',
+        requiredTool: 'mempalace',
+        instruction,
+      })
+    } else {
+      activeInstructions.push(instruction)
+    }
+  }
+
+  const missingTools: MissingTool[] = []
+
+  if (!ctx.hasGitNexusIndex && ctx.repositoryPath && !declinedTools.includes('gitnexus')) {
+    missingTools.push({
+      tool: 'gitnexus',
+      label: 'GitNexus Code Intelligence',
+      description: 'Code intelligence graph for impact analysis, safe refactoring, and codebase exploration.',
+      installGuide: 'Run `npx gitnexus@latest analyze` in the project root to create the index.',
+      benefits: [
+        'Impact analysis before editing — know what breaks',
+        'Safe rename and refactoring across the call graph',
+        'Execution flow tracing and debugging',
+        'Codebase exploration via natural language queries',
+      ],
+      impactedPacks: pendingPacks.filter((p) => p.requiredTool === 'gitnexus').map((p) => p.packId),
+    })
+  }
+
+  if (!ctx.hasMemPalace && !declinedTools.includes('mempalace')) {
+    missingTools.push({
+      tool: 'mempalace',
+      label: 'MemPalace Memory Layer',
+      description: 'Persistent memory system that carries context, preferences, and learned patterns across sessions.',
+      installGuide:
+        'Install MemPalace from https://github.com/Mutigen/mempalace and run `mempalace init` to create your palace.',
+      benefits: [
+        'Persistent memory across conversations and projects',
+        'Automatic context loading from previous sessions',
+        'Personal identity and preference tracking',
+      ],
+      impactedPacks: pendingPacks.filter((p) => p.requiredTool === 'mempalace').map((p) => p.packId),
+    })
+  }
+
+  if (!ctx.hasObsidianVault && !declinedTools.includes('obsidian')) {
+    missingTools.push({
+      tool: 'obsidian',
+      label: 'Obsidian Knowledge Vault',
+      description: 'Markdown-based knowledge management connected to your project for documentation and notes.',
+      installGuide:
+        'Download Obsidian from https://obsidian.md and create a vault in your project directory, or open an existing vault.',
+      benefits: [
+        'Structured project documentation alongside code',
+        'Linked knowledge graph for project decisions and architecture',
+        'Markdown-first workflow compatible with version control',
+      ],
+      impactedPacks: [],
+    })
+  }
 
   return {
     contractVersion: '1.0.0',
@@ -123,14 +221,9 @@ function buildHandoffContract(
       rootPath: plan.context.repositoryPath,
     },
     bootstrap,
-    instructions: packs.map((pack) => ({
-      packId: pack.id,
-      version: pack.version,
-      systemPrompt: pack.instructions.system_prompt,
-      constraints: pack.instructions.constraints,
-      toolsAllowed: pack.instructions.tools_allowed,
-      toolsBlocked: pack.instructions.tools_blocked,
-    })),
+    instructions: activeInstructions,
+    pendingPacks,
+    missingTools,
     policy: {
       approvalRequired: evaluation.approvalRequired,
       maxRiskLevel: evaluation.maxRiskLevel,
@@ -183,7 +276,9 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
             : 'active'
 
       const activationId = randomUUID()
-      const handoff = status !== 'denied' ? buildHandoffContract(activationId, plan, packs, evaluation) : undefined
+      const declinedTools = await memoryService.getDeclinedTools()
+      const handoff =
+        status !== 'denied' ? buildHandoffContract(activationId, plan, packs, evaluation, declinedTools) : undefined
 
       return memoryService.recordActivation({ id: activationId, status, plan, ...(handoff ? { handoff } : {}) })
     },
@@ -218,7 +313,8 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
       const plan = policyService.applyPolicy(await orchestrator.buildActivationPlan(ctx), evaluation)
 
       const activationId = randomUUID()
-      const handoff = buildHandoffContract(activationId, plan, packs, evaluation)
+      const declinedTools = await memoryService.getDeclinedTools()
+      const handoff = buildHandoffContract(activationId, plan, packs, evaluation, declinedTools)
 
       const activation = await memoryService.recordActivation({
         id: activationId,
@@ -278,6 +374,56 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
         category: pack.category,
         riskLevel: pack.risk_level,
       }))
+    },
+    async reloadActivation(input: { activationId: string }) {
+      const activation = await memoryService.getActivation(input.activationId)
+      if (!activation) return { error: `Activation ${input.activationId} not found` }
+      if (!activation.handoff) return { error: 'Activation has no handoff contract' }
+
+      const handoff = activation.handoff
+      if (!handoff.pendingPacks || handoff.pendingPacks.length === 0) {
+        return { activationId: activation.id, status: 'no_pending_packs', promoted: [], stillPending: [], handoff }
+      }
+
+      const ctx = await contextAnalyzer.analyzeProjectContext(
+        AnalyzeProjectInputSchema.parse({
+          projectId: activation.plan.projectId,
+          repositoryPath: handoff.workspace.rootPath,
+        }),
+      )
+
+      const promoted: string[] = []
+      const stillPending: typeof handoff.pendingPacks = []
+
+      for (const pending of handoff.pendingPacks) {
+        const isReady =
+          (pending.requiredTool === 'gitnexus' && ctx.hasGitNexusIndex) ||
+          (pending.requiredTool === 'mempalace' && ctx.hasMemPalace)
+
+        if (isReady) {
+          handoff.instructions.push(pending.instruction)
+          promoted.push(pending.packId)
+        } else {
+          stillPending.push(pending)
+        }
+      }
+
+      handoff.pendingPacks = stillPending
+      await memoryService.updateActivationHandoff(input.activationId, handoff)
+
+      return {
+        activationId: activation.id,
+        promoted,
+        stillPending: stillPending.map((p) => ({ packId: p.packId, reason: p.reason })),
+        handoff,
+      }
+    },
+    async declineToolSuggestion(input: { tool: string }) {
+      await memoryService.declineToolSuggestion(input.tool)
+      return {
+        declined: input.tool,
+        message: `Tool suggestion for '${input.tool}' will no longer appear in handoff contracts.`,
+      }
     },
   }
 }
@@ -384,6 +530,30 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
       }),
     },
     async (input) => textResult(await handlers.confirmActivation(input)),
+  )
+
+  server.registerTool(
+    'reload_activation',
+    {
+      description:
+        'Re-evaluate a stored activation after external tools have been set up (e.g. GitNexus index created, MemPalace installed). Promotes pending packs to active when their required tools become available.',
+      inputSchema: z.object({
+        activationId: z.string().min(1).describe('The activationId of the activation to reload'),
+      }),
+    },
+    async (input) => textResult(await handlers.reloadActivation(input)),
+  )
+
+  server.registerTool(
+    'decline_tool_suggestion',
+    {
+      description:
+        'Decline a tool suggestion so it no longer appears in future handoff contracts. Use when the user explicitly does not want to install a recommended tool (e.g. GitNexus, MemPalace).',
+      inputSchema: z.object({
+        tool: z.string().min(1).describe("The tool identifier to decline, e.g. 'gitnexus', 'mempalace', 'obsidian'"),
+      }),
+    },
+    async (input) => textResult(await handlers.declineToolSuggestion(input)),
   )
 
   server.registerTool(

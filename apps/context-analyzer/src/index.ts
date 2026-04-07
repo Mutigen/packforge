@@ -1,6 +1,7 @@
 import { readFile, readdir } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import path from 'node:path'
+import { execFile } from 'node:child_process'
 import yaml from 'js-yaml'
 import {
   AnalyzeProjectInputSchema,
@@ -52,6 +53,7 @@ type GitNexusMeta = {
 type GitNexusGraphSummary = {
   symbolCount: number
   clusterLabels: string[]
+  processLabels: string[]
   languages: string[]
   hasProcesses: boolean
 }
@@ -84,19 +86,114 @@ function inferLanguagesFromFiles(files: string[]): string[] {
   return [...languages]
 }
 
-async function readGitNexusGraphSummary(repositoryPath: string): Promise<GitNexusGraphSummary | null> {
+function runGitNexusCypher(repoName: string, query: string, timeoutMs = 10_000): Promise<string> {
+  return new Promise((resolve, reject) => {
+    execFile(
+      'npx',
+      ['gitnexus', 'cypher', '-r', repoName, query],
+      { timeout: timeoutMs, maxBuffer: 1024 * 512 },
+      (error, stdout) => {
+        if (error) return reject(error)
+        resolve(stdout)
+      },
+    )
+  })
+}
+
+async function queryGitNexusGraphSubprocess(repoName: string): Promise<{
+  clusterLabels: string[]
+  processLabels: string[]
+  symbolCount: number
+} | null> {
+  try {
+    const [clusterResult, processResult, symbolResult] = await Promise.all([
+      runGitNexusCypher(repoName, 'MATCH (c:Community) RETURN c.label AS label').catch(() => null),
+      runGitNexusCypher(repoName, 'MATCH (p:Process) RETURN p.label AS label').catch(() => null),
+      runGitNexusCypher(repoName, 'MATCH (n) WHERE n:Function OR n:Method RETURN count(n) AS cnt').catch(() => null),
+    ])
+
+    const parseLabels = (raw: string | null): string[] => {
+      if (!raw) return []
+      try {
+        const parsed = JSON.parse(raw) as { markdown?: string }
+        if (!parsed.markdown) return []
+        return parsed.markdown
+          .split('\n')
+          .slice(2) // skip header + separator
+          .map((row) =>
+            row
+              .replace(/^\|\s*/, '')
+              .replace(/\s*\|$/, '')
+              .trim(),
+          )
+          .filter(Boolean)
+      } catch {
+        return []
+      }
+    }
+
+    const parseCount = (raw: string | null): number => {
+      if (!raw) return 0
+      try {
+        const parsed = JSON.parse(raw) as { markdown?: string }
+        if (!parsed.markdown) return 0
+        const lines = parsed.markdown.split('\n').slice(2)
+        const first = lines[0]
+          ?.replace(/^\|\s*/, '')
+          .replace(/\s*\|$/, '')
+          .trim()
+        return first ? parseInt(first, 10) || 0 : 0
+      } catch {
+        return 0
+      }
+    }
+
+    const clusterLabels = parseLabels(clusterResult)
+    const processLabels = parseLabels(processResult)
+    const symbolCount = parseCount(symbolResult)
+
+    if (clusterLabels.length === 0 && processLabels.length === 0 && symbolCount === 0) {
+      return null
+    }
+
+    return { clusterLabels, processLabels, symbolCount }
+  } catch {
+    return null
+  }
+}
+
+async function readGitNexusGraphSummary(
+  repositoryPath: string,
+  repoName?: string,
+): Promise<GitNexusGraphSummary | null> {
   const meta = await readJsonIfExists<GitNexusMeta>(path.join(repositoryPath, '.gitnexus', 'meta.json'))
   if (!meta) return null
 
   const files = await listRelativeFiles(repositoryPath).catch(() => [] as string[])
   const languages = inferLanguagesFromFiles(files)
 
+  // Try subprocess for richer graph data
+  const resolvedRepoName = repoName ?? path.basename(repositoryPath)
+  const subprocessData = await queryGitNexusGraphSubprocess(resolvedRepoName)
+
+  if (subprocessData) {
+    return {
+      symbolCount: subprocessData.symbolCount || (meta.stats?.nodes ?? 0),
+      clusterLabels: subprocessData.clusterLabels,
+      processLabels: subprocessData.processLabels,
+      languages,
+      hasProcesses: subprocessData.processLabels.length > 0 || (meta.stats?.processes ?? 0) > 0,
+    }
+  }
+
+  // Fallback: meta.json only
   const communityCount = meta.stats?.communities ?? 0
   const clusterLabels = communityCount > 0 ? Array.from({ length: communityCount }, (_, i) => `cluster_${i}`) : []
 
   return {
     symbolCount: meta.stats?.nodes ?? 0,
     clusterLabels,
+    processLabels: [],
     languages,
     hasProcesses: (meta.stats?.processes ?? 0) > 0,
   }
@@ -105,6 +202,78 @@ async function readGitNexusGraphSummary(repositoryPath: string): Promise<GitNexu
 type MemPalaceSummary = {
   identity: string | null
   wingCount: number
+}
+
+type ObsidianDiscovery = {
+  vaultPaths: string[]
+  projectVaultPath: string | null
+}
+
+async function discoverObsidianVaults(projectPath?: string): Promise<ObsidianDiscovery> {
+  const vaultPaths: string[] = []
+  let projectVaultPath: string | null = null
+
+  // Check if project itself is an Obsidian vault
+  if (projectPath) {
+    const obsidianDir = path.join(projectPath, '.obsidian')
+    try {
+      await readdir(obsidianDir)
+      projectVaultPath = projectPath
+      vaultPaths.push(projectPath)
+    } catch {
+      // not a vault
+    }
+  }
+
+  // Read Obsidian app config for registered vaults (macOS)
+  const configPath = path.join(homedir(), 'Library', 'Application Support', 'obsidian', 'obsidian.json')
+  try {
+    const configRaw = await readFile(configPath, 'utf8')
+    const config = JSON.parse(configRaw) as { vaults?: Record<string, { path?: string }> }
+    if (config.vaults) {
+      for (const vault of Object.values(config.vaults)) {
+        if (vault.path && !vaultPaths.includes(vault.path)) {
+          // Verify the vault still exists
+          try {
+            await readdir(path.join(vault.path, '.obsidian'))
+            vaultPaths.push(vault.path)
+            if (!projectVaultPath && projectPath && vault.path.startsWith(projectPath)) {
+              projectVaultPath = vault.path
+            }
+          } catch {
+            // vault no longer available
+          }
+        }
+      }
+    }
+  } catch {
+    // Obsidian not installed or no config
+  }
+
+  // Check common vault locations on Linux
+  if (vaultPaths.length === 0) {
+    const linuxConfig = path.join(homedir(), '.config', 'obsidian', 'obsidian.json')
+    try {
+      const configRaw = await readFile(linuxConfig, 'utf8')
+      const config = JSON.parse(configRaw) as { vaults?: Record<string, { path?: string }> }
+      if (config.vaults) {
+        for (const vault of Object.values(config.vaults)) {
+          if (vault.path && !vaultPaths.includes(vault.path)) {
+            try {
+              await readdir(path.join(vault.path, '.obsidian'))
+              vaultPaths.push(vault.path)
+            } catch {
+              // vault no longer available
+            }
+          }
+        }
+      }
+    } catch {
+      // not on Linux or no config
+    }
+  }
+
+  return { vaultPaths, projectVaultPath }
 }
 
 async function readMemPalaceSummary(homedir: string): Promise<MemPalaceSummary | null> {
@@ -281,8 +450,9 @@ async function readGitNexusMeta(
   }
 
   const staleDays = Math.max(0, Math.floor((Date.now() - new Date(meta.indexedAt).getTime()) / (1000 * 60 * 60 * 24)))
+  const repoName = path.basename(meta.repoPath ?? repositoryPath)
 
-  const graphSummary = await readGitNexusGraphSummary(repositoryPath)
+  const graphSummary = await readGitNexusGraphSummary(repositoryPath, repoName)
 
   return { meta, staleDays, ...(graphSummary ? { graphSummary } : {}) }
 }
@@ -338,6 +508,9 @@ export function createContextAnalyzer() {
       }
     }
 
+    const obsidian = await discoverObsidianVaults(repositoryPath)
+    const resolvedObsidianPath = parsed.obsidianVaultPath ?? obsidian.projectVaultPath ?? obsidian.vaultPaths[0]
+
     const description = [parsed.description, readme ?? ''].filter(Boolean).join('\n').trim()
     const stack = await inferStackSignals(repositoryPath, analyzerSources)
     const domain = parsed.domain ?? inferDomain(description, fileList)
@@ -361,15 +534,18 @@ export function createContextAnalyzer() {
       analyzedAt: new Date().toISOString(),
       executionTarget: parsed.executionTarget,
       repositoryPath,
-      obsidianVaultPath: parsed.obsidianVaultPath,
+      obsidianVaultPath: resolvedObsidianPath,
       gitNexusRepo: meta?.repoPath,
       gitNexusStaleDays: staleDays,
       hasGitNexusIndex: Boolean(meta),
       gitNexusSymbolCount: graphSummary?.symbolCount,
       gitNexusClusters: graphSummary?.clusterLabels ?? [],
+      gitNexusProcessLabels: graphSummary?.processLabels ?? [],
       hasMemPalace: Boolean(mempalace),
       ...(mempalace?.identity ? { mempalaceIdentity: mempalace.identity } : {}),
       ...(mempalace ? { mempalaceWingCount: mempalace.wingCount } : {}),
+      hasObsidianVault: obsidian.vaultPaths.length > 0,
+      obsidianVaults: obsidian.vaultPaths,
     })
   }
 
