@@ -1,4 +1,4 @@
-import { readFile, readdir } from 'node:fs/promises'
+import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import path from 'node:path'
 import { execFile } from 'node:child_process'
@@ -58,6 +58,22 @@ type GitNexusGraphSummary = {
   hasProcesses: boolean
 }
 
+/** Lightweight project snapshot written to the MemPalace packforge-cache. */
+type PackforgeProjectSnapshot = {
+  projectId: string
+  repositoryPath?: string
+  analyzerMode: AnalyzerMode
+  stack: StackSignal[]
+  domain: Domain
+  phase: Phase
+  taskType: TaskType
+  riskProfile: RiskProfile
+  gitNexusSymbolCount?: number
+  gitNexusClusters: string[]
+  gitNexusProcessLabels: string[]
+  analyzedAt: string
+}
+
 const EXTENSION_LANGUAGE_MAP: Record<string, string> = {
   '.ts': 'typescript',
   '.tsx': 'typescript',
@@ -86,7 +102,7 @@ function inferLanguagesFromFiles(files: string[]): string[] {
   return [...languages]
 }
 
-function runGitNexusCypher(repoName: string, query: string, timeoutMs = 10_000): Promise<string> {
+function runGitNexusCypher(repoName: string, query: string, timeoutMs: number): Promise<string> {
   return new Promise((resolve, reject) => {
     execFile(
       'npx',
@@ -100,16 +116,21 @@ function runGitNexusCypher(repoName: string, query: string, timeoutMs = 10_000):
   })
 }
 
-async function queryGitNexusGraphSubprocess(repoName: string): Promise<{
+async function queryGitNexusGraphSubprocess(
+  repoName: string,
+  timeoutMs: number,
+): Promise<{
   clusterLabels: string[]
   processLabels: string[]
   symbolCount: number
 } | null> {
   try {
     const [clusterResult, processResult, symbolResult] = await Promise.all([
-      runGitNexusCypher(repoName, 'MATCH (c:Community) RETURN c.label AS label').catch(() => null),
-      runGitNexusCypher(repoName, 'MATCH (p:Process) RETURN p.label AS label').catch(() => null),
-      runGitNexusCypher(repoName, 'MATCH (n) WHERE n:Function OR n:Method RETURN count(n) AS cnt').catch(() => null),
+      runGitNexusCypher(repoName, 'MATCH (c:Community) RETURN c.label AS label', timeoutMs).catch(() => null),
+      runGitNexusCypher(repoName, 'MATCH (p:Process) RETURN p.label AS label', timeoutMs).catch(() => null),
+      runGitNexusCypher(repoName, 'MATCH (n) WHERE n:Function OR n:Method RETURN count(n) AS cnt', timeoutMs).catch(
+        () => null,
+      ),
     ])
 
     const parseLabels = (raw: string | null): string[] => {
@@ -164,7 +185,8 @@ async function queryGitNexusGraphSubprocess(repoName: string): Promise<{
 
 async function readGitNexusGraphSummary(
   repositoryPath: string,
-  repoName?: string,
+  repoName: string | undefined,
+  timeoutMs: number,
 ): Promise<GitNexusGraphSummary | null> {
   const meta = await readJsonIfExists<GitNexusMeta>(path.join(repositoryPath, '.gitnexus', 'meta.json'))
   if (!meta) return null
@@ -174,7 +196,7 @@ async function readGitNexusGraphSummary(
 
   // Try subprocess for richer graph data
   const resolvedRepoName = repoName ?? path.basename(repositoryPath)
-  const subprocessData = await queryGitNexusGraphSubprocess(resolvedRepoName)
+  const subprocessData = await queryGitNexusGraphSubprocess(resolvedRepoName, timeoutMs)
 
   if (subprocessData) {
     return {
@@ -276,15 +298,15 @@ async function discoverObsidianVaults(projectPath?: string): Promise<ObsidianDis
   return { vaultPaths, projectVaultPath }
 }
 
-async function readMemPalaceSummary(homedir: string): Promise<MemPalaceSummary | null> {
-  const palacePath = path.join(homedir, '.mempalace', 'palace')
+async function readMemPalaceSummary(homedirPath: string): Promise<MemPalaceSummary | null> {
+  const palacePath = path.join(homedirPath, '.mempalace', 'palace')
   try {
     await readdir(palacePath)
   } catch {
     return null
   }
 
-  const identity = await readTextIfExists(path.join(homedir, '.mempalace', 'identity.txt'))
+  const identity = await readTextIfExists(path.join(homedirPath, '.mempalace', 'identity.txt'))
 
   let wingCount = 0
   try {
@@ -295,6 +317,37 @@ async function readMemPalaceSummary(homedir: string): Promise<MemPalaceSummary |
   }
 
   return { identity: identity?.trim() ?? null, wingCount }
+}
+
+/** Sanitize a projectId to a safe filename component. */
+function toSafeFileName(id: string): string {
+  return id.replace(/[^a-z0-9_-]/gi, '_')
+}
+
+/**
+ * Write a lightweight project snapshot to the MemPalace packforge-cache directory
+ * (~/.mempalace/packforge-cache/{projectId}.json).  Stored outside the palace/ structure
+ * to avoid corrupting MemPalace's internal graph index.
+ *
+ * Note: the tilde prefix shown in documentation is a shell expansion convention.
+ * The actual path is resolved via os.homedir().
+ */
+async function writeMemPalaceProjectSnapshot(homedirPath: string, snapshot: PackforgeProjectSnapshot): Promise<void> {
+  const cacheDir = path.join(homedirPath, '.mempalace', 'packforge-cache')
+  await mkdir(cacheDir, { recursive: true })
+  const filePath = path.join(cacheDir, `${toSafeFileName(snapshot.projectId)}.json`)
+  await writeFile(filePath, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8')
+}
+
+/**
+ * Read the most recent project snapshot from the MemPalace packforge-cache, if present.
+ */
+async function readMemPalaceProjectSnapshot(
+  homedirPath: string,
+  projectId: string,
+): Promise<PackforgeProjectSnapshot | null> {
+  const filePath = path.join(homedirPath, '.mempalace', 'packforge-cache', `${toSafeFileName(projectId)}.json`)
+  return readJsonIfExists<PackforgeProjectSnapshot>(filePath)
 }
 
 async function readTextIfExists(filePath: string): Promise<string | null> {
@@ -443,6 +496,7 @@ async function inferStackSignals(repositoryPath: string, sources: AnalyzerSource
 
 async function readGitNexusMeta(
   repositoryPath: string,
+  timeoutMs: number,
 ): Promise<{ meta: GitNexusMeta | null; staleDays?: number; graphSummary?: GitNexusGraphSummary }> {
   const meta = await readJsonIfExists<GitNexusMeta>(path.join(repositoryPath, '.gitnexus', 'meta.json'))
   if (!meta) {
@@ -452,12 +506,27 @@ async function readGitNexusMeta(
   const staleDays = Math.max(0, Math.floor((Date.now() - new Date(meta.indexedAt).getTime()) / (1000 * 60 * 60 * 24)))
   const repoName = path.basename(meta.repoPath ?? repositoryPath)
 
-  const graphSummary = await readGitNexusGraphSummary(repositoryPath, repoName)
+  const graphSummary = await readGitNexusGraphSummary(repositoryPath, repoName, timeoutMs)
 
   return { meta, staleDays, ...(graphSummary ? { graphSummary } : {}) }
 }
 
-export function createContextAnalyzer() {
+export function createContextAnalyzer(options?: {
+  /** Timeout for each GitNexus cypher subprocess call in ms. Defaults to 10 000 ms. */
+  gitNexusTimeoutMs?: number
+}) {
+  const gitNexusTimeoutMs = options?.gitNexusTimeoutMs ?? 10_000
+
+  /**
+   * In-process GitNexus graph summary cache.
+   * Key: absolute repositoryPath.
+   * Value: { staleDays, summary } — invalidated automatically when staleDays changes (index re-analyzed).
+   *
+   * Avoids the three expensive `npx gitnexus cypher` subprocess calls on every invocation
+   * as long as the server process is running and the index hasn't been refreshed.
+   */
+  const gitNexusGraphCache = new Map<string, { staleDays: number; summary: GitNexusGraphSummary | null }>()
+
   async function analyzeProjectContext(input: AnalyzeProjectInput): Promise<ProjectContext> {
     const parsed = AnalyzeProjectInputSchema.parse(input)
     const analyzerSources: AnalyzerSourceType[] = []
@@ -491,16 +560,35 @@ export function createContextAnalyzer() {
       analyzerSources.push('readme-keywords')
     }
 
-    const { meta, staleDays, graphSummary } = await readGitNexusMeta(repositoryPath)
+    // ─── GitNexus meta + graph summary ───────────────────────────────────────
+    const meta = await readJsonIfExists<GitNexusMeta>(path.join(repositoryPath, '.gitnexus', 'meta.json'))
     const analyzerMode: AnalyzerMode = meta ? 'full' : 'fallback'
+
+    let staleDays: number | undefined
+    let graphSummary: GitNexusGraphSummary | undefined
+
     if (meta) {
       analyzerSources.push('gitnexus-meta')
-    }
-    if (graphSummary) {
-      analyzerSources.push('gitnexus-graph')
+      staleDays = Math.max(0, Math.floor((Date.now() - new Date(meta.indexedAt).getTime()) / (1000 * 60 * 60 * 24)))
+
+      // Use in-process cache when staleDays hasn't changed (index not refreshed)
+      const cached = gitNexusGraphCache.get(repositoryPath)
+      if (cached && cached.staleDays === staleDays) {
+        graphSummary = cached.summary ?? undefined
+      } else {
+        const repoName = path.basename(meta.repoPath ?? repositoryPath)
+        graphSummary = (await readGitNexusGraphSummary(repositoryPath, repoName, gitNexusTimeoutMs)) ?? undefined
+        gitNexusGraphCache.set(repositoryPath, { staleDays, summary: graphSummary ?? null })
+      }
+
+      if (graphSummary) {
+        analyzerSources.push('gitnexus-graph')
+      }
     }
 
-    const mempalace = await readMemPalaceSummary(homedir())
+    // ─── MemPalace detection ──────────────────────────────────────────────────
+    const homedirPath = homedir()
+    const mempalace = await readMemPalaceSummary(homedirPath)
     if (mempalace) {
       analyzerSources.push('mempalace-palace')
       if (mempalace.identity) {
@@ -518,7 +606,7 @@ export function createContextAnalyzer() {
     const taskType = parsed.taskType ?? inferTaskType(description)
     const riskProfile = parsed.riskProfile ?? inferRiskProfile(description, domain)
 
-    return ProjectContextSchema.parse({
+    const context = ProjectContextSchema.parse({
       projectId: parsed.projectId,
       description,
       stack,
@@ -547,12 +635,53 @@ export function createContextAnalyzer() {
       hasObsidianVault: obsidian.vaultPaths.length > 0,
       obsidianVaults: obsidian.vaultPaths,
     })
+
+    // ─── MemPalace write-through ──────────────────────────────────────────────
+    // When MemPalace is installed we persist a lightweight project snapshot to
+    // ~/.mempalace/packforge-cache/{projectId}.json so that:
+    //   1. Packforge can surface project evolution on subsequent runs.
+    //   2. AI agents with MemPalace access can search/retrieve previous
+    //      packforge analysis results via mempalace_search or read_file.
+    if (mempalace) {
+      const snapshot: PackforgeProjectSnapshot = {
+        projectId: parsed.projectId,
+        ...(repositoryPath ? { repositoryPath } : {}),
+        analyzerMode,
+        stack,
+        domain,
+        phase,
+        taskType,
+        riskProfile,
+        ...(graphSummary?.symbolCount !== undefined ? { gitNexusSymbolCount: graphSummary.symbolCount } : {}),
+        gitNexusClusters: graphSummary?.clusterLabels ?? [],
+        gitNexusProcessLabels: graphSummary?.processLabels ?? [],
+        analyzedAt: context.analyzedAt,
+      }
+      writeMemPalaceProjectSnapshot(homedirPath, snapshot).catch((err) => {
+        // Fire-and-forget: write failure must not block the analysis result, but surface for debugging
+        if (process.env.NODE_ENV !== 'test') {
+          console.warn('[packforge] Failed to write project snapshot to MemPalace cache:', err)
+        }
+      })
+    }
+
+    return context
+  }
+
+  /**
+   * Read the most recent project snapshot previously written to the MemPalace
+   * packforge-cache for a given projectId.  Returns null when MemPalace is not
+   * installed or no snapshot exists yet.
+   */
+  async function getProjectHistory(projectId: string): Promise<PackforgeProjectSnapshot | null> {
+    return readMemPalaceProjectSnapshot(homedir(), projectId)
   }
 
   return {
     service: 'context-analyzer',
     status: 'ready',
     analyzeProjectContext,
+    getProjectHistory,
   }
 }
 

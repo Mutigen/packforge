@@ -4,7 +4,20 @@ const GITNEXUS_TOOL_PREFIX = 'mcp_gitnexus_'
 const GITNEXUS_CLI_PACK_ID = 'packforge-cli'
 const MEMPALACE_TOOL_PREFIX = 'mempalace_'
 
-export function scorePack(pack: InstructionPack, ctx: ProjectContext): number {
+/** Points applied per net feedback vote, capped at ±10 total impact. */
+const FEEDBACK_POINTS_PER_VOTE = 5
+const FEEDBACK_MAX_IMPACT = 10
+
+/**
+ * Score a pack against the current project context.
+ * @param feedbackScores Optional net vote tally per packId (positive = helpful, negative = not helpful).
+ *                       Computed by `memoryService.getPackFeedbackScores()`.
+ */
+export function scorePack(
+  pack: InstructionPack,
+  ctx: ProjectContext,
+  feedbackScores: Record<string, number> = {},
+): number {
   let score = 0
   const signals = pack.activation_signals
 
@@ -41,5 +54,13 @@ export function scorePack(pack: InstructionPack, ctx: ProjectContext): number {
     score += 15
   }
 
-  return Math.min(score, 100)
+  // Feedback-driven adjustment — user corrections shift future recommendations
+  const netVotes = feedbackScores[pack.id] ?? 0
+  const feedbackDelta = Math.max(
+    -FEEDBACK_MAX_IMPACT,
+    Math.min(FEEDBACK_MAX_IMPACT, netVotes * FEEDBACK_POINTS_PER_VOTE),
+  )
+  score += feedbackDelta
+
+  return Math.max(0, Math.min(score, 100))
 }

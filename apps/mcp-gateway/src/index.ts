@@ -254,13 +254,15 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
       const ctx = input.context
         ? ProjectContextSchema.parse(input.context)
         : await contextAnalyzer.analyzeProjectContext(AnalyzeProjectInputSchema.parse(input.analyze))
-      return orchestrator.recommendPacks(ctx)
+      const feedbackScores = await memoryService.getPackFeedbackScores(ctx.projectId)
+      return orchestrator.recommendPacks(ctx, 40, feedbackScores)
     },
     async activatePackSet(input: { context?: ProjectContext; analyze?: unknown; autoApprove?: boolean }) {
       const ctx = input.context
         ? ProjectContextSchema.parse(input.context)
         : await contextAnalyzer.analyzeProjectContext(AnalyzeProjectInputSchema.parse(input.analyze))
-      const recommendations = await orchestrator.recommendPacks(ctx)
+      const feedbackScores = await memoryService.getPackFeedbackScores(ctx.projectId)
+      const recommendations = await orchestrator.recommendPacks(ctx, 40, feedbackScores)
       const packs = selectPacks(
         recommendations.packsById,
         recommendations.recommendations.map((recommendation) => recommendation.packId),
@@ -276,7 +278,7 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
             : 'active'
 
       const activationId = randomUUID()
-      const declinedTools = await memoryService.getDeclinedTools()
+      const declinedTools = await memoryService.getDeclinedTools(ctx.projectId)
       const handoff =
         status !== 'denied' ? buildHandoffContract(activationId, plan, packs, evaluation, declinedTools) : undefined
 
@@ -304,7 +306,8 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
       }
 
       const ctx = await contextAnalyzer.analyzeProjectContext(AnalyzeProjectInputSchema.parse(analyzeInput))
-      const result = await orchestrator.recommendPacks(ctx)
+      const feedbackScores = await memoryService.getPackFeedbackScores(ctx.projectId)
+      const result = await orchestrator.recommendPacks(ctx, 40, feedbackScores)
       const packs = selectPacks(
         result.packsById,
         result.recommendations.map((r) => r.packId),
@@ -313,7 +316,7 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
       const plan = policyService.applyPolicy(await orchestrator.buildActivationPlan(ctx), evaluation)
 
       const activationId = randomUUID()
-      const declinedTools = await memoryService.getDeclinedTools()
+      const declinedTools = await memoryService.getDeclinedTools(ctx.projectId)
       const handoff = buildHandoffContract(activationId, plan, packs, evaluation, declinedTools)
 
       const activation = await memoryService.recordActivation({
@@ -418,12 +421,25 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
         handoff,
       }
     },
-    async declineToolSuggestion(input: { tool: string }) {
-      await memoryService.declineToolSuggestion(input.tool)
+    async declineToolSuggestion(input: { tool: string; projectId?: string }) {
+      await memoryService.declineToolSuggestion(input.tool, input.projectId)
+      const scope = input.projectId ? `for project '${input.projectId}'` : 'globally'
       return {
         declined: input.tool,
-        message: `Tool suggestion for '${input.tool}' will no longer appear in handoff contracts.`,
+        message: `Tool suggestion for '${input.tool}' will no longer appear in handoff contracts (${scope}).`,
       }
+    },
+    async recordPackFeedback(input: { packId: string; helpful: boolean; note?: string; projectId?: string }) {
+      await memoryService.recordFeedback(input.packId, input.helpful, input.note, input.projectId)
+      return {
+        recorded: true,
+        packId: input.packId,
+        helpful: input.helpful,
+        ...(input.projectId ? { projectId: input.projectId } : {}),
+      }
+    },
+    async getProjectHistory(input: { projectId: string }) {
+      return contextAnalyzer.getProjectHistory(input.projectId)
     },
   }
 }
@@ -551,9 +567,61 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
         'Decline a tool suggestion so it no longer appears in future handoff contracts. Use when the user explicitly does not want to install a recommended tool (e.g. GitNexus, MemPalace).',
       inputSchema: z.object({
         tool: z.string().min(1).describe("The tool identifier to decline, e.g. 'gitnexus', 'mempalace', 'obsidian'"),
+        projectId: z
+          .string()
+          .min(1)
+          .optional()
+          .describe(
+            'Optional project scope. When provided, the declination applies only to this project. Omit to decline globally across all projects.',
+          ),
       }),
     },
-    async (input) => textResult(await handlers.declineToolSuggestion(input)),
+    async (input) => {
+      const args: { tool: string; projectId?: string } = { tool: input.tool }
+      if (input.projectId) args.projectId = input.projectId
+      return textResult(await handlers.declineToolSuggestion(args))
+    },
+  )
+
+  server.registerTool(
+    'record_pack_feedback',
+    {
+      description:
+        'Record whether a recommended instruction pack was helpful. Feedback influences future scoring — packs marked unhelpful will receive a lower score in subsequent recommendations for the same project.',
+      inputSchema: z.object({
+        packId: z.string().min(1).describe('The ID of the pack to rate (e.g. "packforge-memory")'),
+        helpful: z.boolean().describe('True if the pack was useful, false if it was not.'),
+        note: z.string().optional().describe('Optional freeform note explaining the feedback.'),
+        projectId: z
+          .string()
+          .min(1)
+          .optional()
+          .describe(
+            'Optional project scope. When provided, feedback applies only to recommendations for this project.',
+          ),
+      }),
+    },
+    async (input) => {
+      const args: { packId: string; helpful: boolean; note?: string; projectId?: string } = {
+        packId: input.packId,
+        helpful: input.helpful,
+      }
+      if (input.note) args.note = input.note
+      if (input.projectId) args.projectId = input.projectId
+      return textResult(await handlers.recordPackFeedback(args))
+    },
+  )
+
+  server.registerTool(
+    'get_project_history',
+    {
+      description:
+        'Return the most recent packforge analysis snapshot for a project, previously written to the MemPalace packforge-cache. Surfaces stack evolution, inferred domain/phase, and GitNexus summary from the last time the project was analyzed. Returns null when MemPalace is not installed or the project has not been analyzed before.',
+      inputSchema: z.object({
+        projectId: z.string().min(1).describe('The project identifier to retrieve history for.'),
+      }),
+    },
+    async (input) => textResult(await handlers.getProjectHistory(input)),
   )
 
   server.registerTool(

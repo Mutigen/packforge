@@ -114,7 +114,8 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
     const ctx = body.context
       ? ProjectContextSchema.parse(body.context)
       : await contextAnalyzer.analyzeProjectContext(AnalyzeProjectInputSchema.parse(body.input))
-    const recommendations = await orchestrator.recommendPacks(ctx, body.minimumScore)
+    const feedbackScores = await memoryService.getPackFeedbackScores(ctx.projectId)
+    const recommendations = await orchestrator.recommendPacks(ctx, body.minimumScore, feedbackScores)
     return { context: ctx, ...recommendations }
   })
 
@@ -123,7 +124,8 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
     const ctx = body.context
       ? ProjectContextSchema.parse(body.context)
       : await contextAnalyzer.analyzeProjectContext(AnalyzeProjectInputSchema.parse(body.input))
-    const recommendationResult = await orchestrator.recommendPacks(ctx)
+    const feedbackScores = await memoryService.getPackFeedbackScores(ctx.projectId)
+    const recommendationResult = await orchestrator.recommendPacks(ctx, 40, feedbackScores)
     const packs = selectPacks(
       recommendationResult.packsById,
       recommendationResult.recommendations.map((recommendation) => recommendation.packId),
@@ -174,6 +176,16 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
       return { error: 'activation not found' }
     }
     return activation
+  })
+
+  app.post('/feedback', async (request, reply) => {
+    const body = request.body as { packId?: string; helpful?: boolean; note?: string; projectId?: string }
+    if (!body.packId || typeof body.helpful !== 'boolean') {
+      reply.code(400)
+      return { error: 'packId and helpful are required' }
+    }
+    await memoryService.recordFeedback(body.packId, body.helpful, body.note, body.projectId)
+    return { recorded: true, packId: body.packId, helpful: body.helpful }
   })
 
   return app

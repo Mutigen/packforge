@@ -3,6 +3,9 @@ import { validatePackDirectory } from '@hub/pack-validator'
 import type { ActivationPlan, InstructionPack, ProjectContext, Recommendation } from '@hub/shared-types'
 import { scorePack } from './matcher.js'
 
+/** In-process pack registry cache TTL (5 minutes). */
+const PACK_CACHE_TTL_MS = 5 * 60 * 1000
+
 type BlockedPack = {
   packId: string
   reasons: string[]
@@ -67,13 +70,23 @@ function resolveConflicts(
 export function createOrchestrator(options?: { packsDir?: string }) {
   const packsDir = options?.packsDir ?? path.resolve(process.cwd(), 'packs')
 
-  async function loadInstructionPacks(): Promise<InstructionPack[]> {
-    return validatePackDirectory(packsDir)
+  // In-process pack registry cache — avoids re-reading all YAML files on every call
+  let cachedPacks: InstructionPack[] | null = null
+  let cacheLoadedAt = 0
+
+  async function loadInstructionPacks(forceRefresh = false): Promise<InstructionPack[]> {
+    if (!forceRefresh && cachedPacks !== null && Date.now() - cacheLoadedAt < PACK_CACHE_TTL_MS) {
+      return cachedPacks
+    }
+    cachedPacks = await validatePackDirectory(packsDir)
+    cacheLoadedAt = Date.now()
+    return cachedPacks
   }
 
   async function recommendPacks(
     ctx: ProjectContext,
     minimumScore = 40,
+    feedbackScores: Record<string, number> = {},
   ): Promise<{
     recommendations: Recommendation[]
     blockedPacks: BlockedPack[]
@@ -84,7 +97,7 @@ export function createOrchestrator(options?: { packsDir?: string }) {
 
     const scored = packs
       .map((pack) => {
-        const rawScore = scorePack(pack, ctx)
+        const rawScore = scorePack(pack, ctx, feedbackScores)
         const score = Math.round(rawScore * ctx.confidenceFactor)
         return {
           packId: pack.id,
