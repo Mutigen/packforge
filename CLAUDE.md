@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **MCP_AGENT_APP** (384 symbols, 654 relationships, 26 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **MCP_AGENT_APP** (389 symbols, 730 relationships, 27 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
@@ -68,6 +68,36 @@ Before completing any code modification task, verify:
 2. No HIGH/CRITICAL risk warnings were ignored
 3. `gitnexus_detect_changes()` confirms changes match expected scope
 4. All d=1 (WILL BREAK) dependents were updated
+5. If MemPalace is available and a bug was fixed or a non-trivial improvement was made: **MUST write a `mempalace_diary_write` entry** (see Self-Improvement Logging below)
+
+## Self-Improvement Logging
+
+Whenever an agent working on this codebase **fixes a bug, resolves an edge case, or discovers a non-obvious insight**, it MUST log it to MemPalace so future agents can build on it.
+
+**When to log:**
+- A bug was fixed (root cause was non-obvious)
+- A pack scoring rule produced unexpected results in practice
+- An edge case in context detection was discovered
+- A refactor revealed a hidden dependency
+- A test uncovered an assumption that was wrong
+
+**How to log:**
+```
+mempalace_diary_write(
+  agent="packforge",
+  entry="PROBLEM: <what failed> | ROOT_CAUSE: <why> | FIX: <what changed> | AFFECTED: <file or symbol>"
+)
+```
+
+**Format (AAAK-style for compression):**
+```
+BUG: scorePack returned 0 for node+ts stack | CAUSE: stack signals not normalized before match | FIX: toLowerCase in inferStackSignals | FILE: context-analyzer/src/index.ts
+```
+
+**Do NOT log:**
+- Trivial one-line fixes with obvious cause
+- Formatting / lint changes
+- Dependency version bumps
 
 ## Keeping the Index Fresh
 
