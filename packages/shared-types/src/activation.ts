@@ -74,7 +74,7 @@ export const RuntimeHandoffContractSchema = z.object({
     branchName: z.string().min(1).optional(),
   }),
   bootstrap: z.array(BootstrapStepSchema).default([]),
-  instructions: z.array(RuntimeInstructionSchema).min(1),
+  instructions: z.array(RuntimeInstructionSchema).default([]),
   pendingPacks: z.array(PendingPackSchema).default([]),
   missingTools: z.array(MissingToolSchema).default([]),
   policy: z.object({

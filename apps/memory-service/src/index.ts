@@ -29,6 +29,17 @@ type MemoryState = {
   declinedToolsByProject: Record<string, string[]>
 }
 
+type ListActivationsOptions = {
+  /** Filter by project id. */
+  projectId?: string
+  /** Filter by activation status. */
+  status?: StoredActivation['status']
+  /** Maximum number of activations to return. */
+  limit?: number
+  /** Number of activations to skip (for pagination). */
+  offset?: number
+}
+
 const DEFAULT_MAX_ACTIVATIONS = 100
 
 function migrateState(raw: Partial<MemoryState>): MemoryState {
@@ -47,7 +58,7 @@ function migrateState(raw: Partial<MemoryState>): MemoryState {
   return state
 }
 
-async function ensureState(filePath: string): Promise<MemoryState> {
+async function readState(filePath: string): Promise<MemoryState> {
   try {
     const source = await readFile(filePath, 'utf8')
     return migrateState(JSON.parse(source) as Partial<MemoryState>)
@@ -56,14 +67,37 @@ async function ensureState(filePath: string): Promise<MemoryState> {
   }
 }
 
-async function persistState(filePath: string, state: MemoryState): Promise<void> {
+async function writeState(filePath: string, state: MemoryState): Promise<void> {
   await mkdir(path.dirname(filePath), { recursive: true })
   await writeFile(filePath, `${JSON.stringify(state, null, 2)}\n`, 'utf8')
+}
+
+/**
+ * Simple async mutex to prevent concurrent read-modify-write cycles on the
+ * same JSON file.  All mutating operations acquire the lock before touching
+ * the file so that parallel calls are serialised correctly.
+ */
+function createMutex() {
+  let pending: Promise<void> = Promise.resolve()
+
+  return {
+    /** Execute `fn` exclusively — only one fn runs at a time. */
+    run<T>(fn: () => Promise<T>): Promise<T> {
+      const next = pending.then(fn, fn)
+      // Keep the chain alive but don't propagate rejections into subsequent callers
+      pending = next.then(
+        () => undefined,
+        () => undefined,
+      )
+      return next
+    },
+  }
 }
 
 export function createMemoryService(options?: { filePath?: string; maxActivations?: number }) {
   const filePath = options?.filePath ?? path.resolve(process.cwd(), '.hub-data', 'memory.json')
   const maxActivations = options?.maxActivations ?? DEFAULT_MAX_ACTIVATIONS
+  const mutex = createMutex()
 
   async function recordActivation(input: {
     id?: string
@@ -71,31 +105,33 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
     plan: ActivationPlan
     handoff?: RuntimeHandoffContract
   }): Promise<StoredActivation> {
-    const state = await ensureState(filePath)
-    const activation: StoredActivation = {
-      id: input.id ?? randomUUID(),
-      status: input.status,
-      createdAt: new Date().toISOString(),
-      plan: input.plan,
-    }
+    return mutex.run(async () => {
+      const state = await readState(filePath)
+      const activation: StoredActivation = {
+        id: input.id ?? randomUUID(),
+        status: input.status,
+        createdAt: new Date().toISOString(),
+        plan: input.plan,
+      }
 
-    if (input.handoff) {
-      activation.handoff = input.handoff
-    }
+      if (input.handoff) {
+        activation.handoff = input.handoff
+      }
 
-    state.activations.unshift(activation)
+      state.activations.unshift(activation)
 
-    // Prune oldest activations to prevent unbounded growth
-    if (state.activations.length > maxActivations) {
-      state.activations = state.activations.slice(0, maxActivations)
-    }
+      // Prune oldest activations to prevent unbounded growth
+      if (state.activations.length > maxActivations) {
+        state.activations = state.activations.slice(0, maxActivations)
+      }
 
-    await persistState(filePath, state)
-    return activation
+      await writeState(filePath, state)
+      return activation
+    })
   }
 
   async function getActivation(id: string): Promise<StoredActivation | null> {
-    const state = await ensureState(filePath)
+    const state = await readState(filePath)
     return state.activations.find((activation) => activation.id === id) ?? null
   }
 
@@ -103,29 +139,44 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
     id: string,
     status: StoredActivation['status'],
   ): Promise<StoredActivation | null> {
-    const state = await ensureState(filePath)
-    const activation = state.activations.find((a) => a.id === id)
-    if (!activation) return null
-    activation.status = status
-    await persistState(filePath, state)
-    return activation
+    return mutex.run(async () => {
+      const state = await readState(filePath)
+      const activation = state.activations.find((a) => a.id === id)
+      if (!activation) return null
+      activation.status = status
+      await writeState(filePath, state)
+      return activation
+    })
   }
 
   async function updateActivationHandoff(
     id: string,
     handoff: RuntimeHandoffContract,
   ): Promise<StoredActivation | null> {
-    const state = await ensureState(filePath)
-    const activation = state.activations.find((a) => a.id === id)
-    if (!activation) return null
-    activation.handoff = handoff
-    await persistState(filePath, state)
-    return activation
+    return mutex.run(async () => {
+      const state = await readState(filePath)
+      const activation = state.activations.find((a) => a.id === id)
+      if (!activation) return null
+      activation.handoff = handoff
+      await writeState(filePath, state)
+      return activation
+    })
   }
 
-  async function listActivations(): Promise<StoredActivation[]> {
-    const state = await ensureState(filePath)
-    return state.activations
+  async function listActivations(opts?: ListActivationsOptions): Promise<StoredActivation[]> {
+    const state = await readState(filePath)
+    let result = state.activations
+
+    if (opts?.projectId) {
+      result = result.filter((a) => a.plan.projectId === opts.projectId)
+    }
+    if (opts?.status) {
+      result = result.filter((a) => a.status === opts.status)
+    }
+
+    const offset = opts?.offset ?? 0
+    const limit = opts?.limit ?? result.length
+    return result.slice(offset, offset + limit)
   }
 
   /**
@@ -136,17 +187,19 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
    * @param projectId Optional project scope — omit for a global (cross-project) entry.
    */
   async function recordFeedback(packId: string, helpful: boolean, note?: string, projectId?: string): Promise<void> {
-    const state = await ensureState(filePath)
-    const entry: FeedbackEntry = {
-      packId,
-      helpful,
-      createdAt: new Date().toISOString(),
-    }
-    if (note) entry.note = note
-    if (projectId) entry.projectId = projectId
+    return mutex.run(async () => {
+      const state = await readState(filePath)
+      const entry: FeedbackEntry = {
+        packId,
+        helpful,
+        createdAt: new Date().toISOString(),
+      }
+      if (note) entry.note = note
+      if (projectId) entry.projectId = projectId
 
-    state.feedback.unshift(entry)
-    await persistState(filePath, state)
+      state.feedback.unshift(entry)
+      await writeState(filePath, state)
+    })
   }
 
   /**
@@ -156,7 +209,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
    * included when no project-specific entries exist for that pack.
    */
   async function getPackFeedbackScores(projectId?: string): Promise<Record<string, number>> {
-    const state = await ensureState(filePath)
+    const state = await readState(filePath)
     const scores: Record<string, number> = {}
 
     const projectEntries = projectId ? state.feedback.filter((f) => f.projectId === projectId) : []
@@ -185,19 +238,21 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
    * @param projectId Optional project scope — omit to decline globally.
    */
   async function declineToolSuggestion(tool: string, projectId?: string): Promise<void> {
-    const state = await ensureState(filePath)
-    const bucket = projectId ?? '*'
-    if (!state.declinedToolsByProject[bucket]) {
-      state.declinedToolsByProject[bucket] = []
-    }
-    if (!state.declinedToolsByProject[bucket].includes(tool)) {
-      state.declinedToolsByProject[bucket].push(tool)
-      // Keep legacy list in sync for backward compat
-      if (!projectId && !state.declinedTools.includes(tool)) {
-        state.declinedTools.push(tool)
+    return mutex.run(async () => {
+      const state = await readState(filePath)
+      const bucket = projectId ?? '*'
+      if (!state.declinedToolsByProject[bucket]) {
+        state.declinedToolsByProject[bucket] = []
       }
-      await persistState(filePath, state)
-    }
+      if (!state.declinedToolsByProject[bucket].includes(tool)) {
+        state.declinedToolsByProject[bucket].push(tool)
+        // Keep legacy list in sync for backward compat
+        if (!projectId && !state.declinedTools.includes(tool)) {
+          state.declinedTools.push(tool)
+        }
+        await writeState(filePath, state)
+      }
+    })
   }
 
   /**
@@ -205,7 +260,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
    * @param projectId Optional project scope — omit for the global list only.
    */
   async function getDeclinedTools(projectId?: string): Promise<string[]> {
-    const state = await ensureState(filePath)
+    const state = await readState(filePath)
     const global = state.declinedToolsByProject['*'] ?? []
     if (!projectId) return global
 

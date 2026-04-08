@@ -119,8 +119,12 @@ export function createOrchestrator(options?: { packsDir?: string }) {
     }
   }
 
-  async function buildActivationPlan(ctx: ProjectContext): Promise<ActivationPlan> {
-    const { recommendations, blockedPacks } = await recommendPacks(ctx)
+  async function buildActivationPlan(
+    ctx: ProjectContext,
+    minimumScore = 40,
+    feedbackScores: Record<string, number> = {},
+  ): Promise<ActivationPlan> {
+    const { recommendations, blockedPacks } = await recommendPacks(ctx, minimumScore, feedbackScores)
 
     return {
       projectId: ctx.projectId,

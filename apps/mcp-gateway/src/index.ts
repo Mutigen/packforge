@@ -55,18 +55,41 @@ async function parseSpecFile(filePath: string): Promise<{
   }
 
   const projectId =
-    (frontmatter.projectId as string) ?? path.basename(filePath, path.extname(filePath)).replace(/-spec$/, '')
+    typeof frontmatter.projectId === 'string'
+      ? frontmatter.projectId
+      : path.basename(filePath, path.extname(filePath)).replace(/-spec$/, '')
 
+  // Validate individual override fields through Zod schema partials
+  // so we catch invalid enum values early with a clear error rather than a runtime crash.
+  const SpecOverridesSchema = AnalyzeProjectInputSchema.pick({
+    domain: true,
+    phase: true,
+    riskProfile: true,
+    taskType: true,
+    workMode: true,
+    executionTarget: true,
+    repositoryPath: true,
+    customKeywords: true,
+  }).partial()
+
+  const rawOverrides = SpecOverridesSchema.parse({
+    ...(frontmatter.domain !== undefined ? { domain: frontmatter.domain } : {}),
+    ...(frontmatter.phase !== undefined ? { phase: frontmatter.phase } : {}),
+    ...(frontmatter.riskProfile !== undefined ? { riskProfile: frontmatter.riskProfile } : {}),
+    ...(frontmatter.taskType !== undefined ? { taskType: frontmatter.taskType } : {}),
+    ...(frontmatter.workMode !== undefined ? { workMode: frontmatter.workMode } : {}),
+    ...(frontmatter.executionTarget !== undefined ? { executionTarget: frontmatter.executionTarget } : {}),
+    ...(frontmatter.repositoryPath !== undefined ? { repositoryPath: frontmatter.repositoryPath } : {}),
+    ...(Array.isArray(frontmatter.customKeywords) ? { customKeywords: frontmatter.customKeywords } : {}),
+  })
+
+  // Strip undefined keys so the spread in the caller doesn't overwrite defaults
   const overrides: Partial<AnalyzeProjectInput> = {}
-  if (frontmatter.domain) overrides.domain = frontmatter.domain as AnalyzeProjectInput['domain']
-  if (frontmatter.phase) overrides.phase = frontmatter.phase as AnalyzeProjectInput['phase']
-  if (frontmatter.riskProfile) overrides.riskProfile = frontmatter.riskProfile as AnalyzeProjectInput['riskProfile']
-  if (frontmatter.taskType) overrides.taskType = frontmatter.taskType as AnalyzeProjectInput['taskType']
-  if (frontmatter.workMode) overrides.workMode = frontmatter.workMode as AnalyzeProjectInput['workMode']
-  if (frontmatter.executionTarget)
-    overrides.executionTarget = frontmatter.executionTarget as AnalyzeProjectInput['executionTarget']
-  if (frontmatter.repositoryPath) overrides.repositoryPath = frontmatter.repositoryPath as string
-  if (Array.isArray(frontmatter.customKeywords)) overrides.customKeywords = frontmatter.customKeywords as string[]
+  for (const [key, value] of Object.entries(rawOverrides)) {
+    if (value !== undefined) {
+      ;(overrides as Record<string, unknown>)[key] = value
+    }
+  }
 
   return { projectId, description: body.trim(), overrides }
 }
@@ -268,7 +291,10 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
         recommendations.recommendations.map((recommendation) => recommendation.packId),
       )
       const evaluation = policyService.evaluateActivation(ctx, packs)
-      const plan = policyService.applyPolicy(await orchestrator.buildActivationPlan(ctx), evaluation)
+      const plan = policyService.applyPolicy(
+        await orchestrator.buildActivationPlan(ctx, 40, feedbackScores),
+        evaluation,
+      )
 
       const status =
         evaluation.decision === 'deny'
@@ -313,7 +339,10 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
         result.recommendations.map((r) => r.packId),
       )
       const evaluation = policyService.evaluateActivation(ctx, packs)
-      const plan = policyService.applyPolicy(await orchestrator.buildActivationPlan(ctx), evaluation)
+      const plan = policyService.applyPolicy(
+        await orchestrator.buildActivationPlan(ctx, 40, feedbackScores),
+        evaluation,
+      )
 
       const activationId = randomUUID()
       const declinedTools = await memoryService.getDeclinedTools(ctx.projectId)
@@ -321,7 +350,12 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
 
       const activation = await memoryService.recordActivation({
         id: activationId,
-        status: evaluation.decision === 'deny' ? 'denied' : 'pending_confirmation',
+        status:
+          evaluation.decision === 'deny'
+            ? 'denied'
+            : evaluation.decision === 'allow'
+              ? 'active'
+              : 'pending_confirmation',
         plan,
         handoff,
       })
