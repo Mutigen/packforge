@@ -83,7 +83,10 @@ function createMutex() {
   return {
     /** Execute `fn` exclusively — only one fn runs at a time. */
     run<T>(fn: () => Promise<T>): Promise<T> {
-      const next = pending.then(fn, fn)
+      const next = pending.then(
+        () => fn(),
+        () => fn(),
+      )
       // Keep the chain alive but don't propagate rejections into subsequent callers
       pending = next.then(
         () => undefined,

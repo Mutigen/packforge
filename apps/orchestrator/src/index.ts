@@ -11,6 +11,9 @@ type BlockedPack = {
   reasons: string[]
 }
 
+/** Score threshold above which a pack is marked `required`. */
+const BASE_REQUIRED_THRESHOLD = 80
+
 function buildReasons(pack: InstructionPack, ctx: ProjectContext): string[] {
   const reasons: string[] = []
   const stackMatches = ctx.stack.filter((signal) => pack.activation_signals.stack_hints.includes(signal))
@@ -100,7 +103,7 @@ export function createOrchestrator(options?: { packsDir?: string }) {
         const rawScore = scorePack(pack, ctx, feedbackScores)
         const score = Math.round(rawScore * ctx.confidenceFactor)
         // Scale the threshold by confidenceFactor so `required` is reachable in every analyzer mode
-        const requiredThreshold = Math.round(80 * ctx.confidenceFactor)
+        const requiredThreshold = Math.round(BASE_REQUIRED_THRESHOLD * ctx.confidenceFactor)
         return {
           packId: pack.id,
           version: pack.version,

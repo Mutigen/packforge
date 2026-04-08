@@ -74,6 +74,10 @@ export const RuntimeHandoffContractSchema = z.object({
     branchName: z.string().min(1).optional(),
   }),
   bootstrap: z.array(BootstrapStepSchema).default([]),
+  /**
+   * Active runtime instructions.  May be empty when all recommended packs are
+   * in `pendingPacks` (awaiting external tool installation).
+   */
   instructions: z.array(RuntimeInstructionSchema).default([]),
   pendingPacks: z.array(PendingPackSchema).default([]),
   missingTools: z.array(MissingToolSchema).default([]),
