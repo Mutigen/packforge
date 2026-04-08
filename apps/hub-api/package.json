@@ -22,7 +22,7 @@
     "@hub/shared-types": "*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/sdk-node": "^0.214.0",
-    "drizzle-orm": "^0.41.0",
+    "drizzle-orm": "^0.45.2",
     "fastify": "^5.3.2",
     "js-yaml": "^4.1.0",
     "pg": "^8.14.1",
