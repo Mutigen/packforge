@@ -485,7 +485,16 @@ async function inferStackSignals(repositoryPath: string, sources: AnalyzerSource
     const workflowFiles = await readdir(workflowsDir)
     if (workflowFiles.length > 0) {
       sources.push('github-workflows')
-      stack.push('node')
+      // Infer stack from workflow file contents instead of blindly adding 'node'
+      for (const wf of workflowFiles) {
+        if (!wf.endsWith('.yml') && !wf.endsWith('.yaml')) continue
+        const wfContent = await readTextIfExists(path.join(workflowsDir, wf))
+        if (!wfContent) continue
+        if (/node-version|setup-node|actions\/setup-node|npm |yarn |pnpm /.test(wfContent)) stack.push('node')
+        if (/python-version|setup-python|actions\/setup-python|pip /.test(wfContent)) stack.push('python')
+        if (/go-version|setup-go|actions\/setup-go/.test(wfContent)) stack.push('go')
+        if (/rust|cargo|actions-rs/.test(wfContent)) stack.push('rust')
+      }
     }
   } catch {
     // ignore

@@ -29,9 +29,25 @@ export async function validatePackFile(filePath: string): Promise<InstructionPac
   return InstructionPackSchema.parse(parsed)
 }
 
-export function validatePackCollection(packs: InstructionPack[]): InstructionPack[] {
+export type PackCollectionWarning = {
+  code: 'asymmetric-compatible-with'
+  message: string
+  packId: string
+  referencedPackId: string
+}
+
+export function validatePackCollection(packs: InstructionPack[]): {
+  packs: InstructionPack[]
+  warnings: PackCollectionWarning[]
+} {
   const seenIds = new Set<string>()
   const knownIds = new Set(packs.map((pack) => pack.id))
+  const warnings: PackCollectionWarning[] = []
+  const compatMap = new Map<string, Set<string>>()
+
+  for (const pack of packs) {
+    compatMap.set(pack.id, new Set(pack.compatible_with))
+  }
 
   for (const pack of packs) {
     if (seenIds.has(pack.id)) {
@@ -45,6 +61,16 @@ export function validatePackCollection(packs: InstructionPack[]): InstructionPac
       }
       if (reference === pack.id) {
         throw new Error(`Pack ${pack.id} cannot reference itself in compatible_with`)
+      }
+      // Check symmetry: if A lists B as compatible, B should list A
+      const otherCompat = compatMap.get(reference)
+      if (otherCompat && !otherCompat.has(pack.id)) {
+        warnings.push({
+          code: 'asymmetric-compatible-with',
+          message: `Pack ${pack.id} lists ${reference} as compatible, but ${reference} does not list ${pack.id}`,
+          packId: pack.id,
+          referencedPackId: reference,
+        })
       }
     }
 
@@ -61,13 +87,14 @@ export function validatePackCollection(packs: InstructionPack[]): InstructionPac
     }
   }
 
-  return packs
+  return { packs, warnings }
 }
 
 export async function validatePackDirectory(rootDir: string): Promise<InstructionPack[]> {
   const files = await listPackFiles(rootDir)
   const packs = await Promise.all(files.map((filePath) => validatePackFile(filePath)))
 
+  // Validate collection — asymmetry warnings are non-fatal
   validatePackCollection(packs)
 
   return packs.sort((left, right) => left.id.localeCompare(right.id))

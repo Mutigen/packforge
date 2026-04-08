@@ -52,7 +52,7 @@ function buildHandoffContract(input: {
       approvalRequired: input.approvalRequired,
       maxRiskLevel: input.maxRiskLevel,
       writeAccess: true,
-      networkAccess: true,
+      networkAccess: input.ctx.riskProfile !== 'regulated',
       deployAllowed: input.ctx.taskType === 'deploy' && !input.approvalRequired,
     },
     trace: {

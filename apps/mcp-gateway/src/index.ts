@@ -391,10 +391,22 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
         return { activationId: activation.id, status: 'no_pending_packs', promoted: [], stillPending: [], handoff }
       }
 
+      // Re-analyze context but preserve original context fields from the stored plan
+      // so that description, taskType, domain, phase, riskProfile etc. are not lost.
+      const originalCtx = activation.plan.context
       const ctx = await contextAnalyzer.analyzeProjectContext(
         AnalyzeProjectInputSchema.parse({
           projectId: activation.plan.projectId,
           repositoryPath: handoff.workspace.rootPath,
+          description: originalCtx.description,
+          taskType: originalCtx.taskType,
+          domain: originalCtx.domain,
+          phase: originalCtx.phase,
+          riskProfile: originalCtx.riskProfile,
+          workMode: originalCtx.workMode,
+          customKeywords: originalCtx.customKeywords,
+          executionTarget: originalCtx.executionTarget,
+          obsidianVaultPath: originalCtx.obsidianVaultPath,
         }),
       )
 

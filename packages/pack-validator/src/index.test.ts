@@ -29,13 +29,13 @@ const basePack: Omit<InstructionPack, 'id'> = {
 
 describe('pack-validator', () => {
   it('builds a registry from validated packs', () => {
-    const packs = validatePackCollection([
+    const result = validatePackCollection([
       { ...basePack, id: 'alpha', compatible_with: ['beta'] },
       { ...basePack, id: 'beta' },
     ])
 
     const registry = buildPackRegistry(
-      packs,
+      result.packs,
       new Map([
         ['alpha', 'packs/engineering/alpha.yaml'],
         ['beta', 'packs/engineering/beta.yaml'],
@@ -44,5 +44,26 @@ describe('pack-validator', () => {
 
     expect(registry).toHaveLength(2)
     expect(registry[0]?.id).toBe('alpha')
+  })
+
+  it('detects asymmetric compatible_with relationships', () => {
+    const result = validatePackCollection([
+      { ...basePack, id: 'alpha', compatible_with: ['beta'] },
+      { ...basePack, id: 'beta', compatible_with: [] },
+    ])
+
+    expect(result.warnings).toHaveLength(1)
+    expect(result.warnings[0]?.code).toBe('asymmetric-compatible-with')
+    expect(result.warnings[0]?.packId).toBe('alpha')
+    expect(result.warnings[0]?.referencedPackId).toBe('beta')
+  })
+
+  it('returns no warnings for symmetric compatible_with', () => {
+    const result = validatePackCollection([
+      { ...basePack, id: 'alpha', compatible_with: ['beta'] },
+      { ...basePack, id: 'beta', compatible_with: ['alpha'] },
+    ])
+
+    expect(result.warnings).toHaveLength(0)
   })
 })
