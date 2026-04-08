@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
+import { z } from 'zod'
 import { buildPackRegistry, getPackRegistryEntry, listPackFiles, validatePackDirectory } from '@hub/pack-validator'
 import { createContextAnalyzer } from '@hub/context-analyzer'
 import { createKnowledgeCompiler } from '@hub/knowledge-compiler'
@@ -82,7 +83,12 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
   })
 
   app.post('/compiler/run', async (request) => {
-    const body = request.body as { vaultPath: string; outputPath?: string }
+    const body = z
+      .object({
+        vaultPath: z.string().min(1),
+        outputPath: z.string().min(1).optional(),
+      })
+      .parse(request.body)
     return knowledgeCompiler.compileVault({
       vaultPath: body.vaultPath,
       outputPath: body.outputPath ?? packsDir,
@@ -110,17 +116,29 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
   })
 
   app.post('/recommendations', async (request) => {
-    const body = request.body as { context?: ProjectContext; input?: unknown; minimumScore?: number }
+    const body = z
+      .object({
+        context: ProjectContextSchema.optional(),
+        input: z.unknown().optional(),
+        minimumScore: z.number().int().min(0).max(100).optional(),
+      })
+      .parse(request.body)
     const ctx = body.context
       ? ProjectContextSchema.parse(body.context)
       : await contextAnalyzer.analyzeProjectContext(AnalyzeProjectInputSchema.parse(body.input))
     const feedbackScores = await memoryService.getPackFeedbackScores(ctx.projectId)
-    const recommendations = await orchestrator.recommendPacks(ctx, body.minimumScore, feedbackScores)
+    const recommendations = await orchestrator.recommendPacks(ctx, body.minimumScore ?? 40, feedbackScores)
     return { context: ctx, ...recommendations }
   })
 
   app.post('/activations', async (request, reply) => {
-    const body = request.body as { context?: ProjectContext; input?: unknown; autoApprove?: boolean }
+    const body = z
+      .object({
+        context: ProjectContextSchema.optional(),
+        input: z.unknown().optional(),
+        autoApprove: z.boolean().optional(),
+      })
+      .parse(request.body)
     const ctx = body.context
       ? ProjectContextSchema.parse(body.context)
       : await contextAnalyzer.analyzeProjectContext(AnalyzeProjectInputSchema.parse(body.input))
@@ -170,7 +188,8 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
   })
 
   app.get('/activations/:id', async (request, reply) => {
-    const activation = await memoryService.getActivation((request.params as { id: string }).id)
+    const params = z.object({ id: z.string().min(1) }).parse(request.params)
+    const activation = await memoryService.getActivation(params.id)
     if (!activation) {
       reply.code(404)
       return { error: 'activation not found' }
@@ -178,12 +197,15 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
     return activation
   })
 
-  app.post('/feedback', async (request, reply) => {
-    const body = request.body as { packId?: string; helpful?: boolean; note?: string; projectId?: string }
-    if (!body.packId || typeof body.helpful !== 'boolean') {
-      reply.code(400)
-      return { error: 'packId and helpful are required' }
-    }
+  app.post('/feedback', async (request) => {
+    const body = z
+      .object({
+        packId: z.string().min(1),
+        helpful: z.boolean(),
+        note: z.string().optional(),
+        projectId: z.string().min(1).optional(),
+      })
+      .parse(request.body)
     await memoryService.recordFeedback(body.packId, body.helpful, body.note, body.projectId)
     return { recorded: true, packId: body.packId, helpful: body.helpful }
   })

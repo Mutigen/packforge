@@ -104,7 +104,9 @@ export function createOrchestrator(options?: { packsDir?: string }) {
           version: pack.version,
           score,
           reasons: buildReasons(pack, ctx),
-          required: score >= 80,
+          // Use rawScore for the required threshold so that packs can be marked
+          // required even in fallback/manual modes where confidenceFactor < 1.
+          required: rawScore >= 80,
         }
       })
       .filter((recommendation) => recommendation.score >= minimumScore)

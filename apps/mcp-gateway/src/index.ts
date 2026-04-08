@@ -367,7 +367,10 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
       }
 
       const updated = await memoryService.updateActivationStatus(input.activationId, 'active')
-      return { activationId: updated!.id, status: 'active', handoff: updated!.handoff }
+      if (!updated) {
+        return { error: `Activation ${input.activationId} could not be updated (may have been pruned)` }
+      }
+      return { activationId: updated.id, status: 'active', handoff: updated.handoff }
     },
     async listRegistryPacks() {
       const packs = await orchestrator.loadInstructionPacks()
