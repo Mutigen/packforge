@@ -47,6 +47,15 @@ function migrateState(raw: Partial<MemoryState>): MemoryState {
   return state
 }
 
+/**
+ * Read or initialize the memory state from disk.
+ *
+ * **Concurrency note:** The memory service uses a simple read-modify-write pattern
+ * without file-level locking. Concurrent writes from multiple processes or parallel
+ * requests can result in lost updates (last-write-wins). This is acceptable for
+ * single-process deployments (MCP Gateway, development server) but should be replaced
+ * with a proper database or advisory locking for multi-process production use.
+ */
 async function ensureState(filePath: string): Promise<MemoryState> {
   try {
     const source = await readFile(filePath, 'utf8')

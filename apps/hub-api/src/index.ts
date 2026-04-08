@@ -98,10 +98,14 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
   app.get('/packs', async () => {
     const packs = await validatePackDirectory(packsDir)
     const files = await listPackFiles(packsDir)
+    // Build map using actual pack IDs from validated packs matched to file paths.
+    // This handles cases where filename differs from pack id.
     const filePathByPackId = new Map<string, string>()
-    for (const filePath of files) {
-      const packId = path.basename(filePath, '.yaml')
-      filePathByPackId.set(packId, filePath)
+    for (const pack of packs) {
+      const filePath = files.find((candidate) => candidate.endsWith(`${pack.id}.yaml`))
+      if (filePath) {
+        filePathByPackId.set(pack.id, filePath)
+      }
     }
     return buildPackRegistry(packs, filePathByPackId)
   })

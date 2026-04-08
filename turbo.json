@@ -14,8 +14,13 @@
       "outputs": ["coverage/**"]
     },
     "type-check": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": []
     },
-    "lint": {}
+    "lint": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*.ts", "../../eslint.config.mjs"],
+      "outputs": []
+    }
   }
 }

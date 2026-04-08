@@ -4,6 +4,9 @@ const GITNEXUS_TOOL_PREFIX = 'mcp_gitnexus_'
 const GITNEXUS_CLI_PACK_ID = 'packforge-cli'
 const MEMPALACE_TOOL_PREFIX = 'mempalace_'
 
+/** Maximum score contribution from stack matches to prevent saturation. */
+const MAX_STACK_SCORE = 40
+
 /** Points applied per net feedback vote, capped at ±10 total impact. */
 const FEEDBACK_POINTS_PER_VOTE = 5
 const FEEDBACK_MAX_IMPACT = 10
@@ -21,17 +24,19 @@ export function scorePack(
   let score = 0
   const signals = pack.activation_signals
 
+  // Stack matches: 20pts each, capped at MAX_STACK_SCORE to prevent oversaturation
   const stackMatches = ctx.stack.filter((token) => signals.stack_hints.includes(token)).length
-  score += stackMatches * 20
+  score += Math.min(stackMatches * 20, MAX_STACK_SCORE)
 
   if (signals.phases.includes(ctx.phase)) score += 25
   if (signals.domains.includes(ctx.domain)) score += 20
   if (signals.task_types.includes(ctx.taskType)) score += 20
   if (signals.risk_profiles?.includes(ctx.riskProfile)) score += 10
 
+  // Keyword matches: 5pts each, capped at 15 to prevent keyword-stuffing oversaturation
   const description = ctx.description.toLowerCase()
   const keywordMatches = signals.keywords.filter((keyword) => description.includes(keyword.toLowerCase())).length
-  score += keywordMatches * 5
+  score += Math.min(keywordMatches * 5, 15)
 
   // GitNexus-aware scoring
   const usesGitNexusTools = pack.instructions.tools_allowed.some((t) => t.startsWith(GITNEXUS_TOOL_PREFIX))

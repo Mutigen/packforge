@@ -196,7 +196,13 @@ function buildHandoffContract(
     })
   }
 
-  if (!ctx.hasObsidianVault && !declinedTools.includes('obsidian')) {
+  // Only suggest Obsidian when the context involves documentation tasks or the domain benefits from it.
+  // Since no packs currently require Obsidian tools, only show this for documentation-oriented projects.
+  if (
+    !ctx.hasObsidianVault &&
+    !declinedTools.includes('obsidian') &&
+    (ctx.taskType === 'document' || packs.some((p) => p.category === 'documentation'))
+  ) {
     missingTools.push({
       tool: 'obsidian',
       label: 'Obsidian Knowledge Vault',
@@ -208,7 +214,7 @@ function buildHandoffContract(
         'Linked knowledge graph for project decisions and architecture',
         'Markdown-first workflow compatible with version control',
       ],
-      impactedPacks: [],
+      impactedPacks: packs.filter((p) => p.category === 'documentation').map((p) => p.id),
     })
   }
 
