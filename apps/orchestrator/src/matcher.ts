@@ -62,5 +62,14 @@ export function scorePack(
   )
   score += feedbackDelta
 
+  // WorkMode adjustment — open-source projects prefer documentation-heavy packs
+  if (ctx.workMode === 'open-source' && pack.category === 'documentation') {
+    score += 10
+  }
+  // Solo workers benefit more from quality packs (no team review available)
+  if (ctx.workMode === 'solo' && pack.category === 'quality') {
+    score += 5
+  }
+
   return Math.max(0, Math.min(score, 100))
 }

@@ -86,12 +86,24 @@ function toStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : []
 }
 
-function toNoteRefs(vaultName: string, refs: string[]): ObsidianNoteRef[] {
+function toNoteRefs(vaultName: string, refs: string[], kind: string = 'pattern'): ObsidianNoteRef[] {
+  // Validate that the kind is a known ObsidianNoteKind, fall back to 'pattern'
+  const validKinds: readonly string[] = [
+    'source',
+    'concept',
+    'domain',
+    'pattern',
+    'policy',
+    'pack-blueprint',
+    'taxonomy',
+    'decision',
+  ]
+  const resolvedKind = validKinds.includes(kind) ? kind : 'pattern'
   return refs.map((ref) => ({
     vault: vaultName,
     path: ref,
     title: path.basename(ref, '.md'),
-    kind: 'pattern',
+    kind: resolvedKind as ObsidianNoteRef['kind'],
   }))
 }
 
@@ -106,13 +118,19 @@ function buildBlueprint(note: VaultNote, vaultName: string): PackBlueprint {
     domain: toStringArray(frontmatter.domain) as PackBlueprint['domain'],
     phase: toStringArray(frontmatter.phase) as PackBlueprint['phase'],
     riskLevel: String(frontmatter.risk_level ?? 'low') as PackBlueprint['riskLevel'],
-    sourceNotes: toNoteRefs(vaultName, toStringArray(frontmatter.source_notes)),
+    sourceNotes: toNoteRefs(
+      vaultName,
+      toStringArray(frontmatter.source_notes),
+      String(frontmatter.source_note_kind ?? 'pattern'),
+    ),
     stackHints: toStringArray(frontmatter.stack_hints) as PackBlueprint['stackHints'],
     taskTypes: toStringArray(frontmatter.task_types) as PackBlueprint['taskTypes'],
     riskProfiles: toStringArray(frontmatter.risk_profiles) as PackBlueprint['riskProfiles'],
     keywords: toStringArray(frontmatter.keywords),
     compatibleWith: toStringArray(frontmatter.compatible_with),
     conflictsWith: toStringArray(frontmatter.conflicts_with),
+    signalDomains: toStringArray(frontmatter.signal_domains) as PackBlueprint['signalDomains'],
+    signalPhases: toStringArray(frontmatter.signal_phases) as PackBlueprint['signalPhases'],
     tone: String(frontmatter.tone ?? 'precise') as PackBlueprint['tone'],
     reasoningStyle: String(frontmatter.reasoning_style ?? 'trade-off-first') as PackBlueprint['reasoningStyle'],
     outputFormat: String(frontmatter.output_format ?? 'structured') as PackBlueprint['outputFormat'],
@@ -149,8 +167,8 @@ function compileBlueprint(blueprint: PackBlueprint) {
       keywords: blueprint.keywords,
       stack_hints: blueprint.stackHints,
       task_types: blueprint.taskTypes,
-      domains: blueprint.domain,
-      phases: blueprint.phase,
+      domains: blueprint.signalDomains.length > 0 ? blueprint.signalDomains : blueprint.domain,
+      phases: blueprint.signalPhases.length > 0 ? blueprint.signalPhases : blueprint.phase,
       risk_profiles: blueprint.riskProfiles,
     },
     conflicts_with: blueprint.conflictsWith,

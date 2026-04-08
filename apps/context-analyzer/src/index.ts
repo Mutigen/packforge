@@ -187,11 +187,14 @@ async function readGitNexusGraphSummary(
   repositoryPath: string,
   repoName: string | undefined,
   timeoutMs: number,
+  preloadedMeta?: GitNexusMeta | null,
+  preloadedFiles?: string[],
 ): Promise<GitNexusGraphSummary | null> {
-  const meta = await readJsonIfExists<GitNexusMeta>(path.join(repositoryPath, '.gitnexus', 'meta.json'))
+  const meta =
+    preloadedMeta ?? (await readJsonIfExists<GitNexusMeta>(path.join(repositoryPath, '.gitnexus', 'meta.json')))
   if (!meta) return null
 
-  const files = await listRelativeFiles(repositoryPath).catch(() => [] as string[])
+  const files = preloadedFiles ?? (await listRelativeFiles(repositoryPath).catch(() => [] as string[]))
   const languages = inferLanguagesFromFiles(files)
 
   // Try subprocess for richer graph data
@@ -432,7 +435,20 @@ function inferPhase(fileList: string[]): Phase {
   if (fileList.some((filePath) => filePath.startsWith('infra/terraform'))) return 'production'
   if (fileList.some((filePath) => filePath.startsWith('.github/workflows'))) return 'mvp'
   if (fileList.some((filePath) => filePath.startsWith('docs/'))) return 'architecture'
-  if (fileList.some((filePath) => filePath === 'CHANGELOG.md')) return 'production'
+  // CHANGELOG.md combined with a lockfile (e.g. package-lock.json) signals an established project.
+  // CHANGELOG.md alone is too common to reliably indicate production maturity.
+  if (
+    fileList.some((filePath) => filePath === 'CHANGELOG.md') &&
+    fileList.some(
+      (filePath) =>
+        filePath === 'package-lock.json' ||
+        filePath === 'yarn.lock' ||
+        filePath === 'pnpm-lock.yaml' ||
+        filePath === 'Gemfile.lock' ||
+        filePath === 'go.sum',
+    )
+  )
+    return 'production'
   return 'discovery'
 }
 
@@ -471,7 +487,9 @@ async function inferStackSignals(repositoryPath: string, sources: AnalyzerSource
     stack.push('docker')
   }
 
-  const compose = await readTextIfExists(path.join(repositoryPath, 'docker-compose.yml'))
+  const compose =
+    (await readTextIfExists(path.join(repositoryPath, 'docker-compose.yml'))) ??
+    (await readTextIfExists(path.join(repositoryPath, 'docker-compose.yaml')))
   if (compose) {
     sources.push('docker-compose')
     if (compose.includes('postgres')) stack.push('postgres')
@@ -485,30 +503,22 @@ async function inferStackSignals(repositoryPath: string, sources: AnalyzerSource
     const workflowFiles = await readdir(workflowsDir)
     if (workflowFiles.length > 0) {
       sources.push('github-workflows')
-      stack.push('node')
+      // Only add 'node' if the workflow files actually reference Node.js setup
+      for (const wf of workflowFiles) {
+        if (wf.endsWith('.yml') || wf.endsWith('.yaml')) {
+          const content = await readTextIfExists(path.join(workflowsDir, wf))
+          if (content && /setup-node|node-version|npm |npx |yarn |pnpm /i.test(content)) {
+            stack.push('node')
+            break
+          }
+        }
+      }
     }
   } catch {
     // ignore
   }
 
   return unique(stack)
-}
-
-async function readGitNexusMeta(
-  repositoryPath: string,
-  timeoutMs: number,
-): Promise<{ meta: GitNexusMeta | null; staleDays?: number; graphSummary?: GitNexusGraphSummary }> {
-  const meta = await readJsonIfExists<GitNexusMeta>(path.join(repositoryPath, '.gitnexus', 'meta.json'))
-  if (!meta) {
-    return { meta: null }
-  }
-
-  const staleDays = Math.max(0, Math.floor((Date.now() - new Date(meta.indexedAt).getTime()) / (1000 * 60 * 60 * 24)))
-  const repoName = path.basename(meta.repoPath ?? repositoryPath)
-
-  const graphSummary = await readGitNexusGraphSummary(repositoryPath, repoName, timeoutMs)
-
-  return { meta, staleDays, ...(graphSummary ? { graphSummary } : {}) }
 }
 
 export function createContextAnalyzer(options?: {
@@ -577,7 +587,8 @@ export function createContextAnalyzer(options?: {
         graphSummary = cached.summary ?? undefined
       } else {
         const repoName = path.basename(meta.repoPath ?? repositoryPath)
-        graphSummary = (await readGitNexusGraphSummary(repositoryPath, repoName, gitNexusTimeoutMs)) ?? undefined
+        graphSummary =
+          (await readGitNexusGraphSummary(repositoryPath, repoName, gitNexusTimeoutMs, meta, fileList)) ?? undefined
         gitNexusGraphCache.set(repositoryPath, { staleDays, summary: graphSummary ?? null })
       }
 

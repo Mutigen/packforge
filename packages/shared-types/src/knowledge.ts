@@ -43,6 +43,10 @@ export const PackBlueprintSchema = z.object({
   keywords: z.array(z.string().min(1)).default([]),
   compatibleWith: z.array(z.string().min(1)).default([]),
   conflictsWith: z.array(z.string().min(1)).default([]),
+  /** Domains used in activation_signals (defaults to pack domain when empty). */
+  signalDomains: z.array(z.enum(Domain)).default([]),
+  /** Phases used in activation_signals (defaults to pack phase when empty). */
+  signalPhases: z.array(z.enum(Phase)).default([]),
   tone: z.enum(PersonalityTone),
   reasoningStyle: z.enum(PersonalityReasoningStyle),
   outputFormat: z.enum(PersonalityOutputFormat),

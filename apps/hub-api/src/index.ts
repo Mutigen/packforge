@@ -23,6 +23,9 @@ function selectPacks(packsById: Map<string, InstructionPack>, packIds: string[])
   return packIds.map((packId) => packsById.get(packId)).filter((pack): pack is InstructionPack => Boolean(pack))
 }
 
+const GITNEXUS_TOOL_PREFIX = 'mcp_gitnexus_'
+const MEMPALACE_TOOL_PREFIX = 'mempalace_'
+
 function buildHandoffContract(input: {
   activationId: string
   contextSnapshotId: string
@@ -31,6 +34,62 @@ function buildHandoffContract(input: {
   approvalRequired: boolean
   maxRiskLevel: 'low' | 'medium' | 'high'
 }): RuntimeHandoffContract {
+  const activeInstructions: Array<{
+    packId: string
+    version: string
+    systemPrompt: string
+    constraints: string[]
+    toolsAllowed: string[]
+    toolsBlocked: string[]
+  }> = []
+  const pendingPacks: Array<{
+    packId: string
+    version: string
+    reason: string
+    requiredTool: 'gitnexus' | 'mempalace'
+    instruction: {
+      packId: string
+      version: string
+      systemPrompt: string
+      constraints: string[]
+      toolsAllowed: string[]
+      toolsBlocked: string[]
+    }
+  }> = []
+
+  for (const pack of input.packs) {
+    const usesGitNexus = pack.instructions.tools_allowed.some((t) => t.startsWith(GITNEXUS_TOOL_PREFIX))
+    const usesMemPalace = pack.instructions.tools_allowed.some((t) => t.startsWith(MEMPALACE_TOOL_PREFIX))
+    const instruction = {
+      packId: pack.id,
+      version: pack.version,
+      systemPrompt: pack.instructions.system_prompt,
+      constraints: pack.instructions.constraints,
+      toolsAllowed: pack.instructions.tools_allowed,
+      toolsBlocked: pack.instructions.tools_blocked,
+    }
+
+    if (usesGitNexus && !input.ctx.hasGitNexusIndex) {
+      pendingPacks.push({
+        packId: pack.id,
+        version: pack.version,
+        reason: 'Requires GitNexus index — run `npx gitnexus analyze` to enable',
+        requiredTool: 'gitnexus',
+        instruction,
+      })
+    } else if (usesMemPalace && !input.ctx.hasMemPalace) {
+      pendingPacks.push({
+        packId: pack.id,
+        version: pack.version,
+        reason: 'Requires MemPalace — install and configure to enable',
+        requiredTool: 'mempalace',
+        instruction,
+      })
+    } else {
+      activeInstructions.push(instruction)
+    }
+  }
+
   return RuntimeHandoffContractSchema.parse({
     contractVersion: '1.0.0',
     activationId: input.activationId,
@@ -40,19 +99,13 @@ function buildHandoffContract(input: {
       rootPath: input.ctx.repositoryPath,
       branchName: 'main',
     },
-    instructions: input.packs.map((pack) => ({
-      packId: pack.id,
-      version: pack.version,
-      systemPrompt: pack.instructions.system_prompt,
-      constraints: pack.instructions.constraints,
-      toolsAllowed: pack.instructions.tools_allowed,
-      toolsBlocked: pack.instructions.tools_blocked,
-    })),
+    instructions: activeInstructions,
+    pendingPacks,
     policy: {
       approvalRequired: input.approvalRequired,
       maxRiskLevel: input.maxRiskLevel,
       writeAccess: true,
-      networkAccess: true,
+      networkAccess: input.ctx.riskProfile !== 'regulated',
       deployAllowed: input.ctx.taskType === 'deploy' && !input.approvalRequired,
     },
     trace: {

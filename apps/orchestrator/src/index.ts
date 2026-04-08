@@ -99,12 +99,14 @@ export function createOrchestrator(options?: { packsDir?: string }) {
       .map((pack) => {
         const rawScore = scorePack(pack, ctx, feedbackScores)
         const score = Math.round(rawScore * ctx.confidenceFactor)
+        // Scale the threshold by confidenceFactor so `required` is reachable in every analyzer mode
+        const requiredThreshold = Math.round(80 * ctx.confidenceFactor)
         return {
           packId: pack.id,
           version: pack.version,
           score,
           reasons: buildReasons(pack, ctx),
-          required: score >= 80,
+          required: score >= requiredThreshold,
         }
       })
       .filter((recommendation) => recommendation.score >= minimumScore)
@@ -133,7 +135,8 @@ export function createOrchestrator(options?: { packsDir?: string }) {
       context: ctx,
       recommendedPacks: recommendations,
       blockedPacks,
-      policyDecision: 'allow',
+      // Pre-policy default — callers must run policyService.applyPolicy() to set the final decision
+      policyDecision: 'confirm',
       policyReasons: [],
     }
   }
