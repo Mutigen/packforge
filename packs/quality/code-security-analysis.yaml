@@ -60,10 +60,11 @@ activation_signals:
     - regulated
 conflicts_with: []
 compatible_with:
-  - project-excellence
   - packforge-impact-analysis
-  - packforge-pr-review
   - packforge-memory
+  - packforge-pr-review
+  - project-excellence
+  - ux-designer
 provenance:
   source_system: obsidian-compiler
   source_refs:

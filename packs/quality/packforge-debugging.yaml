@@ -64,10 +64,11 @@ activation_signals:
     - regulated
 conflicts_with: []
 compatible_with:
+  - packforge-cli
   - packforge-exploring
   - packforge-impact-analysis
-  - packforge-pr-review
   - packforge-memory
+  - packforge-pr-review
 provenance:
   source_system: obsidian-compiler
   source_refs:

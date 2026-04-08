@@ -87,6 +87,10 @@ export const InstructionPackSchema = z.object({
   instructions: InstructionsSchema,
   activation_signals: ActivationSignalsSchema,
   conflicts_with: z.array(z.string().min(1)).default([]),
+  /**
+   * Pack IDs that work well together.  Currently metadata-only — not used in
+   * scoring.  Validated for symmetry by validatePackCollection.
+   */
   compatible_with: z.array(z.string().min(1)).default([]),
   provenance: PackProvenanceSchema.optional(),
   approval: PackApprovalSchema.default({ state: 'approved' }),

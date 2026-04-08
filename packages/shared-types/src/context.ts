@@ -6,11 +6,8 @@ export type AnalyzerMode = (typeof AnalyzerMode)[number]
 
 export const AnalyzerSource = [
   'gitnexus-meta',
-  'gitnexus-query',
   'gitnexus-graph',
   'package-json',
-  'requirements-txt',
-  'pyproject-toml',
   'dockerfile',
   'docker-compose',
   'github-workflows',

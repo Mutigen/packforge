@@ -62,10 +62,11 @@ activation_signals:
     - production
 conflicts_with: []
 compatible_with:
-  - packforge-impact-analysis
+  - code-security-analysis
   - packforge-debugging
-  - packforge-refactoring
+  - packforge-impact-analysis
   - packforge-memory
+  - packforge-refactoring
 provenance:
   source_system: obsidian-compiler
   source_refs:

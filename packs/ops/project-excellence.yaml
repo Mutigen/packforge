@@ -58,9 +58,11 @@ activation_signals:
     - production
 conflicts_with: []
 compatible_with:
-  - init-project
   - agent-customization
   - code-security-analysis
+  - creating-skills
+  - init-project
+  - ux-designer
 provenance:
   source_system: obsidian-compiler
   source_refs:

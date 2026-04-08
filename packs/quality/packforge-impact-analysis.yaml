@@ -65,10 +65,13 @@ activation_signals:
     - regulated
 conflicts_with: []
 compatible_with:
+  - code-security-analysis
+  - packforge-cli
   - packforge-debugging
+  - packforge-exploring
+  - packforge-memory
   - packforge-pr-review
   - packforge-refactoring
-  - packforge-memory
 provenance:
   source_system: obsidian-compiler
   source_refs:

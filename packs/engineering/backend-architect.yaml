@@ -48,7 +48,9 @@ activation_signals:
     - production
 conflicts_with: []
 compatible_with:
+  - fullstack-builder
   - security-reviewer
+  - ux-designer
 provenance:
   source_system: obsidian-compiler
   source_refs:

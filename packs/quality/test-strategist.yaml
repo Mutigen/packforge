@@ -67,5 +67,15 @@ activation_signals:
     - regulated
 conflicts_with: []
 compatible_with:
-  - security-reviewer
+  - frontend-specialist
   - fullstack-builder
+  - security-reviewer
+execution_policy:
+  allowed_targets:
+    - client_workspace
+    - sandbox_container
+  requires_human_confirm: true
+approval:
+  state: approved
+maturity:
+  level: stable

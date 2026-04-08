@@ -62,3 +62,12 @@ activation_signals:
 conflicts_with: []
 compatible_with:
   - test-strategist
+execution_policy:
+  allowed_targets:
+    - client_workspace
+    - sandbox_container
+  requires_human_confirm: false
+approval:
+  state: approved
+maturity:
+  level: stable

@@ -68,6 +68,7 @@ compatible_with:
   - packforge-debugging
   - packforge-impact-analysis
   - packforge-memory
+  - packforge-refactoring
 provenance:
   source_system: obsidian-compiler
   source_refs:
