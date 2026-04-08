@@ -90,14 +90,15 @@ export function validatePackCollection(packs: InstructionPack[]): {
   return { packs, warnings }
 }
 
-export async function validatePackDirectory(rootDir: string): Promise<InstructionPack[]> {
+export async function validatePackDirectory(
+  rootDir: string,
+): Promise<{ packs: InstructionPack[]; warnings: PackCollectionWarning[] }> {
   const files = await listPackFiles(rootDir)
   const packs = await Promise.all(files.map((filePath) => validatePackFile(filePath)))
 
-  // Validate collection — asymmetry warnings are non-fatal
-  validatePackCollection(packs)
+  const { warnings } = validatePackCollection(packs)
 
-  return packs.sort((left, right) => left.id.localeCompare(right.id))
+  return { packs: packs.sort((left, right) => left.id.localeCompare(right.id)), warnings }
 }
 
 export function getPackRegistryEntry(pack: InstructionPack, filePath: string): PackRegistryEntry {

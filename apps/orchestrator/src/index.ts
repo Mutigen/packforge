@@ -78,7 +78,8 @@ export function createOrchestrator(options?: { packsDir?: string }) {
     if (!forceRefresh && cachedPacks !== null && Date.now() - cacheLoadedAt < PACK_CACHE_TTL_MS) {
       return cachedPacks
     }
-    cachedPacks = await validatePackDirectory(packsDir)
+    const result = await validatePackDirectory(packsDir)
+    cachedPacks = result.packs
     cacheLoadedAt = Date.now()
     return cachedPacks
   }
