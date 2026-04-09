@@ -19,13 +19,45 @@
 
 **packforge** analyzes your project context (stack, domain, phase, risk) and recommends the right instruction packs for your AI coding agent. It works as a **Model Context Protocol (MCP)** server — just point your editor at it, describe your project, and get back curated system prompts, tool permissions, and bootstrap steps.
 
+## Highlights
+
+### Zero-Config Project Analysis
+Point PackForge at any project and it auto-detects the stack, domain, project phase, and risk profile — no config files needed. It reads `package.json`, file trees, CI workflows, and existing tooling to build a full picture in seconds.
+
+### Context-Aware Pack Activation
+Based on the analysis, PackForge selects the right instruction packs (system prompts, constraints, tool permissions) from a registry of **18 packs across 5 categories**. Packs that don't match your context are filtered out — your AI agent only gets relevant instructions.
+
+### Smart Tool Onboarding
+PackForge detects whether GitNexus, MemPalace, and Obsidian are installed — both globally and per-project. Missing tools surface with install guides, concrete benefits, and a list of packs waiting for them. Users can permanently decline suggestions they don't want.
+
+### Per-Project Setup Detection
+It's not enough to have a tool installed globally. PackForge checks whether the current project is actually indexed — e.g., does GitNexus have a `.gitnexus/` index for this repo? Does MemPalace have a wing for this folder? If not, it emits a bootstrap step: *"Run this command to set it up."*
+
+### Self-Improving Memory
+Every AI agent working with PackForge is **required** to log non-trivial fixes to MemPalace via `mempalace_diary_write`. Each entry captures the problem, root cause, solution, and affected files. Future sessions read these entries first — the system learns from every bug it solves and never repeats the same mistake.
+
+### Staged Activation with Pending Packs
+Packs that require unavailable tools (e.g., GitNexus not yet indexed) aren't discarded — they're held as "pending". Once the tool is set up, `reload_activation` promotes them to active without re-running the full analysis.
+
+### GitNexus Deep Integration
+When a project has a GitNexus code intelligence graph, PackForge queries it for symbol counts, clusters, and execution flows. Six dedicated packs cover exploring, debugging, impact analysis, refactoring, PR review, and CLI — each with pre-configured MCP tool permissions and a **+25 scoring boost**.
+
+### MemPalace as Persistent Agent Memory
+MemPalace gives AI agents memory that survives across conversations. PackForge writes project snapshots after every analysis, reads past decisions before recommending changes, and uses the diary system to accumulate operational knowledge over time.
+
+### 2-Tool UX
+The core workflow is two commands: `start_project_from_spec` → `confirm_activation`. Everything else is optional.
+
 ### Key Features
 
 - **Context-Aware Recommendations** — analyzes `package.json`, file tree, GitNexus graph, and MemPalace memory to understand your project
 - **18 Instruction Packs** — covering engineering, quality, ops, product, and documentation workflows
 - **2-Tool UX** — `start_project_from_spec` → `confirm_activation`. That's it.
-- **GitNexus Integration** — leverages code intelligence graph for deeper context enrichment
+- **Staged Activation** — packs requiring unavailable tools (GitNexus, MemPalace) are held as pending; `reload_activation` promotes them once tools are set up
+- **Tool Onboarding** — missing tools surface install guides and benefits; users can permanently decline suggestions via `decline_tool_suggestion`
+- **GitNexus Integration** — leverages code intelligence graph for deeper context enrichment; subprocess-based graph queries with meta.json fallback
 - **MemPalace Integration** — enriches agent context with persistent memory, past decisions, and knowledge graph
+- **Obsidian Auto-Discovery** — detects Obsidian vaults from system config and project `.obsidian/` directory
 - **Turborepo Monorepo** — 7 apps, 6 shared packages, fully typed with Zod schemas
 
 ## Architecture
@@ -38,7 +70,7 @@
                              │ stdio
 ┌────────────────────────────▼──────────────────────────────┐
 │                     MCP Gateway                           │
-│              (stdio MCP server, 8 tools)                  │
+│              (stdio MCP server, 10 tools)                 │
 └──┬──────────┬──────────┬──────────┬───────────────────────┘
    │          │          │          │
 ┌──▼───────┐ ┌▼────────┐ ┌▼────────┐ ┌▼──────────────┐
@@ -139,7 +171,7 @@ Create `.vscode/mcp.json` in any project:
 
 </details>
 
-After adding the config, **reload your editor** (VS Code: `Cmd+Shift+P` → "Reload Window"). You should see 8 packforge tools available.
+After adding the config, **reload your editor** (VS Code: `Cmd+Shift+P` → "Reload Window"). You should see 10 packforge tools available.
 
 ## Usage
 
@@ -147,6 +179,11 @@ Once connected via MCP, use two tools:
 
 1. **`start_project_from_spec`** — describe your project to get pack recommendations
 2. **`confirm_activation`** — activate recommended packs and receive system prompts + bootstrap steps
+
+After activation, if external tools become available:
+
+3. **`reload_activation`** — re-evaluate context and promote pending packs to active
+4. **`decline_tool_suggestion`** — permanently dismiss a tool suggestion (e.g. GitNexus, MemPalace)
 
 ## Pack Categories
 
@@ -168,9 +205,11 @@ packforge has deep [GitNexus](https://github.com/nicobailon/gitnexus) integratio
 
 packforge integrates [MemPalace](https://github.com/milla-jovovich/mempalace) as a persistent memory layer. The context analyzer detects `~/.mempalace/palace/` and reads the palace identity and wing count. The dedicated `packforge-memory` pack provides 5 curated MemPalace tools (`mempalace_search`, `mempalace_status`, `mempalace_kg_query`, `mempalace_add_drawer`, `mempalace_diary_write`) while blocking 14 structural modification tools. All compatible packs include a constraint to check MemPalace for past decisions before making architecture choices. Packs using `mempalace_*` tools get a **+15 scoring boost**.
 
-### Obsidian (Pack Authoring)
+### Obsidian
 
-Instruction packs can be authored as Obsidian vault blueprints in `vault/`. Each blueprint is a Markdown file with structured sections (personality, constraints, tools, signals) that compiles to a validated YAML pack. This lets you design packs visually in Obsidian and compile them into the pack registry.
+packforge detects Obsidian vaults automatically — both from the system-level Obsidian config (`obsidian.json`) and from a project-local `.obsidian/` directory. The detected vault path is included in the project context for richer pack matching.
+
+Instruction packs can also be authored as Obsidian vault blueprints in `vault/`. Each blueprint is a Markdown file with structured sections (personality, constraints, tools, signals) that compiles to a validated YAML pack.
 
 ## Project Structure
 
@@ -179,7 +218,7 @@ apps/
   context-analyzer/   # Analyzes project stack, domain, phase, GitNexus + MemPalace
   hub-api/            # REST API gateway (alternative to MCP)
   knowledge-compiler/ # Compiles Obsidian vault blueprints to YAML packs
-  mcp-gateway/        # MCP stdio server (primary entry point, 8 tools)
+  mcp-gateway/        # MCP stdio server (primary entry point, 10 tools)
   memory-service/     # Activation state persistence (JSON file storage)
   orchestrator/       # Matches and scores packs against context
   policy-service/     # Governance, approval, and risk evaluation
