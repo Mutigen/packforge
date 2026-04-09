@@ -227,6 +227,7 @@ async function readGitNexusGraphSummary(
 type MemPalaceSummary = {
   identity: string | null
   wingCount: number
+  projectIndexed: boolean
 }
 
 type ObsidianDiscovery = {
@@ -301,7 +302,7 @@ async function discoverObsidianVaults(projectPath?: string): Promise<ObsidianDis
   return { vaultPaths, projectVaultPath }
 }
 
-async function readMemPalaceSummary(homedirPath: string): Promise<MemPalaceSummary | null> {
+async function readMemPalaceSummary(homedirPath: string, projectPath?: string): Promise<MemPalaceSummary | null> {
   const palacePath = path.join(homedirPath, '.mempalace', 'palace')
   try {
     await readdir(palacePath)
@@ -312,14 +313,26 @@ async function readMemPalaceSummary(homedirPath: string): Promise<MemPalaceSumma
   const identity = await readTextIfExists(path.join(homedirPath, '.mempalace', 'identity.txt'))
 
   let wingCount = 0
+  let projectIndexed = false
   try {
     const entries = await readdir(palacePath, { withFileTypes: true })
-    wingCount = entries.filter((e) => e.isDirectory() && e.name.startsWith('wing_')).length
+    const wingDirs = entries.filter((e) => e.isDirectory() && e.name.startsWith('wing_'))
+    wingCount = wingDirs.length
+
+    if (projectPath) {
+      const folderName = path
+        .basename(projectPath)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '')
+      const expectedWing = `wing_${folderName}`
+      projectIndexed = wingDirs.some((e) => e.name === expectedWing)
+    }
   } catch {
     // ignore
   }
 
-  return { identity: identity?.trim() ?? null, wingCount }
+  return { identity: identity?.trim() ?? null, wingCount, projectIndexed }
 }
 
 /** Sanitize a projectId to a safe filename component. */
@@ -599,7 +612,7 @@ export function createContextAnalyzer(options?: {
 
     // ─── MemPalace detection ──────────────────────────────────────────────────
     const homedirPath = homedir()
-    const mempalace = await readMemPalaceSummary(homedirPath)
+    const mempalace = await readMemPalaceSummary(homedirPath, repositoryPath)
     if (mempalace) {
       analyzerSources.push('mempalace-palace')
       if (mempalace.identity) {
@@ -641,6 +654,7 @@ export function createContextAnalyzer(options?: {
       gitNexusClusters: graphSummary?.clusterLabels ?? [],
       gitNexusProcessLabels: graphSummary?.processLabels ?? [],
       hasMemPalace: Boolean(mempalace),
+      mempalaceProjectIndexed: Boolean(mempalace?.projectIndexed),
       ...(mempalace?.identity ? { mempalaceIdentity: mempalace.identity } : {}),
       ...(mempalace ? { mempalaceWingCount: mempalace.wingCount } : {}),
       hasObsidianVault: obsidian.vaultPaths.length > 0,

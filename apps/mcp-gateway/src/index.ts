@@ -118,7 +118,16 @@ function buildBootstrapSteps(ctx: ProjectContext): BootstrapStep[] {
     }
   }
 
-  if (ctx.hasMemPalace) {
+  if (ctx.hasMemPalace && !ctx.mempalaceProjectIndexed && ctx.repositoryPath) {
+    steps.push({
+      id: 'mempalace-project-init',
+      label: 'Index project into MemPalace',
+      command: `mempalace init "${ctx.repositoryPath}" && mempalace mine`,
+      condition: 'if_project_not_indexed',
+      description:
+        'This project has not been mined into MemPalace yet. Run this once to let MemPalace learn the codebase so memory-enriched packs can access past context, decisions, and patterns.',
+    })
+  } else if (ctx.hasMemPalace) {
     steps.push({
       id: 'mempalace-wakeup',
       label: 'Wake up MemPalace',
