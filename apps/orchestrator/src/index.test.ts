@@ -74,6 +74,7 @@ const baseCtx = {
   gitNexusClusters: [] as string[],
   gitNexusProcessLabels: [] as string[],
   hasMemPalace: false,
+  mempalaceProjectIndexed: false,
   hasObsidianVault: false,
   obsidianVaults: [] as string[],
 }

@@ -74,6 +74,7 @@ execution_policy:
         gitNexusClusters: [],
         gitNexusProcessLabels: [],
         hasMemPalace: false,
+        mempalaceProjectIndexed: false,
         hasObsidianVault: false,
         obsidianVaults: [],
       },

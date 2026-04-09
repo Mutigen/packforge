@@ -34,6 +34,7 @@ function makePlan(projectId = 'proj'): ActivationPlan {
       gitNexusClusters: [],
       gitNexusProcessLabels: [],
       hasMemPalace: false,
+      mempalaceProjectIndexed: false,
       hasObsidianVault: false,
       obsidianVaults: [],
     },

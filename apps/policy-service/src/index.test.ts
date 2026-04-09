@@ -20,6 +20,7 @@ const baseContext: ProjectContext = {
   gitNexusClusters: [],
   gitNexusProcessLabels: [],
   hasMemPalace: false,
+  mempalaceProjectIndexed: false,
   hasObsidianVault: false,
   obsidianVaults: [],
 }
