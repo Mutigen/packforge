@@ -211,13 +211,12 @@ async function readGitNexusGraphSummary(
     }
   }
 
-  // Fallback: meta.json only
-  const communityCount = meta.stats?.communities ?? 0
-  const clusterLabels = communityCount > 0 ? Array.from({ length: communityCount }, (_, i) => `cluster_${i}`) : []
-
+  // Fallback: meta.json only — no subprocess data available.
+  // Avoid emitting opaque placeholder labels like 'cluster_0' that carry no semantic value.
+  // Downstream consumers should check symbolCount and hasProcesses for index status.
   return {
     symbolCount: meta.stats?.nodes ?? 0,
-    clusterLabels,
+    clusterLabels: [],
     processLabels: [],
     languages,
     hasProcesses: (meta.stats?.processes ?? 0) > 0,
@@ -516,15 +515,15 @@ async function inferStackSignals(repositoryPath: string, sources: AnalyzerSource
     const workflowFiles = await readdir(workflowsDir)
     if (workflowFiles.length > 0) {
       sources.push('github-workflows')
-      // Only add 'node' if the workflow files actually reference Node.js setup
+      // Infer stack from workflow file contents instead of blindly adding 'node'
       for (const wf of workflowFiles) {
-        if (wf.endsWith('.yml') || wf.endsWith('.yaml')) {
-          const content = await readTextIfExists(path.join(workflowsDir, wf))
-          if (content && /setup-node|node-version|npm |npx |yarn |pnpm /i.test(content)) {
-            stack.push('node')
-            break
-          }
-        }
+        if (!wf.endsWith('.yml') && !wf.endsWith('.yaml')) continue
+        const wfContent = await readTextIfExists(path.join(workflowsDir, wf))
+        if (!wfContent) continue
+        if (/node-version|setup-node|actions\/setup-node|npm |yarn |pnpm /.test(wfContent)) stack.push('node')
+        if (/python-version|setup-python|actions\/setup-python|pip /.test(wfContent)) stack.push('python')
+        if (/go-version|setup-go|actions\/setup-go/.test(wfContent)) stack.push('go')
+        if (/rust|cargo|actions-rs/.test(wfContent)) stack.push('rust')
       }
     }
   } catch {
@@ -556,6 +555,16 @@ export function createContextAnalyzer(options?: {
     const repositoryPath = parsed.repositoryPath ? path.resolve(parsed.repositoryPath) : undefined
 
     if (!repositoryPath) {
+      // Even without a repositoryPath, detect user-level services (MemPalace, Obsidian)
+      const homedirPath = homedir()
+      const mempalace = await readMemPalaceSummary(homedirPath)
+      const obsidian = await discoverObsidianVaults()
+      const manualSources: AnalyzerSourceType[] = ['user-form']
+      if (mempalace) {
+        manualSources.push('mempalace-palace')
+        if (mempalace.identity) manualSources.push('mempalace-identity')
+      }
+
       return ProjectContextSchema.parse({
         projectId: parsed.projectId,
         description: parsed.description,
@@ -567,11 +576,16 @@ export function createContextAnalyzer(options?: {
         workMode: parsed.workMode,
         customKeywords: parsed.customKeywords,
         analyzerMode: 'manual',
-        analyzerSources: ['user-form'],
+        analyzerSources: manualSources,
         confidenceFactor: MODE_CONFIDENCE_FACTOR.manual,
         analyzedAt: new Date().toISOString(),
         executionTarget: parsed.executionTarget,
-        obsidianVaultPath: parsed.obsidianVaultPath,
+        obsidianVaultPath: parsed.obsidianVaultPath ?? obsidian.vaultPaths[0],
+        hasMemPalace: Boolean(mempalace),
+        ...(mempalace?.identity ? { mempalaceIdentity: mempalace.identity } : {}),
+        ...(mempalace ? { mempalaceWingCount: mempalace.wingCount } : {}),
+        hasObsidianVault: obsidian.vaultPaths.length > 0,
+        obsidianVaults: obsidian.vaultPaths,
       })
     }
 

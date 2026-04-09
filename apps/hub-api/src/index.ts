@@ -137,7 +137,10 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
 
   app.post('/compiler/run', async (request) => {
     const body = z
-      .object({ vaultPath: z.string().min(1), outputPath: z.string().min(1).optional() })
+      .object({
+        vaultPath: z.string().min(1),
+        outputPath: z.string().min(1).optional(),
+      })
       .parse(request.body)
     return knowledgeCompiler.compileVault({
       vaultPath: body.vaultPath,
@@ -146,18 +149,25 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
   })
 
   app.get('/packs', async () => {
-    const packs = await validatePackDirectory(packsDir)
+    const { packs } = await validatePackDirectory(packsDir)
     const files = await listPackFiles(packsDir)
-    const filePathByPackId = new Map<string, string>()
+    // Pre-build a map from basename (without extension) to full path for O(1) lookups
+    const filesByBasename = new Map<string, string>()
     for (const filePath of files) {
-      const packId = path.basename(filePath, '.yaml')
-      filePathByPackId.set(packId, filePath)
+      filesByBasename.set(path.basename(filePath, '.yaml'), filePath)
+    }
+    const filePathByPackId = new Map<string, string>()
+    for (const pack of packs) {
+      const filePath = filesByBasename.get(pack.id)
+      if (filePath) {
+        filePathByPackId.set(pack.id, filePath)
+      }
     }
     return buildPackRegistry(packs, filePathByPackId)
   })
 
   app.get('/registry', async () => {
-    const packs = await validatePackDirectory(packsDir)
+    const { packs } = await validatePackDirectory(packsDir)
     const files = await listPackFiles(packsDir)
     return packs.map((pack) => {
       const filePath = files.find((candidate) => candidate.endsWith(`${pack.id}.yaml`))
@@ -170,14 +180,14 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
       .object({
         context: ProjectContextSchema.optional(),
         input: z.unknown().optional(),
-        minimumScore: z.number().optional(),
+        minimumScore: z.number().int().min(0).max(100).optional(),
       })
       .parse(request.body)
     const ctx = body.context
       ? body.context
       : await contextAnalyzer.analyzeProjectContext(AnalyzeProjectInputSchema.parse(body.input))
     const feedbackScores = await memoryService.getPackFeedbackScores(ctx.projectId)
-    const recommendations = await orchestrator.recommendPacks(ctx, body.minimumScore, feedbackScores)
+    const recommendations = await orchestrator.recommendPacks(ctx, body.minimumScore ?? 40, feedbackScores)
     return { context: ctx, ...recommendations }
   })
 
@@ -247,7 +257,7 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
     return activation
   })
 
-  app.post('/feedback', async (request, reply) => {
+  app.post('/feedback', async (request) => {
     const body = z
       .object({
         packId: z.string().min(1),

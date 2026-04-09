@@ -58,7 +58,16 @@ function migrateState(raw: Partial<MemoryState>): MemoryState {
   return state
 }
 
-async function readState(filePath: string): Promise<MemoryState> {
+/**
+ * Read or initialize the memory state from disk.
+ *
+ * **Concurrency note:** The memory service uses a simple read-modify-write pattern
+ * without file-level locking. Concurrent writes from multiple processes or parallel
+ * requests can result in lost updates (last-write-wins). This is acceptable for
+ * single-process deployments (MCP Gateway, development server) but should be replaced
+ * with a proper database or advisory locking for multi-process production use.
+ */
+async function ensureState(filePath: string): Promise<MemoryState> {
   try {
     const source = await readFile(filePath, 'utf8')
     return migrateState(JSON.parse(source) as Partial<MemoryState>)
@@ -109,7 +118,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
     handoff?: RuntimeHandoffContract
   }): Promise<StoredActivation> {
     return mutex.run(async () => {
-      const state = await readState(filePath)
+      const state = await ensureState(filePath)
       const activation: StoredActivation = {
         id: input.id ?? randomUUID(),
         status: input.status,
@@ -134,7 +143,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
   }
 
   async function getActivation(id: string): Promise<StoredActivation | null> {
-    const state = await readState(filePath)
+    const state = await ensureState(filePath)
     return state.activations.find((activation) => activation.id === id) ?? null
   }
 
@@ -143,7 +152,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
     status: StoredActivation['status'],
   ): Promise<StoredActivation | null> {
     return mutex.run(async () => {
-      const state = await readState(filePath)
+      const state = await ensureState(filePath)
       const activation = state.activations.find((a) => a.id === id)
       if (!activation) return null
       activation.status = status
@@ -157,7 +166,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
     handoff: RuntimeHandoffContract,
   ): Promise<StoredActivation | null> {
     return mutex.run(async () => {
-      const state = await readState(filePath)
+      const state = await ensureState(filePath)
       const activation = state.activations.find((a) => a.id === id)
       if (!activation) return null
       activation.handoff = handoff
@@ -167,7 +176,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
   }
 
   async function listActivations(opts?: ListActivationsOptions): Promise<StoredActivation[]> {
-    const state = await readState(filePath)
+    const state = await ensureState(filePath)
     let result = state.activations
 
     if (opts?.projectId) {
@@ -191,7 +200,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
    */
   async function recordFeedback(packId: string, helpful: boolean, note?: string, projectId?: string): Promise<void> {
     return mutex.run(async () => {
-      const state = await readState(filePath)
+      const state = await ensureState(filePath)
       const entry: FeedbackEntry = {
         packId,
         helpful,
@@ -212,7 +221,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
    * included when no project-specific entries exist for that pack.
    */
   async function getPackFeedbackScores(projectId?: string): Promise<Record<string, number>> {
-    const state = await readState(filePath)
+    const state = await ensureState(filePath)
     const scores: Record<string, number> = {}
 
     const projectEntries = projectId ? state.feedback.filter((f) => f.projectId === projectId) : []
@@ -242,7 +251,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
    */
   async function declineToolSuggestion(tool: string, projectId?: string): Promise<void> {
     return mutex.run(async () => {
-      const state = await readState(filePath)
+      const state = await ensureState(filePath)
       const bucket = projectId ?? '*'
       if (!state.declinedToolsByProject[bucket]) {
         state.declinedToolsByProject[bucket] = []
@@ -263,7 +272,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
    * @param projectId Optional project scope — omit for the global list only.
    */
   async function getDeclinedTools(projectId?: string): Promise<string[]> {
-    const state = await readState(filePath)
+    const state = await ensureState(filePath)
     const global = state.declinedToolsByProject['*'] ?? []
     if (!projectId) return global
 

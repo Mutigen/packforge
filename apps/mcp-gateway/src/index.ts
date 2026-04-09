@@ -228,7 +228,13 @@ function buildHandoffContract(
     })
   }
 
-  if (!ctx.hasObsidianVault && !declinedTools.includes('obsidian')) {
+  // Only suggest Obsidian when the context involves documentation tasks or the domain benefits from it.
+  // Since no packs currently require Obsidian tools, only show this for documentation-oriented projects.
+  if (
+    !ctx.hasObsidianVault &&
+    !declinedTools.includes('obsidian') &&
+    (ctx.taskType === 'document' || packs.some((p) => p.category === 'documentation'))
+  ) {
     missingTools.push({
       tool: 'obsidian',
       label: 'Obsidian Knowledge Vault',
@@ -240,7 +246,7 @@ function buildHandoffContract(
         'Linked knowledge graph for project decisions and architecture',
         'Markdown-first workflow compatible with version control',
       ],
-      impactedPacks: [],
+      impactedPacks: packs.filter((p) => p.category === 'documentation').map((p) => p.id),
     })
   }
 
@@ -410,7 +416,10 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
       }
 
       const updated = await memoryService.updateActivationStatus(input.activationId, 'active')
-      return { activationId: updated!.id, status: 'active', handoff: updated!.handoff }
+      if (!updated) {
+        return { error: `Activation ${input.activationId} could not be updated (may have been pruned)` }
+      }
+      return { activationId: updated.id, status: 'active', handoff: updated.handoff }
     },
     async listRegistryPacks() {
       const packs = await orchestrator.loadInstructionPacks()
@@ -431,10 +440,22 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
         return { activationId: activation.id, status: 'no_pending_packs', promoted: [], stillPending: [], handoff }
       }
 
+      // Re-analyze context but preserve original context fields from the stored plan
+      // so that description, taskType, domain, phase, riskProfile etc. are not lost.
+      const originalCtx = activation.plan.context
       const ctx = await contextAnalyzer.analyzeProjectContext(
         AnalyzeProjectInputSchema.parse({
           projectId: activation.plan.projectId,
           repositoryPath: handoff.workspace.rootPath,
+          description: originalCtx.description,
+          taskType: originalCtx.taskType,
+          domain: originalCtx.domain,
+          phase: originalCtx.phase,
+          riskProfile: originalCtx.riskProfile,
+          workMode: originalCtx.workMode,
+          customKeywords: originalCtx.customKeywords,
+          executionTarget: originalCtx.executionTarget,
+          obsidianVaultPath: originalCtx.obsidianVaultPath,
         }),
       )
 
