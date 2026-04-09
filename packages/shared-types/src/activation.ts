@@ -42,7 +42,13 @@ export const BootstrapStepSchema = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
   command: z.string().min(1),
-  condition: z.enum(['always', 'if_missing_gitnexus', 'if_missing_deps', 'if_mempalace_available']),
+  condition: z.enum([
+    'always',
+    'if_missing_gitnexus',
+    'if_missing_deps',
+    'if_mempalace_available',
+    'if_project_not_indexed',
+  ]),
   description: z.string().min(1).optional(),
 })
 

@@ -41,7 +41,10 @@ instructions:
     - Do not modify the palace structure (wings/rooms) — only read and add drawers.
     - When MemPalace is available, call get_project_history at session start to surface evolution since last run.
     - Compare current stack/phase/domain against the project history snapshot to detect drift before recommending changes.
-    - After fixing any non-obvious bug or discovering a non-trivial edge case, MUST call mempalace_diary_write with agent="packforge" and entry in format "PROBLEM: X | ROOT_CAUSE: Y | FIX: Z | AFFECTED: file". This is how PackForge learns from practice automatically.
+    - >-
+      After fixing any non-obvious bug or discovering a non-trivial edge case, MUST call mempalace_diary_write
+      with agent="packforge" and entry in format "PROBLEM: X | ROOT_CAUSE: Y | FIX: Z | AFFECTED: file".
+      This is how PackForge learns from practice automatically.
   tools_allowed:
     - mempalace_search
     - mempalace_status
