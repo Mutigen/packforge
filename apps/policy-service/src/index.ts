@@ -1,8 +1,9 @@
-import type { ActivationPlan, InstructionPack, ProjectContext } from '@hub/shared-types'
+import type { ActivationPlan, InstructionPack, PackDiagnostic, ProjectContext } from '@hub/shared-types'
 
 type PolicyEvaluation = {
   decision: 'allow' | 'confirm' | 'deny'
   reasons: string[]
+  diagnostics: PackDiagnostic[]
   approvalRequired: boolean
   maxRiskLevel: 'low' | 'medium' | 'high'
 }
@@ -21,10 +22,20 @@ function getMaxRiskLevel(packs: InstructionPack[]): 'low' | 'medium' | 'high' {
 
 export function createPolicyService() {
   function evaluateActivation(ctx: ProjectContext, packs: InstructionPack[]): PolicyEvaluation {
+    const diagnostics: PackDiagnostic[] = []
+
     if (packs.length === 0) {
       return {
         decision: 'deny',
         reasons: ['no packs selected'],
+        diagnostics: [
+          {
+            severity: 'error',
+            tag: 'policy-violation',
+            packId: '*',
+            message: 'no packs selected',
+          },
+        ],
         approvalRequired: false,
         maxRiskLevel: 'low',
       }
@@ -37,31 +48,78 @@ export function createPolicyService() {
       (pack) => !pack.execution_policy.allowed_targets.includes(ctx.executionTarget),
     )
     if (disallowedTargetPack) {
+      const message = `pack ${disallowedTargetPack.id} is not allowed on target ${ctx.executionTarget}`
       return {
         decision: 'deny',
-        reasons: [`pack ${disallowedTargetPack.id} is not allowed on target ${ctx.executionTarget}`],
+        reasons: [message],
+        diagnostics: [
+          {
+            severity: 'error',
+            tag: 'policy-violation',
+            packId: disallowedTargetPack.id,
+            message,
+            suggestion: `Add '${ctx.executionTarget}' to the pack's allowed_targets or use a different execution target`,
+          },
+        ],
         approvalRequired: false,
         maxRiskLevel,
       }
     }
 
     if (ctx.riskProfile === 'regulated') {
-      reasons.push('regulated projects require human confirmation')
+      const message = 'regulated projects require human confirmation'
+      reasons.push(message)
+      diagnostics.push({
+        severity: 'warning',
+        tag: 'policy-violation',
+        packId: '*',
+        message,
+      })
     }
     if (ctx.taskType === 'deploy') {
-      reasons.push('deploy flows require human confirmation')
+      const message = 'deploy flows require human confirmation'
+      reasons.push(message)
+      diagnostics.push({
+        severity: 'warning',
+        tag: 'policy-violation',
+        packId: '*',
+        message,
+      })
     }
     if (maxRiskLevel !== 'low') {
-      reasons.push(`pack set contains ${maxRiskLevel} risk instructions`)
+      const message = `pack set contains ${maxRiskLevel} risk instructions`
+      reasons.push(message)
+      for (const pack of packs) {
+        if (pack.risk_level !== 'low') {
+          diagnostics.push({
+            severity: pack.risk_level === 'high' ? 'warning' : 'info',
+            tag: 'policy-violation',
+            packId: pack.id,
+            message: `${pack.id} has ${pack.risk_level} risk level`,
+          })
+        }
+      }
     }
     if (packs.some((pack) => pack.execution_policy.requires_human_confirm)) {
-      reasons.push('pack execution policy requires human confirmation')
+      const message = 'pack execution policy requires human confirmation'
+      reasons.push(message)
+      for (const pack of packs) {
+        if (pack.execution_policy.requires_human_confirm) {
+          diagnostics.push({
+            severity: 'info',
+            tag: 'policy-violation',
+            packId: pack.id,
+            message: `${pack.id} requires human confirmation`,
+          })
+        }
+      }
     }
 
     if (reasons.length > 0) {
       return {
         decision: 'confirm',
         reasons,
+        diagnostics,
         approvalRequired: true,
         maxRiskLevel,
       }
@@ -70,6 +128,7 @@ export function createPolicyService() {
     return {
       decision: 'allow',
       reasons: ['pack set approved by default policy'],
+      diagnostics,
       approvalRequired: false,
       maxRiskLevel,
     }

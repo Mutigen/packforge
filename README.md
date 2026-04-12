@@ -25,7 +25,7 @@
 Point PackForge at any project and it auto-detects the stack, domain, project phase, and risk profile — no config files needed. It reads `package.json`, file trees, CI workflows, and existing tooling to build a full picture in seconds.
 
 ### Context-Aware Pack Activation
-Based on the analysis, PackForge selects the right instruction packs (system prompts, constraints, tool permissions) from a registry of **18 packs across 5 categories**. Packs that don't match your context are filtered out — your AI agent only gets relevant instructions.
+Based on the analysis, PackForge selects the right instruction packs (system prompts, constraints, tool permissions) from a registry of **18 packs across 5 categories**. Six composable scorers (stack, taxonomy, keyword, tool-awareness, feedback, work-mode) are combined via `createCompositeScorer()` — swap or weight individual scorers without touching the pipeline. Packs that don't match your context are filtered out; every decision emits structured diagnostics with severity, tags, and actionable suggestions.
 
 ### Smart Tool Onboarding
 PackForge detects whether GitNexus, MemPalace, and Obsidian are installed — both globally and per-project. Missing tools surface with install guides, concrete benefits, and a list of packs waiting for them. Users can permanently decline suggestions they don't want.
@@ -51,6 +51,13 @@ The core workflow is two commands: `start_project_from_spec` → `confirm_activa
 ### Key Features
 
 - **Context-Aware Recommendations** — analyzes `package.json`, file tree, GitNexus graph, and MemPalace memory to understand your project
+- **Composable Scoring** — six individual `PackScorer` functions combined via `createCompositeScorer()`; swap, weight, or extend scorers without touching the pipeline
+- **Structured Diagnostics** — every policy check and conflict resolution emits `PackDiagnostic` with severity, tags, and actionable suggestions
+- **Lifecycle Hooks** — typed `HookRunner` emits events at each pipeline stage (`context:analyzed`, `scoring:complete`, `policy:evaluated`, `activation:before/after/error`)
+- **Event Subscribers** — decoupled `ActivationSubscriber` pattern for telemetry, logging, or external integrations
+- **Content-Hash Cache** — pack registry invalidates only when YAML files actually change (SHA-256 hash of directory contents), replacing TTL-based expiration
+- **Convergence-Based Conflict Resolution** — iterative conflict loop that stabilizes the kept set instead of single-pass filtering
+- **Cancellation Tokens** — `abort` (hard error) + `cancel` (graceful shutdown) propagated through `ActivationContext`
 - **18 Instruction Packs** — covering engineering, quality, ops, product, and documentation workflows
 - **2-Tool UX** — `start_project_from_spec` → `confirm_activation`. That's it.
 - **Staged Activation** — packs requiring unavailable tools (GitNexus, MemPalace) are held as pending; `reload_activation` promotes them once tools are set up
@@ -71,17 +78,19 @@ The core workflow is two commands: `start_project_from_spec` → `confirm_activa
 ┌────────────────────────────▼──────────────────────────────┐
 │                     MCP Gateway                           │
 │              (stdio MCP server, 10 tools)                 │
+│              + diagnostics in every response               │
 └──┬──────────┬──────────┬──────────┬───────────────────────┘
    │          │          │          │
 ┌──▼───────┐ ┌▼────────┐ ┌▼────────┐ ┌▼──────────────┐
 │ Context  │ │Orchestr.│ │ Policy  │ │   Memory      │
-│ Analyzer │ │(match + │ │ Service │ │   Service     │
-│          │ │ score)  │ │(govern.)│ │(JSON persist.)│
+│ Analyzer │ │ hooks + │ │ Service │ │   Service     │
+│          │ │ events +│ │ struct. │ │(JSON persist.)│
+│          │ │ converg.│ │ diags.  │ │               │
 └──┬───┬───┘ └────┬────┘ └─────────┘ └───────────────┘
    │   │          │
 ┌──▼┐ ┌▼────┐  ┌──▼─────────────────────────────────┐
 │GN │ │ MP  │  │       Pack Registry (YAML)          │
-│   │ │     │  │    18 packs across 5 categories      │
+│   │ │     │  │  18 packs · content-hash cache       │
 └───┘ └─────┘  └─────────────────────────────────────┘
 
 GN = GitNexus (code graph)    MP = MemPalace (persistent memory)
@@ -220,15 +229,15 @@ apps/
   knowledge-compiler/ # Compiles Obsidian vault blueprints to YAML packs
   mcp-gateway/        # MCP stdio server (primary entry point, 10 tools)
   memory-service/     # Activation state persistence (JSON file storage)
-  orchestrator/       # Matches and scores packs against context
-  policy-service/     # Governance, approval, and risk evaluation
+  orchestrator/       # Composable scoring, lifecycle hooks, convergence loop, content-hash cache
+  policy-service/     # Governance, approval, risk evaluation, structured diagnostics
 packages/
   pack-validator/     # YAML pack validation and registry builder
   shared-auth/        # JWT / JWKS auth primitives
   shared-config/      # Centralized config schemas
   shared-otel/        # OpenTelemetry instrumentation
   shared-policy/      # Policy domain models
-  shared-types/       # Canonical Zod schemas (context, packs, activation)
+  shared-types/       # Canonical Zod schemas, ActivationContext, HookRunner, diagnostics, result factories
 packs/                # 18 YAML instruction packs across 5 categories
 vault/                # Obsidian blueprints for pack authoring
 scripts/              # Validation and export utilities

@@ -15,6 +15,7 @@ import {
   ProjectContextSchema,
   RuntimeHandoffContractSchema,
   type InstructionPack,
+  type PackDiagnostic,
   type ProjectContext,
   type RuntimeHandoffContract,
 } from '@hub/shared-types'
@@ -224,13 +225,13 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
     if (evaluation.decision === 'deny') {
       const activation = await memoryService.recordActivation({ status: 'denied', plan })
       reply.code(403)
-      return { activation }
+      return { activation, diagnostics: evaluation.diagnostics }
     }
 
     if (evaluation.decision === 'confirm' && !body.autoApprove) {
       const activation = await memoryService.recordActivation({ status: 'pending_confirmation', plan })
       reply.code(202)
-      return { activation }
+      return { activation, diagnostics: evaluation.diagnostics }
     }
 
     const activationId = randomUUID()
@@ -244,7 +245,7 @@ export function createHubApiApp(options?: { packsDir?: string; memoryFilePath?: 
     })
     const activation = await memoryService.recordActivation({ status: 'active', plan, handoff })
 
-    return { activation }
+    return { activation, diagnostics: evaluation.diagnostics }
   })
 
   app.get('/activations/:id', async (request, reply) => {

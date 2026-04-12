@@ -17,6 +17,7 @@ import {
   type BootstrapStep,
   type InstructionPack,
   type MissingTool,
+  type PackDiagnostic,
   type PendingPack,
   type ProjectContext,
   type RuntimeHandoffContract,
@@ -323,7 +324,14 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
       const handoff =
         status !== 'denied' ? buildHandoffContract(activationId, plan, packs, evaluation, declinedTools) : undefined
 
-      return memoryService.recordActivation({ id: activationId, status, plan, ...(handoff ? { handoff } : {}) })
+      const activation = await memoryService.recordActivation({
+        id: activationId,
+        status,
+        plan,
+        ...(handoff ? { handoff } : {}),
+      })
+
+      return { ...activation, diagnostics: evaluation.diagnostics }
     },
     async getActivationStatus(input: { activationId: string }) {
       return memoryService.getActivation(input.activationId)
@@ -401,6 +409,7 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
         blockedPacks: result.blockedPacks,
         policyDecision: plan.policyDecision,
         policyReasons: plan.policyReasons,
+        diagnostics: evaluation.diagnostics,
       }
     },
     async confirmActivation(input: { activationId: string }) {
