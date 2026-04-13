@@ -89,7 +89,7 @@ function resolveConflicts(
   packsById: Map<string, InstructionPack>,
 ): { kept: Recommendation[]; blocked: BlockedPack[]; stable: boolean } {
   let kept: Recommendation[] = []
-  const allBlocked: BlockedPack[] = []
+  const accumulatedBlocked: BlockedPack[] = []
   let previousKeptIds: string[] = []
   let iterations = 0
 
@@ -126,8 +126,8 @@ function resolveConflicts(
     // Accumulate blocked packs across iterations — packs blocked in earlier rounds
     // must not be dropped when candidates is narrowed to `kept` for re-evaluation.
     for (const b of iterationBlocked) {
-      if (!allBlocked.some((ab) => ab.packId === b.packId)) {
-        allBlocked.push(b)
+      if (!accumulatedBlocked.some((ab) => ab.packId === b.packId)) {
+        accumulatedBlocked.push(b)
       }
     }
 
@@ -136,7 +136,7 @@ function resolveConflicts(
       currentKeptIds.length === previousKeptIds.length &&
       currentKeptIds.every((id, i) => id === previousKeptIds[i])
     ) {
-      return { kept, blocked: allBlocked, stable: true }
+      return { kept, blocked: accumulatedBlocked, stable: true }
     }
 
     previousKeptIds = currentKeptIds
@@ -144,7 +144,7 @@ function resolveConflicts(
     iterations++
   }
 
-  return { kept, blocked: allBlocked, stable: false }
+  return { kept, blocked: accumulatedBlocked, stable: false }
 }
 
 // ---------------------------------------------------------------------------

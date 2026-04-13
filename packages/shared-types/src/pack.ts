@@ -94,7 +94,7 @@ export const InstructionPackSchema = z.object({
   risk_level: z.enum(PackRiskLevel),
   personality: PersonalitySchema,
   instructions: InstructionsSchema,
-  sections: PackSectionsSchema,
+  sections: PackSectionsSchema.optional(),
   activation_signals: ActivationSignalsSchema,
   conflicts_with: z.array(z.string().min(1)).default([]),
   /**
