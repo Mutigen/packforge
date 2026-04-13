@@ -11,7 +11,7 @@ const basePack: Omit<InstructionPack, 'id'> = {
   phase: ['mvp'],
   risk_level: 'low',
   personality: { tone: 'precise', reasoning_style: 'trade-off-first', output_format: 'structured' },
-  instructions: { system_prompt: 'prompt', constraints: [], tools_allowed: [], tools_blocked: [] },
+  instructions: { system_prompt: 'prompt', constraints: [], tools_allowed: [], tools_blocked: [], tool_priority: [] },
   activation_signals: {
     keywords: [],
     stack_hints: [],

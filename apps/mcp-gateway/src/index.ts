@@ -147,10 +147,32 @@ const GITNEXUS_TOOL_PREFIX = 'mcp_gitnexus_'
 const MEMPALACE_TOOL_PREFIX = 'mempalace_'
 
 function packToInstruction(pack: InstructionPack): RuntimeInstruction {
+  let systemPrompt = pack.instructions.system_prompt
+
+  // Enrich with structured sections if available
+  if (pack.sections) {
+    const parts: string[] = []
+    if (pack.sections.when_to_use) {
+      parts.push(`## When to Use\n${pack.sections.when_to_use}`)
+    }
+    if (pack.sections.constraints?.length) {
+      parts.push(`## Constraints\n${pack.sections.constraints.map((c) => `- ${c}`).join('\n')}`)
+    }
+    if (pack.sections.examples?.length) {
+      parts.push(`## Examples\n${pack.sections.examples.map((e) => `- ${e}`).join('\n')}`)
+    }
+    if (pack.sections.anti_patterns?.length) {
+      parts.push(`## Anti-Patterns\n${pack.sections.anti_patterns.map((a) => `- ${a}`).join('\n')}`)
+    }
+    if (parts.length > 0) {
+      systemPrompt = `${systemPrompt}\n\n${parts.join('\n\n')}`
+    }
+  }
+
   return {
     packId: pack.id,
     version: pack.version,
-    systemPrompt: pack.instructions.system_prompt,
+    systemPrompt,
     constraints: pack.instructions.constraints,
     toolsAllowed: pack.instructions.tools_allowed,
     toolsBlocked: pack.instructions.tools_blocked,

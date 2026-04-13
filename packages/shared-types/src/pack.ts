@@ -43,11 +43,17 @@ export const PersonalitySchema = z.object({
   output_format: z.enum(PersonalityOutputFormat),
 })
 
+export const ToolPrioritySchema = z.object({
+  tool: z.string().min(1),
+  priority: z.number().int().min(0).max(100).default(50),
+})
+
 export const InstructionsSchema = z.object({
   system_prompt: z.string().min(1),
   constraints: z.array(z.string().min(1)).default([]),
   tools_allowed: z.array(z.string().min(1)).default([]),
   tools_blocked: z.array(z.string().min(1)).default([]),
+  tool_priority: z.array(ToolPrioritySchema).default([]),
 })
 
 export const PackSectionsSchema = z
@@ -122,9 +128,87 @@ export const PackRegistryEntrySchema = z.object({
   description: z.string().min(1),
 })
 
+export const ToolPermissionLevel = ['allow', 'deny', 'ask'] as const
+export type ToolPermissionLevel = (typeof ToolPermissionLevel)[number]
+
+export type ToolPermissionMap = Map<string, ToolPermissionLevel>
+
+/**
+ * Resolve tool permissions across multiple packs.
+ * Rules:
+ * - `"*"` in tools_blocked → wildcard deny (all tools denied unless explicitly allowed)
+ * - Explicit deny wins over allow (strictest-wins)
+ * - `ask` is weaker than `deny` but stronger than `allow`
+ */
+export function resolveToolPermissions(packs: InstructionPack[]): ToolPermissionMap {
+  const permissions: ToolPermissionMap = new Map()
+  let wildcardDeny = false
+
+  for (const pack of packs) {
+    if (pack.instructions.tools_blocked.includes('*')) {
+      wildcardDeny = true
+    }
+    for (const tool of pack.instructions.tools_allowed) {
+      if (!permissions.has(tool)) {
+        permissions.set(tool, 'allow')
+      }
+    }
+    for (const tool of pack.instructions.tools_blocked) {
+      if (tool === '*') continue
+      permissions.set(tool, 'deny') // deny always wins
+    }
+  }
+
+  if (wildcardDeny) {
+    // Only explicitly allowed tools survive
+    const allowed = new Set([...permissions.entries()].filter(([, level]) => level === 'allow').map(([tool]) => tool))
+    const result: ToolPermissionMap = new Map()
+    for (const tool of allowed) {
+      result.set(tool, 'allow')
+    }
+    // Re-apply explicit denies
+    for (const [tool, level] of permissions) {
+      if (level === 'deny') {
+        result.set(tool, 'deny')
+      }
+    }
+    return result
+  }
+
+  return permissions
+}
+
+/**
+ * Collect and rank tools by priority across packs, then trim to a cap.
+ * Higher priority = more important. Tools not listed default to 50.
+ */
+export function trimToolsToCap(packs: InstructionPack[], maxTools: number): string[] {
+  const priorityMap = new Map<string, number>()
+
+  for (const pack of packs) {
+    for (const tool of pack.instructions.tools_allowed) {
+      if (!priorityMap.has(tool)) {
+        priorityMap.set(tool, 50) // default priority
+      }
+    }
+    for (const { tool, priority } of pack.instructions.tool_priority) {
+      const current = priorityMap.get(tool) ?? 0
+      if (priority > current) {
+        priorityMap.set(tool, priority)
+      }
+    }
+  }
+
+  return [...priorityMap.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, maxTools)
+    .map(([tool]) => tool)
+}
+
 export type ActivationSignals = z.infer<typeof ActivationSignalsSchema>
 export type Personality = z.infer<typeof PersonalitySchema>
 export type Instructions = z.infer<typeof InstructionsSchema>
+export type ToolPriority = z.infer<typeof ToolPrioritySchema>
 export type PackSections = z.infer<typeof PackSectionsSchema>
 export type PackProvenance = z.infer<typeof PackProvenanceSchema>
 export type PackApproval = z.infer<typeof PackApprovalSchema>

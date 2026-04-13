@@ -109,7 +109,17 @@ export const intentScorer: PackScorer = (pack, ctx) => {
 // Composite scorer — combines individual scorers
 // ---------------------------------------------------------------------------
 
-/** Create a composite scorer from an array of individual scorers. */
+export type ScorerContribution = {
+  name: string
+  score: number
+}
+
+export type ScoreProvenance = {
+  total: number
+  contributions: ScorerContribution[]
+}
+
+/** Create a composite scorer from an array of named scorers. */
 export function createCompositeScorer(scorers: PackScorer[]): PackScorer {
   return (pack, ctx, feedbackScores = {}) => {
     let total = 0
@@ -119,6 +129,51 @@ export function createCompositeScorer(scorers: PackScorer[]): PackScorer {
     return Math.max(0, Math.min(total, 100))
   }
 }
+
+/** Named scorer entry for provenance tracking. */
+export type NamedScorer = { name: string; scorer: PackScorer }
+
+/** Create a composite scorer that also records per-scorer contributions. */
+export function createProvenanceScorer(
+  named: NamedScorer[],
+): PackScorer & {
+  provenance: (pack: InstructionPack, ctx: ProjectContext, feedbackScores?: Record<string, number>) => ScoreProvenance
+} {
+  const score: PackScorer = (pack, ctx, feedbackScores = {}) => {
+    let total = 0
+    for (const { scorer } of named) {
+      total += scorer(pack, ctx, feedbackScores)
+    }
+    return Math.max(0, Math.min(total, 100))
+  }
+
+  const provenance = (
+    pack: InstructionPack,
+    ctx: ProjectContext,
+    feedbackScores: Record<string, number> = {},
+  ): ScoreProvenance => {
+    const contributions: ScorerContribution[] = []
+    let total = 0
+    for (const { name, scorer } of named) {
+      const s = scorer(pack, ctx, feedbackScores)
+      contributions.push({ name, score: s })
+      total += s
+    }
+    return { total: Math.max(0, Math.min(total, 100)), contributions }
+  }
+
+  return Object.assign(score, { provenance })
+}
+
+const namedScorers: NamedScorer[] = [
+  { name: 'stack', scorer: stackScorer },
+  { name: 'taxonomy', scorer: taxonomyScorer },
+  { name: 'keyword', scorer: keywordScorer },
+  { name: 'toolAwareness', scorer: toolAwarenessScorer },
+  { name: 'feedback', scorer: feedbackScorer },
+  { name: 'workMode', scorer: workModeScorer },
+  { name: 'intent', scorer: intentScorer },
+]
 
 /** Default composite scorer — identical behavior to the original monolithic scorePack. */
 export const defaultScorer: PackScorer = createCompositeScorer([
@@ -130,6 +185,9 @@ export const defaultScorer: PackScorer = createCompositeScorer([
   workModeScorer,
   intentScorer,
 ])
+
+/** Default scorer with provenance tracking. */
+export const provenanceScorer = createProvenanceScorer(namedScorers)
 
 /**
  * Score a pack against the current project context.

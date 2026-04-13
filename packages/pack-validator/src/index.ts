@@ -1,7 +1,12 @@
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import yaml from 'js-yaml'
-import { InstructionPackSchema, type InstructionPack, type PackRegistryEntry } from '@hub/shared-types'
+import {
+  InstructionPackSchema,
+  type InstructionPack,
+  type PackDiagnostic,
+  type PackRegistryEntry,
+} from '@hub/shared-types'
 
 export async function listPackFiles(rootDir: string): Promise<string[]> {
   const entries = await readdir(rootDir, { withFileTypes: true })
@@ -26,7 +31,12 @@ export async function loadPackFile(filePath: string): Promise<unknown> {
 
 export async function validatePackFile(filePath: string): Promise<InstructionPack> {
   const parsed = await loadPackFile(filePath)
-  return InstructionPackSchema.parse(parsed)
+  const result = InstructionPackSchema.safeParse(parsed)
+  if (!result.success) {
+    const issues = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ')
+    throw new Error(`Invalid pack ${filePath}: ${issues}`)
+  }
+  return result.data
 }
 
 export type PackCollectionWarning = {
@@ -92,13 +102,30 @@ export function validatePackCollection(packs: InstructionPack[]): {
 
 export async function validatePackDirectory(
   rootDir: string,
-): Promise<{ packs: InstructionPack[]; warnings: PackCollectionWarning[] }> {
+): Promise<{ packs: InstructionPack[]; warnings: PackCollectionWarning[]; diagnostics: PackDiagnostic[] }> {
   const files = await listPackFiles(rootDir)
-  const packs = await Promise.all(files.map((filePath) => validatePackFile(filePath)))
+  const diagnostics: PackDiagnostic[] = []
+
+  const results = await Promise.allSettled(files.map((filePath) => validatePackFile(filePath)))
+
+  const packs: InstructionPack[] = []
+  for (let i = 0; i < results.length; i++) {
+    const result = results[i]!
+    if (result.status === 'fulfilled') {
+      packs.push(result.value)
+    } else {
+      diagnostics.push({
+        severity: 'warning',
+        tag: 'validation',
+        packId: path.basename(files[i]!, '.yaml'),
+        message: result.reason instanceof Error ? result.reason.message : String(result.reason),
+      })
+    }
+  }
 
   const { warnings } = validatePackCollection(packs)
 
-  return { packs: packs.sort((left, right) => left.id.localeCompare(right.id)), warnings }
+  return { packs: packs.sort((left, right) => left.id.localeCompare(right.id)), warnings, diagnostics }
 }
 
 export function getPackRegistryEntry(pack: InstructionPack, filePath: string): PackRegistryEntry {

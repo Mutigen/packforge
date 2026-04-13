@@ -203,6 +203,7 @@ export function createOrchestrator(options?: OrchestratorOptions) {
     ctx: ProjectContext,
     minimumScore = 40,
     feedbackScores: Record<string, number> = {},
+    disabledPacks: string[] = [],
   ): Promise<{
     recommendations: Recommendation[]
     blockedPacks: BlockedPack[]
@@ -213,8 +214,10 @@ export function createOrchestrator(options?: OrchestratorOptions) {
 
     // Stage 1: Load packs
     if (actCtx.aborted) return { recommendations: [], blockedPacks: [], packsById: new Map() }
-    const packs = await loadInstructionPacks()
-    const packsById = new Map(packs.map((pack) => [pack.id, pack]))
+    const allPacks = await loadInstructionPacks()
+    const disabledSet = new Set(disabledPacks)
+    const packs = allPacks.filter((p) => !disabledSet.has(p.id))
+    const packsById = new Map(allPacks.map((pack) => [pack.id, pack]))
 
     await hooks.emit('context:analyzed', actCtx)
     await events.emit({ type: 'context:analyzed', ctx: actCtx })
@@ -268,8 +271,9 @@ export function createOrchestrator(options?: OrchestratorOptions) {
     ctx: ProjectContext,
     minimumScore = 40,
     feedbackScores: Record<string, number> = {},
+    disabledPacks: string[] = [],
   ): Promise<ActivationPlan> {
-    const { recommendations, blockedPacks } = await recommendPacks(ctx, minimumScore, feedbackScores)
+    const { recommendations, blockedPacks } = await recommendPacks(ctx, minimumScore, feedbackScores, disabledPacks)
 
     return {
       projectId: ctx.projectId,
@@ -289,6 +293,7 @@ export function createOrchestrator(options?: OrchestratorOptions) {
     ctx: ProjectContext,
     feedbackScores: Record<string, number> = {},
     tokens?: CancellationTokens,
+    disabledPacks: string[] = [],
   ): Promise<ActivationResult> {
     const actCtx = createActivationContext(ctx)
     const start = Date.now()
@@ -315,7 +320,7 @@ export function createOrchestrator(options?: OrchestratorOptions) {
         })
       }
 
-      const plan = await buildActivationPlan(ctx, actCtx.options.minimumScore, feedbackScores)
+      const plan = await buildActivationPlan(ctx, actCtx.options.minimumScore, feedbackScores, disabledPacks)
 
       await hooks.emit('activation:before', actCtx, plan)
 
@@ -348,6 +353,15 @@ export function createOrchestrator(options?: OrchestratorOptions) {
     }
   }
 
+  let disposed = false
+
+  function dispose(): void {
+    if (disposed) return
+    disposed = true
+    cachedPacks = null
+    cachedHash = null
+  }
+
   return {
     service: 'orchestrator' as const,
     status: 'ready' as const,
@@ -358,5 +372,6 @@ export function createOrchestrator(options?: OrchestratorOptions) {
     recommendPacks,
     buildActivationPlan,
     activate,
+    dispose,
   }
 }

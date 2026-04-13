@@ -16,6 +16,7 @@ export const DiagnosticTag = [
   'low-confidence',
   'missing-tool',
   'score-penalty',
+  'validation',
 ] as const
 export type DiagnosticTag = (typeof DiagnosticTag)[number]
 
@@ -321,7 +322,11 @@ export class HookRunner {
 
   async emit<K extends keyof OrchestratorHooks>(event: K, ...args: Parameters<OrchestratorHooks[K]>): Promise<void> {
     for (const fn of this.hooks.get(event) ?? []) {
-      await fn(...args)
+      try {
+        await fn(...args)
+      } catch (err) {
+        console.error(`[HookRunner] hook "${event}" threw:`, err)
+      }
     }
   }
 }
@@ -339,7 +344,11 @@ export class ActivationEventEmitter {
 
   async emit(event: ActivationEvent): Promise<void> {
     for (const subscriber of this.subscribers) {
-      await subscriber.onEvent(event)
+      try {
+        await subscriber.onEvent(event)
+      } catch (err) {
+        console.error(`[ActivationEventEmitter] subscriber threw on "${event.type}":`, err)
+      }
     }
   }
 }
