@@ -6,6 +6,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
 import yaml from 'js-yaml'
 import { createContextAnalyzer } from '@hub/context-analyzer'
+import { exportForHarness } from '@hub/export-adapters'
 import { createMemoryService } from '@hub/memory-service'
 import { createOrchestrator } from '@hub/orchestrator'
 import { createPolicyService } from '@hub/policy-service'
@@ -514,6 +515,22 @@ export function createGatewayHandlers(options?: { packsDir?: string; memoryFileP
     async getProjectHistory(input: { projectId: string }) {
       return contextAnalyzer.getProjectHistory(input.projectId)
     },
+    async exportForHarness(input: {
+      activationId: string
+      format: 'cursor' | 'claude-code' | 'codex' | 'generic-markdown'
+    }) {
+      const activation = await memoryService.getActivation(input.activationId)
+      if (!activation) {
+        return { error: `Activation ${input.activationId} not found` }
+      }
+      if (activation.status !== 'active') {
+        return { error: `Activation ${input.activationId} is not active (status: ${activation.status})` }
+      }
+      if (!activation.handoff) {
+        return { error: `Activation ${input.activationId} has no handoff contract` }
+      }
+      return exportForHarness(activation.handoff, input.format)
+    },
   }
 }
 
@@ -704,6 +721,19 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
       inputSchema: z.object({}).optional(),
     },
     async () => textResult(await handlers.listRegistryPacks()),
+  )
+
+  server.registerTool(
+    'export_for_harness',
+    {
+      description:
+        'Export active instruction packs as a native config file for a specific AI agent harness (Cursor, Claude Code, Codex, or generic Markdown). Returns the file content and target path.',
+      inputSchema: z.object({
+        activationId: z.string().min(1).describe('The activationId of an active activation'),
+        format: z.enum(['cursor', 'claude-code', 'codex', 'generic-markdown']).describe('Target harness format'),
+      }),
+    },
+    async (input) => textResult(await handlers.exportForHarness(input)),
   )
 
   return {

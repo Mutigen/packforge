@@ -77,7 +77,7 @@ The core workflow is two commands: `start_project_from_spec` → `confirm_activa
                              │ stdio
 ┌────────────────────────────▼──────────────────────────────┐
 │                     MCP Gateway                           │
-│              (stdio MCP server, 10 tools)                 │
+│              (stdio MCP server, 11 tools)                 │
 │              + diagnostics in every response               │
 └──┬──────────┬──────────┬──────────┬───────────────────────┘
    │          │          │          │
@@ -227,7 +227,7 @@ apps/
   context-analyzer/   # Analyzes project stack, domain, phase, GitNexus + MemPalace
   hub-api/            # REST API gateway (alternative to MCP)
   knowledge-compiler/ # Compiles Obsidian vault blueprints to YAML packs
-  mcp-gateway/        # MCP stdio server (primary entry point, 10 tools)
+  mcp-gateway/        # MCP stdio server (primary entry point, 11 tools)
   memory-service/     # Activation state persistence (JSON file storage)
   orchestrator/       # Composable scoring, lifecycle hooks, convergence loop, content-hash cache
   policy-service/     # Governance, approval, risk evaluation, structured diagnostics

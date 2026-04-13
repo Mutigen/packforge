@@ -89,19 +89,19 @@ function resolveConflicts(
   packsById: Map<string, InstructionPack>,
 ): { kept: Recommendation[]; blocked: BlockedPack[]; stable: boolean } {
   let kept: Recommendation[] = []
-  let blocked: BlockedPack[] = []
+  const allBlocked: BlockedPack[] = []
   let previousKeptIds: string[] = []
   let iterations = 0
 
   let candidates = [...recommendations]
   while (iterations < MAX_CONVERGENCE_ITERATIONS) {
     kept = []
-    blocked = []
+    const iterationBlocked: BlockedPack[] = []
 
     for (const rec of candidates) {
       const pack = packsById.get(rec.packId)
       if (!pack) {
-        blocked.push({ packId: rec.packId, reasons: ['pack not found in registry'] })
+        iterationBlocked.push({ packId: rec.packId, reasons: ['pack not found in registry'] })
         continue
       }
 
@@ -113,7 +113,7 @@ function resolveConflicts(
       })
 
       if (conflict) {
-        blocked.push({
+        iterationBlocked.push({
           packId: rec.packId,
           reasons: [`conflicts with ${conflict.packId}`],
         })
@@ -123,12 +123,20 @@ function resolveConflicts(
       kept.push(rec)
     }
 
+    // Accumulate blocked packs across iterations — packs blocked in earlier rounds
+    // must not be dropped when candidates is narrowed to `kept` for re-evaluation.
+    for (const b of iterationBlocked) {
+      if (!allBlocked.some((ab) => ab.packId === b.packId)) {
+        allBlocked.push(b)
+      }
+    }
+
     const currentKeptIds = kept.map((r) => r.packId)
     if (
       currentKeptIds.length === previousKeptIds.length &&
       currentKeptIds.every((id, i) => id === previousKeptIds[i])
     ) {
-      return { kept, blocked, stable: true }
+      return { kept, blocked: allBlocked, stable: true }
     }
 
     previousKeptIds = currentKeptIds
@@ -136,7 +144,7 @@ function resolveConflicts(
     iterations++
   }
 
-  return { kept, blocked, stable: false }
+  return { kept, blocked: allBlocked, stable: false }
 }
 
 // ---------------------------------------------------------------------------

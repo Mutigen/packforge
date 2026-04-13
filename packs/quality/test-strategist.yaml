@@ -70,6 +70,8 @@ compatible_with:
   - frontend-specialist
   - fullstack-builder
   - security-reviewer
+  - security-baseline
+  - verification-loop
 execution_policy:
   allowed_targets:
     - client_workspace

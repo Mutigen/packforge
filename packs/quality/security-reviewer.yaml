@@ -71,6 +71,8 @@ compatible_with:
   - backend-architect
   - fullstack-builder
   - test-strategist
+  - security-baseline
+  - verification-loop
 execution_policy:
   allowed_targets:
     - client_workspace

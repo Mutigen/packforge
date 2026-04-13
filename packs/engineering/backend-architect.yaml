@@ -51,6 +51,7 @@ compatible_with:
   - fullstack-builder
   - security-reviewer
   - ux-designer
+  - security-baseline
 provenance:
   source_system: obsidian-compiler
   source_refs:

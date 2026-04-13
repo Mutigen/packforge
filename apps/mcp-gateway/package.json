@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@hub/context-analyzer": "*",
+    "@hub/export-adapters": "*",
     "@hub/memory-service": "*",
     "@hub/orchestrator": "*",
     "@hub/policy-service": "*",

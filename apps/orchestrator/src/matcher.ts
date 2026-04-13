@@ -73,6 +73,38 @@ export const workModeScorer: PackScorer = (pack, ctx) => {
   return score
 }
 
+/** Task-intent routing: elevated weight for task-type matches with cross-cutting bonuses. */
+export const intentScorer: PackScorer = (pack, ctx) => {
+  let score = 0
+  const signals = pack.activation_signals
+
+  // Primary: task type match gets a strong bonus (elevated from taxonomyScorer's +20)
+  if (signals.task_types.includes(ctx.taskType)) {
+    score += 15 // additional +15 on top of taxonomy's +20 = effective +35
+  }
+
+  // Cross-cutting: security packs always get a bonus in production/regulated contexts
+  if (
+    ctx.riskProfile !== 'prototype' &&
+    pack.category === 'quality' &&
+    signals.risk_profiles?.includes(ctx.riskProfile)
+  ) {
+    score += 10
+  }
+
+  // Cross-cutting: during debug/analyse tasks, quality packs get a bonus
+  if ((ctx.taskType === 'debug' || ctx.taskType === 'analyse') && pack.category === 'quality') {
+    score += 5
+  }
+
+  // Cross-cutting: during deploy, ops packs get a bonus
+  if (ctx.taskType === 'deploy' && pack.category === 'ops') {
+    score += 5
+  }
+
+  return score
+}
+
 // ---------------------------------------------------------------------------
 // Composite scorer — combines individual scorers
 // ---------------------------------------------------------------------------
@@ -96,6 +128,7 @@ export const defaultScorer: PackScorer = createCompositeScorer([
   toolAwarenessScorer,
   feedbackScorer,
   workModeScorer,
+  intentScorer,
 ])
 
 /**

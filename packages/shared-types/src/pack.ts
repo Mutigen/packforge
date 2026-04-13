@@ -50,6 +50,15 @@ export const InstructionsSchema = z.object({
   tools_blocked: z.array(z.string().min(1)).default([]),
 })
 
+export const PackSectionsSchema = z
+  .object({
+    when_to_use: z.string().min(1).describe('Describes when this pack should be activated and for what scenarios'),
+    constraints: z.array(z.string().min(1)).describe('Hard rules the agent must follow when this pack is active'),
+    examples: z.array(z.string().min(1)).describe('Concrete usage examples showing the pack in action'),
+    anti_patterns: z.array(z.string().min(1)).default([]).describe('Common mistakes to avoid'),
+  })
+  .optional()
+
 export const PackProvenanceSchema = z.object({
   source_system: z.string().min(1),
   source_refs: z.array(z.string().min(1)).default([]),
@@ -85,6 +94,7 @@ export const InstructionPackSchema = z.object({
   risk_level: z.enum(PackRiskLevel),
   personality: PersonalitySchema,
   instructions: InstructionsSchema,
+  sections: PackSectionsSchema,
   activation_signals: ActivationSignalsSchema,
   conflicts_with: z.array(z.string().min(1)).default([]),
   /**
@@ -115,6 +125,7 @@ export const PackRegistryEntrySchema = z.object({
 export type ActivationSignals = z.infer<typeof ActivationSignalsSchema>
 export type Personality = z.infer<typeof PersonalitySchema>
 export type Instructions = z.infer<typeof InstructionsSchema>
+export type PackSections = z.infer<typeof PackSectionsSchema>
 export type PackProvenance = z.infer<typeof PackProvenanceSchema>
 export type PackApproval = z.infer<typeof PackApprovalSchema>
 export type PackMaturity = z.infer<typeof PackMaturitySchema>
