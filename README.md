@@ -7,6 +7,7 @@
 </p>
 
 <p align="center">
+  <a href="https://www.npmjs.com/package/packforge"><img src="https://img.shields.io/npm/v/packforge?color=cb3837&label=npm" alt="npm"></a>
   <a href="https://github.com/mutigen/packforge/actions/workflows/ci.yml"><img src="https://github.com/mutigen/packforge/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/mutigen/packforge/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial-blue" alt="License"></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node"></a>
@@ -52,7 +53,10 @@ The core workflow is two commands: `start_project_from_spec` → `confirm_activa
 
 - **Context-Aware Recommendations** — analyzes `package.json`, file tree, GitNexus graph, and MemPalace memory to understand your project
 - **Composable Scoring** — six individual `PackScorer` functions combined via `createCompositeScorer()`; swap, weight, or extend scorers without touching the pipeline
-- **Structured Diagnostics** — every policy check and conflict resolution emits `PackDiagnostic` with severity, tags, and actionable suggestions
+- **Structured Diagnostics** — every policy check and conflict resolution emits `PackDiagnostic` with severity, tags, and actionable suggestions; `mergeDiagnostic()` + `dedupeDiagnostics()` keep accumulation clean
+- **Interrupt / Resume** — activations can be paused with a pending state and resumed later via `resumeActivation(id, decision)`, inspired by LangGraph's human-in-the-loop pattern
+- **Activation Lineage** — every activation tracks its `sourceAction` (`auto-score | user-override | reactivation`) and optional `parentActivationId` for full audit trails
+- **Typed Stream Parts** — discriminated `StreamPart` union with `stage` and `traceId` enables structured streaming of pipeline progress to the client
 - **Lifecycle Hooks** — typed `HookRunner` emits events at each pipeline stage (`context:analyzed`, `scoring:complete`, `policy:evaluated`, `activation:before/after/error`)
 - **Event Subscribers** — decoupled `ActivationSubscriber` pattern for telemetry, logging, or external integrations
 - **Content-Hash Cache** — pack registry invalidates only when YAML files actually change (SHA-256 hash of directory contents), replacing TTL-based expiration
@@ -65,6 +69,7 @@ The core workflow is two commands: `start_project_from_spec` → `confirm_activa
 - **GitNexus Integration** — leverages code intelligence graph for deeper context enrichment; subprocess-based graph queries with meta.json fallback
 - **MemPalace Integration** — enriches agent context with persistent memory, past decisions, and knowledge graph
 - **Obsidian Auto-Discovery** — detects Obsidian vaults from system config and project `.obsidian/` directory
+- **Published on npm** — `npx packforge` just works, self-contained bundle via tsup with zero workspace dependencies
 - **Turborepo Monorepo** — 7 apps, 6 shared packages, fully typed with Zod schemas
 
 ## Architecture
@@ -96,45 +101,57 @@ The core workflow is two commands: `start_project_from_spec` → `confirm_activa
 GN = GitNexus (code graph)    MP = MemPalace (persistent memory)
 ```
 
-## Quick Start
+## Install
+
+### Option A: npx (recommended)
+
+No clone needed — run directly from npm:
 
 ```bash
-# Clone
+npx packforge --help
+```
+
+### Option B: Global install
+
+```bash
+npm install -g packforge
+packforge --help
+```
+
+### Option C: From source
+
+```bash
 git clone https://github.com/mutigen/packforge.git
 cd packforge
-
-# Install
 npm install
-
-# Build
 npx turbo build
-
-# Validate packs
-npm run validate:packs
-
-# Run tests
 npm test
 ```
 
-### MCP Configuration
+### CLI Options
 
-> **Prerequisite:** Run `npx turbo build` first — the gateway serves from `apps/mcp-gateway/dist/index.js`.
+```
+packforge [options]
 
-The gateway defaults its packs directory to `<cwd>/packs`, so `cwd` **must** point to the monorepo root.
+  --packs <dir>      Path to packs directory (or env PACKFORGE_PACKS_DIR)
+  --memory <file>    Path to memory JSON file (or env PACKFORGE_MEMORY_FILE)
+  --version          Show version
+  --help             Show help
+```
+
+## MCP Configuration
+
+### Via npx (zero setup)
 
 <details>
-<summary><strong>VS Code (global — all workspaces)</strong></summary>
-
-Edit `~/.config/Code/User/mcp.json` (Linux) or `~/Library/Application Support/Code/User/mcp.json` (macOS):
+<summary><strong>Claude Desktop</strong></summary>
 
 ```json
 {
-  "servers": {
+  "mcpServers": {
     "packforge": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["/absolute/path/to/packforge/apps/mcp-gateway/dist/index.js"],
-      "cwd": "/absolute/path/to/packforge"
+      "command": "npx",
+      "args": ["-y", "packforge"]
     }
   }
 }
@@ -143,18 +160,14 @@ Edit `~/.config/Code/User/mcp.json` (Linux) or `~/Library/Application Support/Co
 </details>
 
 <details>
-<summary><strong>VS Code (per-project)</strong></summary>
-
-Create `.vscode/mcp.json` in any project:
+<summary><strong>Cursor</strong></summary>
 
 ```json
 {
-  "servers": {
+  "mcpServers": {
     "packforge": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["/absolute/path/to/packforge/apps/mcp-gateway/dist/index.js"],
-      "cwd": "/absolute/path/to/packforge"
+      "command": "npx",
+      "args": ["-y", "packforge"]
     }
   }
 }
@@ -163,7 +176,30 @@ Create `.vscode/mcp.json` in any project:
 </details>
 
 <details>
-<summary><strong>Claude Desktop / Cursor</strong></summary>
+<summary><strong>VS Code</strong></summary>
+
+Edit `~/Library/Application Support/Code/User/mcp.json` (macOS) or `~/.config/Code/User/mcp.json` (Linux):
+
+```json
+{
+  "servers": {
+    "packforge": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "packforge"]
+    }
+  }
+}
+```
+
+</details>
+
+### Via source checkout
+
+<details>
+<summary><strong>VS Code / Claude Desktop / Cursor</strong></summary>
+
+> **Prerequisite:** Run `npx turbo build` first.
 
 ```json
 {
@@ -180,7 +216,7 @@ Create `.vscode/mcp.json` in any project:
 
 </details>
 
-After adding the config, **reload your editor** (VS Code: `Cmd+Shift+P` → "Reload Window"). You should see 10 packforge tools available.
+After adding the config, **reload your editor** (VS Code: `Cmd+Shift+P` → "Reload Window"). You should see 11 packforge tools available.
 
 ## Usage
 
@@ -227,8 +263,8 @@ apps/
   context-analyzer/   # Analyzes project stack, domain, phase, GitNexus + MemPalace
   hub-api/            # REST API gateway (alternative to MCP)
   knowledge-compiler/ # Compiles Obsidian vault blueprints to YAML packs
-  mcp-gateway/        # MCP stdio server (primary entry point, 11 tools)
-  memory-service/     # Activation state persistence (JSON file storage)
+  mcp-gateway/        # MCP stdio server + CLI entrypoint (npx packforge), 11 tools
+  memory-service/     # Activation state persistence, interrupt/resume, lineage tracking
   orchestrator/       # Composable scoring, lifecycle hooks, convergence loop, content-hash cache
   policy-service/     # Governance, approval, risk evaluation, structured diagnostics
 packages/
@@ -237,7 +273,7 @@ packages/
   shared-config/      # Centralized config schemas
   shared-otel/        # OpenTelemetry instrumentation
   shared-policy/      # Policy domain models
-  shared-types/       # Canonical Zod schemas, ActivationContext, HookRunner, diagnostics, result factories
+  shared-types/       # Canonical Zod schemas, ActivationContext, StreamPart, HookRunner, diagnostics reducers
 packs/                # 18 YAML instruction packs across 5 categories
 vault/                # Obsidian blueprints for pack authoring
 scripts/              # Validation and export utilities
