@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
-import type { ActivationPlan, RuntimeHandoffContract } from '@hub/shared-types'
+import type { ActivationPlan, ActivationSourceAction, RuntimeHandoffContract } from '@hub/shared-types'
 
 type StoredActivation = {
   id: string
@@ -9,6 +9,14 @@ type StoredActivation = {
   createdAt: string
   plan: ActivationPlan
   handoff?: RuntimeHandoffContract
+  /** How the activation was triggered (LangGraph-inspired lineage). */
+  sourceAction?: ActivationSourceAction
+  /** ID of a parent activation this was derived from (e.g. reactivation chain). */
+  parentActivationId?: string
+  /** ISO timestamp when the activation was resolved (approved or denied). */
+  resolvedAt?: string
+  /** Optional note provided at resolution time. */
+  resolvedNote?: string
 }
 
 type FeedbackEntry = {
@@ -116,6 +124,8 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
     status: StoredActivation['status']
     plan: ActivationPlan
     handoff?: RuntimeHandoffContract
+    sourceAction?: ActivationSourceAction
+    parentActivationId?: string
   }): Promise<StoredActivation> {
     return mutex.run(async () => {
       const state = await ensureState(filePath)
@@ -128,6 +138,12 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
 
       if (input.handoff) {
         activation.handoff = input.handoff
+      }
+      if (input.sourceAction) {
+        activation.sourceAction = input.sourceAction
+      }
+      if (input.parentActivationId) {
+        activation.parentActivationId = input.parentActivationId
       }
 
       state.activations.unshift(activation)
@@ -280,6 +296,31 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
     return [...new Set([...global, ...projectSpecific])]
   }
 
+  /**
+   * Resume a pending activation — approve or deny it.
+   * Only activations in `pending_confirmation` status can be resolved.
+   * Returns the updated activation, or null if not found / not in pending state.
+   */
+  async function resumeActivation(
+    id: string,
+    decision: 'approve' | 'deny',
+    note?: string,
+  ): Promise<StoredActivation | null> {
+    return mutex.run(async () => {
+      const state = await ensureState(filePath)
+      const activation = state.activations.find((a) => a.id === id)
+      if (!activation) return null
+      if (activation.status !== 'pending_confirmation') return null
+
+      activation.status = decision === 'approve' ? 'active' : 'denied'
+      activation.resolvedAt = new Date().toISOString()
+      if (note) activation.resolvedNote = note
+
+      await writeState(filePath, state)
+      return activation
+    })
+  }
+
   return {
     service: 'memory-service',
     status: 'ready',
@@ -294,6 +335,7 @@ export function createMemoryService(options?: { filePath?: string; maxActivation
     getPackFeedbackScores,
     declineToolSuggestion,
     getDeclinedTools,
+    resumeActivation,
   }
 }
 

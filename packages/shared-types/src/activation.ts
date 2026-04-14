@@ -31,6 +31,13 @@ export const PackDiagnosticSchema = z.object({
 export type PackDiagnostic = z.infer<typeof PackDiagnosticSchema>
 
 // ---------------------------------------------------------------------------
+// ActivationSourceAction — why was this activation triggered? (LangGraph-inspired lineage)
+// ---------------------------------------------------------------------------
+
+export const ActivationSourceAction = ['auto-score', 'user-override', 'reactivation'] as const
+export type ActivationSourceAction = (typeof ActivationSourceAction)[number]
+
+// ---------------------------------------------------------------------------
 // PackScorer — composable function-type (ni-inspired)
 // ---------------------------------------------------------------------------
 
@@ -137,6 +144,19 @@ export type ActivationEvent =
 export interface ActivationSubscriber {
   onEvent(event: ActivationEvent): void | Promise<void>
 }
+
+// ---------------------------------------------------------------------------
+// StreamPart — typed wire format for streaming activation progress
+// Discriminated union enabling full type-narrowing on chunk["type"]
+// (inspired by LangGraph v2 StreamPart)
+// ---------------------------------------------------------------------------
+
+export type StreamPart =
+  | { type: 'context:analyzed'; stage: number; traceId: string; data: { ctx: ActivationContext } }
+  | { type: 'scoring:complete'; stage: number; traceId: string; data: { recommendations: Recommendation[] } }
+  | { type: 'policy:evaluated'; stage: number; traceId: string; data: { diagnostics: PackDiagnostic[] } }
+  | { type: 'activation:complete'; stage: number; traceId: string; data: { result: ActivationResult } }
+  | { type: 'activation:error'; stage: number; traceId: string; data: { message: string } }
 
 // ---------------------------------------------------------------------------
 // Original schemas (kept — backward compatible)
@@ -329,6 +349,48 @@ export class HookRunner {
       }
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Event Emitter — manages subscribers (moon-inspired)
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// DiagnosticsReducer — deduplication + severity escalation
+// Prevents duplicate {tag + packId} entries; escalates severity instead
+// (inspired by LangGraph channel reducers / BinaryOperatorAggregate)
+// ---------------------------------------------------------------------------
+
+const SEVERITY_ORDER: Record<DiagnosticSeverity, number> = { hint: 0, info: 1, warning: 2, error: 3 }
+
+/**
+ * Merge a single incoming diagnostic into an existing list.
+ * - If no entry with the same {tag, packId} exists → append.
+ * - If one exists → escalate severity if incoming is higher; update message.
+ */
+export function mergeDiagnostic(diagnostics: PackDiagnostic[], incoming: PackDiagnostic): PackDiagnostic[] {
+  const idx = diagnostics.findIndex((d) => d.tag === incoming.tag && d.packId === incoming.packId)
+  if (idx === -1) return [...diagnostics, incoming]
+
+  const existing = diagnostics[idx]!
+  if (SEVERITY_ORDER[incoming.severity] <= SEVERITY_ORDER[existing.severity]) return diagnostics
+
+  const result = [...diagnostics]
+  result[idx] = {
+    ...existing,
+    severity: incoming.severity,
+    message: incoming.message,
+    suggestion: incoming.suggestion ?? existing.suggestion,
+  }
+  return result
+}
+
+/**
+ * Deduplicate a full diagnostics array using mergeDiagnostic.
+ * Safe to call at pipeline boundaries before returning ActivationResult.
+ */
+export function dedupeDiagnostics(diagnostics: PackDiagnostic[]): PackDiagnostic[] {
+  return diagnostics.reduce<PackDiagnostic[]>((acc, d) => mergeDiagnostic(acc, d), [])
 }
 
 // ---------------------------------------------------------------------------

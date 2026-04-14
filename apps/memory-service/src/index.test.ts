@@ -125,4 +125,78 @@ describe('createMemoryService', () => {
     const scores = await service.getPackFeedbackScores()
     expect(scores['pack-a']).toBe(5)
   })
+
+  it('persists sourceAction and parentActivationId on recordActivation', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'memory-service-lineage-'))
+    tempDirs.push(dir)
+    const service = createMemoryService({ filePath: path.join(dir, 'memory.json') })
+    const plan = makePlan()
+
+    const parent = await service.recordActivation({ status: 'active', plan, sourceAction: 'auto-score' })
+    const child = await service.recordActivation({
+      status: 'pending_confirmation',
+      plan,
+      sourceAction: 'reactivation',
+      parentActivationId: parent.id,
+    })
+
+    const storedChild = await service.getActivation(child.id)
+    expect(storedChild?.sourceAction).toBe('reactivation')
+    expect(storedChild?.parentActivationId).toBe(parent.id)
+    expect(storedChild?.status).toBe('pending_confirmation')
+  })
+
+  it('resumeActivation: approve sets status to active and records resolvedAt', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'memory-service-resume-approve-'))
+    tempDirs.push(dir)
+    const service = createMemoryService({ filePath: path.join(dir, 'memory.json') })
+    const plan = makePlan()
+
+    const { id } = await service.recordActivation({ status: 'pending_confirmation', plan })
+    const resolved = await service.resumeActivation(id, 'approve', 'looks good')
+
+    expect(resolved?.status).toBe('active')
+    expect(resolved?.resolvedAt).toBeDefined()
+    expect(resolved?.resolvedNote).toBe('looks good')
+
+    const persisted = await service.getActivation(id)
+    expect(persisted?.status).toBe('active')
+  })
+
+  it('resumeActivation: deny sets status to denied', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'memory-service-resume-deny-'))
+    tempDirs.push(dir)
+    const service = createMemoryService({ filePath: path.join(dir, 'memory.json') })
+    const plan = makePlan()
+
+    const { id } = await service.recordActivation({ status: 'pending_confirmation', plan })
+    const resolved = await service.resumeActivation(id, 'deny', 'not relevant')
+
+    expect(resolved?.status).toBe('denied')
+    expect(resolved?.resolvedNote).toBe('not relevant')
+  })
+
+  it('resumeActivation: returns null when activation is not in pending_confirmation state', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'memory-service-resume-noop-'))
+    tempDirs.push(dir)
+    const service = createMemoryService({ filePath: path.join(dir, 'memory.json') })
+    const plan = makePlan()
+
+    const { id } = await service.recordActivation({ status: 'active', plan })
+    const result = await service.resumeActivation(id, 'approve')
+
+    expect(result).toBeNull()
+    // Status should be unchanged
+    const stored = await service.getActivation(id)
+    expect(stored?.status).toBe('active')
+  })
+
+  it('resumeActivation: returns null for unknown id', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'memory-service-resume-missing-'))
+    tempDirs.push(dir)
+    const service = createMemoryService({ filePath: path.join(dir, 'memory.json') })
+
+    const result = await service.resumeActivation('nonexistent-id', 'approve')
+    expect(result).toBeNull()
+  })
 })
