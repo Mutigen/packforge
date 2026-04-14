@@ -17,40 +17,54 @@
     "url": "git+https://github.com/mutigen/packforge.git",
     "directory": "apps/mcp-gateway"
   },
-  "keywords": ["mcp", "ai-agents", "instruction-packs", "claude", "cursor", "codex", "packforge"],
+  "keywords": [
+    "mcp",
+    "ai-agents",
+    "instruction-packs",
+    "claude",
+    "cursor",
+    "codex",
+    "packforge"
+  ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
+    "build:publish": "tsup",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build:publish"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.214.0",
+    "fastify": "^5.3.2",
+    "jose": "^5.10.0",
+    "js-yaml": "^4.1.0",
+    "lru-cache": "^11.1.0",
+    "pino": "^9.6.0",
+    "undici": "^7.4.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
     "@hub/context-analyzer": "*",
     "@hub/export-adapters": "*",
     "@hub/memory-service": "*",
     "@hub/orchestrator": "*",
     "@hub/policy-service": "*",
     "@hub/shared-types": "*",
-    "fastify": "^5.3.2",
-    "undici": "^7.4.0",
-    "zod": "^3.24.2",
-    "pino": "^9.6.0",
-    "jose": "^5.10.0",
-    "lru-cache": "^11.1.0",
-    "@modelcontextprotocol/sdk": "^1.10.1",
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/sdk-node": "^0.214.0",
-    "js-yaml": "^4.1.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.8.3",
-    "tsx": "^4.19.3",
-    "vitest": "^3.1.1",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.14.0",
-    "@types/js-yaml": "^4.0.9"
+    "tsup": "^8.5.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
   }
 }

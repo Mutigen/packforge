@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * PackForge CLI — starts the MCP Gateway server over stdio.
  *
