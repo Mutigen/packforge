@@ -1,0 +1,20 @@
+wing: mcp_agent_app
+rooms:
+- name: configuration
+  description: Files from infra/
+- name: planning
+  description: Files from specs/
+- name: documentation
+  description: Files from docs/
+- name: packs
+  description: Files from packs/
+- name: scripts
+  description: Files from scripts/
+- name: packages
+  description: Files from packages/
+- name: apps
+  description: Files from apps/
+- name: vault
+  description: Files from vault/
+- name: general
+  description: Files that don't fit other rooms

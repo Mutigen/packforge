@@ -572,7 +572,8 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
   server.registerTool(
     'recommend_packs',
     {
-      description: 'Recommend instruction packs for a given context.',
+      description:
+        'Read-only: Score and rank instruction packs for a project context without creating an activation. Use this to preview what packs would be recommended. To actually activate packs, use start_project_from_spec instead.',
       inputSchema: z.object({
         context: ProjectContextSchema.optional(),
         analyze: AnalyzeProjectInputSchema.optional(),
@@ -590,11 +591,21 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
   server.registerTool(
     'activate_pack_set',
     {
-      description: 'Create an activation from a project context and store the result.',
+      description:
+        'Low-level tool: Analyze a project context and automatically activate ALL packs that score above the threshold. Pack selection is automatic based on scoring — there is no packIds parameter. Prefer start_project_from_spec → confirm_activation for the standard workflow. Use this only when you already have a ProjectContext object and want to skip the spec-file step.',
       inputSchema: z.object({
-        context: ProjectContextSchema.optional(),
-        analyze: AnalyzeProjectInputSchema.optional(),
-        autoApprove: z.boolean().default(false),
+        context: ProjectContextSchema.optional().describe(
+          'A full ProjectContext object. Provide either context or analyze, not both.',
+        ),
+        analyze: AnalyzeProjectInputSchema.optional().describe(
+          'Raw analysis input to build a ProjectContext. Provide either context or analyze, not both.',
+        ),
+        autoApprove: z
+          .boolean()
+          .default(false)
+          .describe(
+            'If true, skip pending_confirmation and activate immediately. If false, returns pending_confirmation status — call confirm_activation next.',
+          ),
       }),
     },
     async (input) => {
@@ -610,7 +621,8 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
   server.registerTool(
     'get_activation_status',
     {
-      description: 'Return the stored activation record for an activation id.',
+      description:
+        'Check the current status (pending_confirmation, active, denied) and metadata of an existing activation.',
       inputSchema: z.object({ activationId: z.string().min(1) }),
     },
     async (input) => textResult(await handlers.getActivationStatus(input)),
@@ -619,7 +631,8 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
   server.registerTool(
     'get_active_instructions',
     {
-      description: 'Return the active handoff contract for a stored activation.',
+      description:
+        'Retrieve the full handoff contract (system prompts, constraints, tools, policies) for an already-active activation. Use after confirm_activation.',
       inputSchema: z.object({ activationId: z.string().min(1) }),
     },
     async (input) => textResult(await handlers.getActiveInstructions(input)),
@@ -629,7 +642,7 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
     'start_project_from_spec',
     {
       description:
-        'Read a project spec from a Markdown file, analyze the project context, and recommend instruction packs. Returns recommended packs for user validation before activation. This is the primary entry point — the user writes a .md file with their project idea, and this tool does the rest.',
+        'PRIMARY ENTRY POINT. Reads a project spec (.md file), auto-detects the stack from the repository, scores and recommends instruction packs, and creates a pending activation. Returns the activationId + list of recommended packs for the user to review. After review, call confirm_activation(activationId) to activate. The full workflow is: start_project_from_spec → user reviews packs → confirm_activation.',
       inputSchema: z.object({
         specFilePath: z.string().min(1).describe('Absolute path to a .md file describing the project to build'),
         repositoryPath: z
@@ -652,9 +665,12 @@ export function createMcpGateway(options?: { packsDir?: string; memoryFilePath?:
     'confirm_activation',
     {
       description:
-        'Confirm and activate a pending activation after the user has reviewed the recommended packs. Returns the full runtime handoff contract with system prompts, constraints, allowed/blocked tools, and policies.',
+        'STEP 2 of the workflow. Call this after start_project_from_spec to approve and activate the recommended packs. Returns the full runtime handoff contract: system prompts, constraints, allowed/blocked tools, bootstrap steps, and policies. Only works on activations with status pending_confirmation.',
       inputSchema: z.object({
-        activationId: z.string().min(1).describe('The activationId returned by start_project_from_spec'),
+        activationId: z
+          .string()
+          .min(1)
+          .describe('The activationId returned by start_project_from_spec in the previous step'),
       }),
     },
     async (input) => textResult(await handlers.confirmActivation(input)),

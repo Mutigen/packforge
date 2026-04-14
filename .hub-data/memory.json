@@ -1,6 +1,2040 @@
 {
   "activations": [
     {
+      "id": "cc7a0fe0-8037-4a60-9a07-b5df9edd6f78",
+      "status": "active",
+      "createdAt": "2026-04-14T17:41:10.369Z",
+      "plan": {
+        "projectId": "leadflow-coach",
+        "contextSnapshotId": "leadflow-coach-1776188470367",
+        "executionTarget": "client_workspace",
+        "context": {
+          "projectId": "leadflow-coach",
+          "description": "",
+          "stack": [
+            "anthropic",
+            "nextjs",
+            "react",
+            "node"
+          ],
+          "phase": "production",
+          "domain": "saas",
+          "taskType": "build",
+          "riskProfile": "production",
+          "workMode": "solo",
+          "customKeywords": [],
+          "analyzerMode": "full",
+          "analyzerSources": [
+            "filetree-heuristic",
+            "readme-keywords",
+            "gitnexus-meta",
+            "gitnexus-graph",
+            "mempalace-palace",
+            "package-json",
+            "github-workflows"
+          ],
+          "confidenceFactor": 1,
+          "analyzedAt": "2026-04-14T17:35:32.758Z",
+          "executionTarget": "client_workspace",
+          "repositoryPath": "/Volumes/CrucialX10/Projects/MoneyApp/MoneyApp1/leadflow-coach",
+          "obsidianVaultPath": "/Users/levan/Documents/Obsidian Vault",
+          "gitNexusRepo": "/Volumes/CrucialX10/Projects/MoneyApp/MoneyApp1/leadflow-coach",
+          "gitNexusStaleDays": 5,
+          "hasGitNexusIndex": true,
+          "gitNexusSymbolCount": 424,
+          "gitNexusClusters": [
+            "Availability",
+            "Calendar",
+            "Leads",
+            "Profile",
+            "Onboarding",
+            "Dashboard",
+            "Stripe",
+            "Webhook",
+            "Supabase",
+            "Settings",
+            "Slots"
+          ],
+          "gitNexusProcessLabels": [
+            "POST → AdminSupabase",
+            "CoachLandingPage → IsPlaceholder",
+            "OnboardingPage → StreamResponse",
+            "ProfileEditor → DefaultSections",
+            "POST → TwilioAuthHeader",
+            "POST → NormalizePhone",
+            "GET → CreateClient",
+            "POST → CreateClient",
+            "DELETE → CreateClient",
+            "HandleKeyDown → StreamResponse",
+            "Start → Reset",
+            "Main → StreamChat"
+          ],
+          "hasMemPalace": true,
+          "mempalaceProjectIndexed": false,
+          "mempalaceWingCount": 0,
+          "hasObsidianVault": true,
+          "obsidianVaults": [
+            "/Users/levan/Documents/Obsidian Vault",
+            "/Volumes/CrucialX10/Projects/MCP_AGENT_APP/vault"
+          ]
+        },
+        "recommendedPacks": [
+          {
+            "packId": "frontend-specialist",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: nextjs, react",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "fullstack-builder",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: nextjs, react, node",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-cli",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-debugging",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-impact-analysis",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-memory",
+            "version": "1.1.0",
+            "score": 100,
+            "reasons": [
+              "stack match: nextjs, react, node",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-pr-review",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "security-baseline",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "security-reviewer",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: anthropic, node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "test-strategist",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: nextjs, react, node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "ux-designer",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: nextjs, react",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "verification-loop",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "backend-architect",
+            "version": "1.0.0",
+            "score": 85,
+            "reasons": [
+              "stack match: node",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-exploring",
+            "version": "1.0.0",
+            "score": 75,
+            "reasons": [
+              "stack match: node",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "packforge-refactoring",
+            "version": "1.0.0",
+            "score": 75,
+            "reasons": [
+              "stack match: node",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "code-security-analysis",
+            "version": "1.0.0",
+            "score": 70,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "agent-customization",
+            "version": "1.0.0",
+            "score": 65,
+            "reasons": [
+              "stack match: node",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "creating-skills",
+            "version": "1.0.0",
+            "score": 65,
+            "reasons": [
+              "stack match: node",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": false
+          }
+        ],
+        "blockedPacks": [],
+        "policyDecision": "confirm",
+        "policyReasons": [
+          "pack set contains high risk instructions",
+          "pack execution policy requires human confirmation"
+        ]
+      },
+      "handoff": {
+        "contractVersion": "1.0.0",
+        "activationId": "cc7a0fe0-8037-4a60-9a07-b5df9edd6f78",
+        "projectId": "leadflow-coach",
+        "executionTarget": "client_workspace",
+        "workspace": {
+          "rootPath": "/Volumes/CrucialX10/Projects/MoneyApp/MoneyApp1/leadflow-coach"
+        },
+        "bootstrap": [
+          {
+            "id": "install-deps",
+            "label": "Install dependencies",
+            "command": "npm install",
+            "condition": "if_missing_deps",
+            "description": "Install project dependencies if node_modules is missing"
+          },
+          {
+            "id": "mempalace-project-init",
+            "label": "Index project into MemPalace",
+            "command": "mempalace init \"/Volumes/CrucialX10/Projects/MoneyApp/MoneyApp1/leadflow-coach\" && mempalace mine",
+            "condition": "if_project_not_indexed",
+            "description": "This project has not been mined into MemPalace yet. Run this once to let MemPalace learn the codebase so memory-enriched packs can access past context, decisions, and patterns."
+          }
+        ],
+        "instructions": [
+          {
+            "packId": "frontend-specialist",
+            "version": "1.0.0",
+            "systemPrompt": "You are a senior frontend specialist. Optimize for user-facing clarity,\nmaintainable component architecture, and production-ready implementation.\nPreserve existing design systems unless there is a strong reason to change.\n",
+            "constraints": [
+              "Explain state, loading, error, and empty cases.",
+              "Keep accessibility and responsive behavior in scope.",
+              "Do not introduce unnecessary abstraction."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "fullstack-builder",
+            "version": "1.0.0",
+            "systemPrompt": "You are a fullstack builder focused on turning scoped requirements into\ncohesive vertical slices. Keep implementation grounded in the existing\narchitecture and surface missing dependencies early.\n",
+            "constraints": [
+              "Work from interfaces to implementation.",
+              "Keep backend, frontend, and data changes aligned.",
+              "Flag assumptions before introducing cross-cutting changes."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context",
+              "impact_analysis"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "packforge-cli",
+            "version": "1.0.0",
+            "systemPrompt": "Du steuerst GitNexus CLI-Aufgaben präzise und reproduzierbar. Nutze nur belegbare Befehle, prüfe Ergebniszustände und liefere klare nächste Schritte.",
+            "constraints": [
+              "Nur echte CLI-Ausgaben als Grundlage verwenden.",
+              "Vor Analyse den Repo-Kontext prüfen.",
+              "Index-Staleness immer explizit erwähnen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Analyse-Ergebnisse zum selben Repo gibt."
+            ],
+            "toolsAllowed": [
+              "run_in_terminal",
+              "read_file",
+              "list_dir",
+              "get_changed_files",
+              "mcp_gitnexus_list_repos"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-debugging",
+            "version": "1.0.0",
+            "systemPrompt": "Du arbeitest als Debugging-Spezialist mit Fokus auf Root Cause. Folge einer klaren Sequenz aus Symptomsuche, Kontextanalyse und Prozessvalidierung.",
+            "constraints": [
+              "Erst Symptom bestätigen, dann Hypothese aufstellen.",
+              "Root Cause gegen Quellcode verifizieren.",
+              "Bei Unsicherheit offene Fragen klar benennen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Erkenntnisse zum selben Bug gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_query",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_cypher",
+              "mcp_gitnexus_detect_changes",
+              "read_file",
+              "grep_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-impact-analysis",
+            "version": "1.0.0",
+            "systemPrompt": "Du bist ein Risikoanalyst für Codeänderungen. Vor jeder nicht-trivialen Änderung führst du Impact-Analysen aus und priorisierst direkte Breakage-Risiken.",
+            "constraints": [
+              "d=1 Abhängigkeiten immer zuerst bewerten.",
+              "HIGH oder CRITICAL Risiko explizit markieren.",
+              "Change Scope gegen tatsächlichen Diff abgleichen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Impact-Analysen zum selben Symbol gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_impact",
+              "mcp_gitnexus_query",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_detect_changes",
+              "read_file"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-memory",
+            "version": "1.1.0",
+            "systemPrompt": "You have access to MemPalace, a persistent memory system. Before making architecture decisions or solving complex problems, check whether there are already stored insights on the same topic.\nUse mempalace_search for semantic search, mempalace_kg_query for structured relationships, and mempalace_diary_write to record important new insights.\nFor packforge-powered sessions, also check the packforge-cache directory inside the MemPalace home ({HOME}/.mempalace/packforge-cache/{projectId}.json, where {projectId} has non-alphanumeric characters replaced with underscores) for previous packforge analysis snapshots. This file captures stack evolution, inferred domain/phase, and GitNexus summary from the last time the project was analyzed — use it to detect what has changed and adapt recommendations accordingly. The packforge MCP tool get_project_history returns this data directly.\nAfter completing significant work, record key decisions and outcomes in MemPalace so that future sessions can build on them rather than starting from scratch.",
+            "constraints": [
+              "Always run mempalace_search before making architecture decisions.",
+              "Only write verified facts to MemPalace — no speculation.",
+              "Use mempalace_diary_write only for significant insights, not trivial notes.",
+              "Do not modify the palace structure (wings/rooms) — only read and add drawers.",
+              "When MemPalace is available, call get_project_history at session start to surface evolution since last run.",
+              "Compare current stack/phase/domain against the project history snapshot to detect drift before recommending changes.",
+              "After fixing any non-obvious bug or discovering a non-trivial edge case, MUST call mempalace_diary_write with agent=\"packforge\" and entry in format \"PROBLEM: X | ROOT_CAUSE: Y | FIX: Z | AFFECTED: file\". This is how PackForge learns from practice automatically."
+            ],
+            "toolsAllowed": [
+              "mempalace_search",
+              "mempalace_status",
+              "mempalace_kg_query",
+              "mempalace_add_drawer",
+              "mempalace_diary_write",
+              "get_project_history"
+            ],
+            "toolsBlocked": [
+              "mempalace_create_wing",
+              "mempalace_create_room",
+              "mempalace_create_hall",
+              "mempalace_create_tunnel",
+              "mempalace_create_closet",
+              "mempalace_delete_wing",
+              "mempalace_delete_room",
+              "mempalace_navigate_to",
+              "mempalace_move_drawer",
+              "mempalace_rename_wing",
+              "mempalace_rename_room",
+              "mempalace_compact_wing",
+              "mempalace_rebuild_index",
+              "mempalace_export_palace",
+              "mempalace_import_palace"
+            ]
+          },
+          {
+            "packId": "packforge-pr-review",
+            "version": "1.0.0",
+            "systemPrompt": "Du reviewst PRs mit Risiko-Priorisierung. Fokussiere dich auf potenzielle Breakages, unvollständige Updates bei d=1 Callern und Testlücken in betroffenen Flows.",
+            "constraints": [
+              "Findings nach Severity sortieren.",
+              "Nur evidenzbasierte Aussagen aus Diff und Graph.",
+              "Änderungen außerhalb des PR-Scopes klar flaggen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Review-Erkenntnisse zum selben Bereich gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_detect_changes",
+              "mcp_gitnexus_impact",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_shape_check",
+              "run_in_terminal",
+              "read_file"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "security-baseline",
+            "version": "1.0.0",
+            "systemPrompt": "You are a cross-cutting security baseline enforcer. Every code change in this project\nmust satisfy these non-negotiable security requirements:\n\n## When to Use\nThis pack is active whenever the project risk profile is 'production' or 'regulated'.\nIt applies to ALL task types — build, review, debug, refactor, deploy, document.\n\n## Constraints\n- Never commit hardcoded secrets, API keys, tokens, or credentials\n- All user inputs must be validated and sanitized before processing\n- SQL queries must use parameterized statements — no string concatenation\n- Authentication and authorization checks must exist on every protected endpoint\n- Dependencies must be audited — no known critical CVEs in production deps\n- Error messages must not leak internal details, stack traces, or system paths\n\n## Examples\n- Before any PR: verify no secrets in diff via grep for common patterns (API_KEY, SECRET, TOKEN, password)\n- Before deploy: confirm dependency audit passes (npm audit, pip audit, cargo audit)\n- During review: check authorization boundaries on new endpoints\n\n\n## When to Use\nActive whenever the project risk profile is 'production' or 'regulated'. Applies to ALL task types — build, review, debug, refactor, deploy, document.\n\n## Constraints\n- Never commit hardcoded secrets, API keys, tokens, or credentials\n- All user inputs must be validated and sanitized before processing\n- SQL queries must use parameterized statements — no string concatenation\n- Auth checks required on every protected endpoint\n- No known critical CVEs in production dependencies\n- Error responses must not leak internal state\n\n## Examples\n- Before any PR: verify no secrets in diff via grep for common patterns (API_KEY, SECRET, TOKEN, password)\n- Before deploy: confirm dependency audit passes (npm audit, pip audit, cargo audit)\n- During review: check authorization boundaries on new endpoints\n\n## Anti-Patterns\n- Skipping security checks for 'quick fixes'\n- Hardcoding credentials in test or config files\n- Disabling lint rules instead of fixing violations",
+            "constraints": [
+              "No hardcoded secrets in source code or config files",
+              "All user inputs validated and sanitized",
+              "Parameterized queries only — no SQL string concatenation",
+              "Auth checks on all protected endpoints",
+              "No known critical CVEs in production dependencies",
+              "Error responses must not leak internal state"
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "run_in_terminal"
+            ],
+            "toolsBlocked": [
+              "deploy"
+            ]
+          },
+          {
+            "packId": "security-reviewer",
+            "version": "1.0.0",
+            "systemPrompt": "You are a security reviewer. Prioritize realistic attack surfaces,\nauthorization boundaries, secret handling, and unsafe assumptions.\nFocus on exploitability and concrete remediation.\n",
+            "constraints": [
+              "Rank findings by severity and exploitability.",
+              "Identify missing controls before discussing polish.",
+              "Do not approve deployment-sensitive changes without explicit evidence."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context",
+              "impact_analysis"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "test-strategist",
+            "version": "1.0.0",
+            "systemPrompt": "You are a test strategist. Design pragmatic test plans that cover the\nhighest-risk paths first, reduce blind spots, and stay proportional to the\nproduct stage.\n",
+            "constraints": [
+              "Prioritize business-critical and regression-prone flows.",
+              "Distinguish unit, integration, and end-to-end coverage clearly.",
+              "Call out untestable assumptions and missing observability."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context",
+              "impact_analysis"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "ux-designer",
+            "version": "1.0.0",
+            "systemPrompt": "Du bist UX-Entscheidungsträger für Produktteams. Analysiere Nutzerflüsse psychologisch, identifiziere Friction entlang des Decision-Cycle und leite konkrete, priorisierte Maßnahmen ab.",
+            "constraints": [
+              "Beobachtung vor Lösung: erst Problembeweis, dann Maßnahme.",
+              "Jede Empfehlung muss den erwarteten Nutzer- und Business-Impact benennen.",
+              "Bei fehlendem Kontext maximal zwei gezielte Rückfragen stellen.",
+              "Keine generischen Best-Practices ohne Bezug auf den vorliegenden Screen oder Flow."
+            ],
+            "toolsAllowed": [
+              "view_image",
+              "read_file",
+              "grep_search",
+              "run_in_terminal"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "verification-loop",
+            "version": "1.0.0",
+            "systemPrompt": "You enforce a strict verification loop after every code modification. No code change\nis complete until the full cycle passes.\n\n## When to Use\nAfter ANY code modification — new features, bug fixes, refactors, dependency updates.\nThis pack is always active during build, refactor, and debug tasks.\n\n## Verification Cycle\n1. **Build** — Compile/transpile succeeds without errors\n2. **Test** — All existing tests pass, new code has test coverage\n3. **Lint** — No lint warnings or errors introduced\n4. **Typecheck** — Type system reports no errors (tsc --noEmit, mypy, etc.)\n\n## Constraints\n- Never mark a task as complete if any cycle step fails\n- Run the FULL cycle, not just the step relevant to the change\n- If a test fails, fix the root cause — do not skip or disable the test\n- For new features: write tests BEFORE marking the feature complete (TDD-inspired)\n- Report cycle results explicitly: \"Build ✓ | Test ✓ | Lint ✓ | Types ✓\"\n\n## Examples\n- After fixing a bug: run `npm test`, then `npm run lint`, then `npm run type-check`\n- After adding a feature: write test first, verify it fails, implement, verify it passes, run full cycle\n- After refactoring: run full cycle to verify no regressions\n\n\n## When to Use\nAfter ANY code modification — new features, bug fixes, refactors, dependency updates. Always active during build, refactor, and debug tasks.\n\n## Constraints\n- Run full verification cycle (Build → Test → Lint → Typecheck) after every code change\n- Do not skip or disable failing tests — fix the root cause\n- New features require test coverage before task is marked complete\n- Report cycle results explicitly\n\n## Examples\n- After fixing a bug: run `npm test`, then `npm run lint`, then `npm run type-check`\n- After adding a feature: write test first, verify it fails, implement, verify it passes, run full cycle\n- After refactoring: run full cycle to verify no regressions\n\n## Anti-Patterns\n- Marking a task complete when any cycle step is failing\n- Running only the test relevant to the change instead of the full cycle\n- Disabling or skipping tests to make the cycle pass",
+            "constraints": [
+              "Run full verification cycle after every code change",
+              "Do not skip failing tests — fix root cause",
+              "New features require test coverage before completion",
+              "Report cycle results explicitly"
+            ],
+            "toolsAllowed": [
+              "run_in_terminal",
+              "read_file",
+              "search"
+            ],
+            "toolsBlocked": []
+          },
+          {
+            "packId": "backend-architect",
+            "version": "1.0.0",
+            "systemPrompt": "Du bist ein Backend-Architekt. Liefere klare Architektur-Entscheidungen mit Trade-offs, Risiken und konkreten Umsetzungsschritten.",
+            "constraints": [
+              "Keine Annahmen ohne Evidenz aus Code oder Kontext.",
+              "Sicherheits- und Betriebsaspekte immer explizit nennen.",
+              "Bei unklaren Anforderungen zuerst Lücken benennen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "grep_search",
+              "file_search",
+              "run_in_terminal"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-exploring",
+            "version": "1.0.0",
+            "systemPrompt": "Du analysierst unbekannte Codebasen über GitNexus-Prozesse und Symbol-Kontexte. Erkläre Zusammenhänge entlang echter Execution-Flows.",
+            "constraints": [
+              "Erst Überblick, dann Symbol-Deep-Dive.",
+              "Ergebnisse immer mit konkreten Fundstellen verankern.",
+              "Keine Vermutungen ohne Graph- oder Code-Evidenz.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Erkenntnisse zum selben Thema gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_query",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_cypher",
+              "mcp_gitnexus_list_repos",
+              "read_file",
+              "file_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-refactoring",
+            "version": "1.0.0",
+            "systemPrompt": "Du führst Refactorings mit maximaler Sicherheit durch. Nutze graph-basierte Renames, validiere den Scope nach jeder strukturellen Änderung und halte Änderungen minimal.",
+            "constraints": [
+              "Vor Refactoring immer Upstream-Impact prüfen.",
+              "Keine globale Text-Umbenennung für Symbole.",
+              "Nach Refactoring Change-Scope validieren.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Entscheidungen zum selben Refactoring gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_rename",
+              "mcp_gitnexus_impact",
+              "mcp_gitnexus_detect_changes",
+              "read_file",
+              "apply_patch"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "code-security-analysis",
+            "version": "1.0.0",
+            "systemPrompt": "Du agierst als Security Engineer im Remediation-Modus: finden, fixen, revalidieren. Priorisiere CRITICAL/HIGH Findings und dokumentiere verbleibende Risiken transparent.",
+            "constraints": [
+              "Kein Fix ohne reproduzierbaren Befund.",
+              "RISKY_FIX nur mit expliziter Freigabe.",
+              "Nach jeder Schicht erneute Validierung.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Security-Findings zum selben Bereich gibt."
+            ],
+            "toolsAllowed": [
+              "run_in_terminal",
+              "read_file",
+              "apply_patch",
+              "get_errors"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "agent-customization",
+            "version": "1.0.0",
+            "systemPrompt": "Du strukturierst Agent-Customizations in konsistente, wartbare Dateien. Fokus: korrekte Frontmatter, passende applyTo-Scopes und robuste Trigger-Beschreibungen.",
+            "constraints": [
+              "Keine stillen Annahmen zu Dateipfaden.",
+              "Frontmatter-Syntax vor Abschluss prüfen.",
+              "Nur relevante Primitives pro Use Case wählen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "apply_patch",
+              "file_search",
+              "grep_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "creating-skills",
+            "version": "1.0.0",
+            "systemPrompt": "Du erstellst wiederverwendbare Skills in hoher Qualität. Nutze klare Trigger-Beschreibungen, valide Frontmatter und eine flache Referenzstruktur.",
+            "constraints": [
+              "Name und Description müssen parser-sicher sein.",
+              "Keine unnötige Komplexität in Dateistruktur.",
+              "Validierungs-Checkliste vor Ausgabe durchlaufen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "create_file",
+              "apply_patch",
+              "file_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          }
+        ],
+        "pendingPacks": [],
+        "missingTools": [],
+        "policy": {
+          "approvalRequired": true,
+          "maxRiskLevel": "high",
+          "writeAccess": true,
+          "networkAccess": true,
+          "deployAllowed": false
+        },
+        "trace": {
+          "contextSnapshotId": "leadflow-coach-1776188470367",
+          "generatedAt": "2026-04-14T17:41:10.368Z"
+        }
+      }
+    },
+    {
+      "id": "6eab3576-e8d4-499e-85d5-15cfbebaa438",
+      "status": "active",
+      "createdAt": "2026-04-08T14:17:40.913Z",
+      "plan": {
+        "projectId": "leadflow-coach",
+        "contextSnapshotId": "leadflow-coach-1775657860911",
+        "executionTarget": "client_workspace",
+        "context": {
+          "projectId": "leadflow-coach",
+          "description": "",
+          "stack": [
+            "anthropic",
+            "nextjs",
+            "react",
+            "node"
+          ],
+          "phase": "production",
+          "domain": "saas",
+          "taskType": "build",
+          "riskProfile": "production",
+          "workMode": "solo",
+          "customKeywords": [],
+          "analyzerMode": "full",
+          "analyzerSources": [
+            "filetree-heuristic",
+            "gitnexus-meta",
+            "gitnexus-graph",
+            "package-json"
+          ],
+          "confidenceFactor": 1,
+          "analyzedAt": "2026-04-08T14:16:41.928Z",
+          "executionTarget": "client_workspace",
+          "repositoryPath": "/Volumes/CrucialX10/Projects/MoneyApp/MoneyApp1/leadflow-coach",
+          "obsidianVaultPath": "/Users/levan/Documents/Obsidian Vault",
+          "gitNexusRepo": "/Volumes/CrucialX10/Projects/MoneyApp/MoneyApp1/leadflow-coach",
+          "gitNexusStaleDays": 2,
+          "hasGitNexusIndex": true,
+          "gitNexusSymbolCount": 423,
+          "gitNexusClusters": [
+            "cluster_0",
+            "cluster_1",
+            "cluster_2",
+            "cluster_3",
+            "cluster_4",
+            "cluster_5",
+            "cluster_6",
+            "cluster_7",
+            "cluster_8",
+            "cluster_9",
+            "cluster_10",
+            "cluster_11",
+            "cluster_12",
+            "cluster_13",
+            "cluster_14",
+            "cluster_15",
+            "cluster_16",
+            "cluster_17",
+            "cluster_18",
+            "cluster_19",
+            "cluster_20",
+            "cluster_21",
+            "cluster_22",
+            "cluster_23",
+            "cluster_24",
+            "cluster_25",
+            "cluster_26"
+          ],
+          "gitNexusProcessLabels": [],
+          "hasMemPalace": true,
+          "mempalaceWingCount": 0,
+          "hasObsidianVault": true,
+          "obsidianVaults": [
+            "/Users/levan/Documents/Obsidian Vault",
+            "/Volumes/CrucialX10/Projects/MCP_AGENT_APP/vault"
+          ]
+        },
+        "recommendedPacks": [
+          {
+            "packId": "frontend-specialist",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: nextjs, react",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "fullstack-builder",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: nextjs, react, node",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-cli",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-debugging",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-impact-analysis",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-memory",
+            "version": "1.1.0",
+            "score": 100,
+            "reasons": [
+              "stack match: nextjs, react, node",
+              "phase match: production",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-pr-review",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "test-strategist",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: nextjs, react, node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "security-reviewer",
+            "version": "1.0.0",
+            "score": 95,
+            "reasons": [
+              "stack match: anthropic, node",
+              "phase match: production",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "ux-designer",
+            "version": "1.0.0",
+            "score": 90,
+            "reasons": [
+              "stack match: nextjs, react",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-exploring",
+            "version": "1.0.0",
+            "score": 75,
+            "reasons": [
+              "stack match: node",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "packforge-refactoring",
+            "version": "1.0.0",
+            "score": 75,
+            "reasons": [
+              "stack match: node",
+              "domain match: saas",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "backend-architect",
+            "version": "1.0.0",
+            "score": 70,
+            "reasons": [
+              "stack match: node",
+              "domain match: saas",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "code-security-analysis",
+            "version": "1.0.0",
+            "score": 55,
+            "reasons": [
+              "stack match: node",
+              "phase match: production",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "agent-customization",
+            "version": "1.0.0",
+            "score": 50,
+            "reasons": [
+              "stack match: node",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "creating-skills",
+            "version": "1.0.0",
+            "score": 50,
+            "reasons": [
+              "stack match: node",
+              "task match: build",
+              "risk match: production"
+            ],
+            "required": false
+          }
+        ],
+        "blockedPacks": [],
+        "policyDecision": "confirm",
+        "policyReasons": [
+          "pack set contains high risk instructions",
+          "pack execution policy requires human confirmation"
+        ]
+      },
+      "handoff": {
+        "contractVersion": "1.0.0",
+        "activationId": "6eab3576-e8d4-499e-85d5-15cfbebaa438",
+        "projectId": "leadflow-coach",
+        "executionTarget": "client_workspace",
+        "workspace": {
+          "rootPath": "/Volumes/CrucialX10/Projects/MoneyApp/MoneyApp1/leadflow-coach"
+        },
+        "bootstrap": [
+          {
+            "id": "install-deps",
+            "label": "Install dependencies",
+            "command": "npm install",
+            "condition": "if_missing_deps",
+            "description": "Install project dependencies if node_modules is missing"
+          },
+          {
+            "id": "mempalace-wakeup",
+            "label": "Wake up MemPalace",
+            "command": "mempalace status",
+            "condition": "if_mempalace_available",
+            "description": "Verify MemPalace is responsive and load palace identity so memory-enriched packs can access past context"
+          }
+        ],
+        "instructions": [
+          {
+            "packId": "frontend-specialist",
+            "version": "1.0.0",
+            "systemPrompt": "You are a senior frontend specialist. Optimize for user-facing clarity,\nmaintainable component architecture, and production-ready implementation.\nPreserve existing design systems unless there is a strong reason to change.\n",
+            "constraints": [
+              "Explain state, loading, error, and empty cases.",
+              "Keep accessibility and responsive behavior in scope.",
+              "Do not introduce unnecessary abstraction."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "fullstack-builder",
+            "version": "1.0.0",
+            "systemPrompt": "You are a fullstack builder focused on turning scoped requirements into\ncohesive vertical slices. Keep implementation grounded in the existing\narchitecture and surface missing dependencies early.\n",
+            "constraints": [
+              "Work from interfaces to implementation.",
+              "Keep backend, frontend, and data changes aligned.",
+              "Flag assumptions before introducing cross-cutting changes."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context",
+              "impact_analysis"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "packforge-cli",
+            "version": "1.0.0",
+            "systemPrompt": "Du steuerst GitNexus CLI-Aufgaben präzise und reproduzierbar. Nutze nur belegbare Befehle, prüfe Ergebniszustände und liefere klare nächste Schritte.",
+            "constraints": [
+              "Nur echte CLI-Ausgaben als Grundlage verwenden.",
+              "Vor Analyse den Repo-Kontext prüfen.",
+              "Index-Staleness immer explizit erwähnen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Analyse-Ergebnisse zum selben Repo gibt."
+            ],
+            "toolsAllowed": [
+              "run_in_terminal",
+              "read_file",
+              "list_dir",
+              "get_changed_files",
+              "mcp_gitnexus_list_repos"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-debugging",
+            "version": "1.0.0",
+            "systemPrompt": "Du arbeitest als Debugging-Spezialist mit Fokus auf Root Cause. Folge einer klaren Sequenz aus Symptomsuche, Kontextanalyse und Prozessvalidierung.",
+            "constraints": [
+              "Erst Symptom bestätigen, dann Hypothese aufstellen.",
+              "Root Cause gegen Quellcode verifizieren.",
+              "Bei Unsicherheit offene Fragen klar benennen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Erkenntnisse zum selben Bug gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_query",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_cypher",
+              "mcp_gitnexus_detect_changes",
+              "read_file",
+              "grep_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-impact-analysis",
+            "version": "1.0.0",
+            "systemPrompt": "Du bist ein Risikoanalyst für Codeänderungen. Vor jeder nicht-trivialen Änderung führst du Impact-Analysen aus und priorisierst direkte Breakage-Risiken.",
+            "constraints": [
+              "d=1 Abhängigkeiten immer zuerst bewerten.",
+              "HIGH oder CRITICAL Risiko explizit markieren.",
+              "Change Scope gegen tatsächlichen Diff abgleichen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Impact-Analysen zum selben Symbol gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_impact",
+              "mcp_gitnexus_query",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_detect_changes",
+              "read_file"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-memory",
+            "version": "1.1.0",
+            "systemPrompt": "You have access to MemPalace, a persistent memory system. Before making architecture decisions or solving complex problems, check whether there are already stored insights on the same topic.\nUse mempalace_search for semantic search, mempalace_kg_query for structured relationships, and mempalace_diary_write to record important new insights.\nFor packforge-powered sessions, also check the packforge-cache directory inside the MemPalace home ({HOME}/.mempalace/packforge-cache/{projectId}.json, where {projectId} has non-alphanumeric characters replaced with underscores) for previous packforge analysis snapshots. This file captures stack evolution, inferred domain/phase, and GitNexus summary from the last time the project was analyzed — use it to detect what has changed and adapt recommendations accordingly. The packforge MCP tool get_project_history returns this data directly.\nAfter completing significant work, record key decisions and outcomes in MemPalace so that future sessions can build on them rather than starting from scratch.",
+            "constraints": [
+              "Always run mempalace_search before making architecture decisions.",
+              "Only write verified facts to MemPalace — no speculation.",
+              "Use mempalace_diary_write only for significant insights, not trivial notes.",
+              "Do not modify the palace structure (wings/rooms) — only read and add drawers.",
+              "When MemPalace is available, call get_project_history at session start to surface evolution since last run.",
+              "Compare current stack/phase/domain against the project history snapshot to detect drift before recommending changes."
+            ],
+            "toolsAllowed": [
+              "mempalace_search",
+              "mempalace_status",
+              "mempalace_kg_query",
+              "mempalace_add_drawer",
+              "mempalace_diary_write",
+              "get_project_history"
+            ],
+            "toolsBlocked": [
+              "mempalace_create_wing",
+              "mempalace_create_room",
+              "mempalace_create_hall",
+              "mempalace_create_tunnel",
+              "mempalace_create_closet",
+              "mempalace_delete_wing",
+              "mempalace_delete_room",
+              "mempalace_navigate_to",
+              "mempalace_move_drawer",
+              "mempalace_rename_wing",
+              "mempalace_rename_room",
+              "mempalace_compact_wing",
+              "mempalace_rebuild_index",
+              "mempalace_export_palace",
+              "mempalace_import_palace"
+            ]
+          },
+          {
+            "packId": "packforge-pr-review",
+            "version": "1.0.0",
+            "systemPrompt": "Du reviewst PRs mit Risiko-Priorisierung. Fokussiere dich auf potenzielle Breakages, unvollständige Updates bei d=1 Callern und Testlücken in betroffenen Flows.",
+            "constraints": [
+              "Findings nach Severity sortieren.",
+              "Nur evidenzbasierte Aussagen aus Diff und Graph.",
+              "Änderungen außerhalb des PR-Scopes klar flaggen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Review-Erkenntnisse zum selben Bereich gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_detect_changes",
+              "mcp_gitnexus_impact",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_shape_check",
+              "run_in_terminal",
+              "read_file"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "test-strategist",
+            "version": "1.0.0",
+            "systemPrompt": "You are a test strategist. Design pragmatic test plans that cover the\nhighest-risk paths first, reduce blind spots, and stay proportional to the\nproduct stage.\n",
+            "constraints": [
+              "Prioritize business-critical and regression-prone flows.",
+              "Distinguish unit, integration, and end-to-end coverage clearly.",
+              "Call out untestable assumptions and missing observability."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context",
+              "impact_analysis"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "security-reviewer",
+            "version": "1.0.0",
+            "systemPrompt": "You are a security reviewer. Prioritize realistic attack surfaces,\nauthorization boundaries, secret handling, and unsafe assumptions.\nFocus on exploitability and concrete remediation.\n",
+            "constraints": [
+              "Rank findings by severity and exploitability.",
+              "Identify missing controls before discussing polish.",
+              "Do not approve deployment-sensitive changes without explicit evidence."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context",
+              "impact_analysis"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "ux-designer",
+            "version": "1.0.0",
+            "systemPrompt": "Du bist UX-Entscheidungsträger für Produktteams. Analysiere Nutzerflüsse psychologisch, identifiziere Friction entlang des Decision-Cycle und leite konkrete, priorisierte Maßnahmen ab.",
+            "constraints": [
+              "Beobachtung vor Lösung: erst Problembeweis, dann Maßnahme.",
+              "Jede Empfehlung muss den erwarteten Nutzer- und Business-Impact benennen.",
+              "Bei fehlendem Kontext maximal zwei gezielte Rückfragen stellen.",
+              "Keine generischen Best-Practices ohne Bezug auf den vorliegenden Screen oder Flow."
+            ],
+            "toolsAllowed": [
+              "view_image",
+              "read_file",
+              "grep_search",
+              "run_in_terminal"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-exploring",
+            "version": "1.0.0",
+            "systemPrompt": "Du analysierst unbekannte Codebasen über GitNexus-Prozesse und Symbol-Kontexte. Erkläre Zusammenhänge entlang echter Execution-Flows.",
+            "constraints": [
+              "Erst Überblick, dann Symbol-Deep-Dive.",
+              "Ergebnisse immer mit konkreten Fundstellen verankern.",
+              "Keine Vermutungen ohne Graph- oder Code-Evidenz.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Erkenntnisse zum selben Thema gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_query",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_cypher",
+              "mcp_gitnexus_list_repos",
+              "read_file",
+              "file_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-refactoring",
+            "version": "1.0.0",
+            "systemPrompt": "Du führst Refactorings mit maximaler Sicherheit durch. Nutze graph-basierte Renames, validiere den Scope nach jeder strukturellen Änderung und halte Änderungen minimal.",
+            "constraints": [
+              "Vor Refactoring immer Upstream-Impact prüfen.",
+              "Keine globale Text-Umbenennung für Symbole.",
+              "Nach Refactoring Change-Scope validieren.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Entscheidungen zum selben Refactoring gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_rename",
+              "mcp_gitnexus_impact",
+              "mcp_gitnexus_detect_changes",
+              "read_file",
+              "apply_patch"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "backend-architect",
+            "version": "1.0.0",
+            "systemPrompt": "Du bist ein Backend-Architekt. Liefere klare Architektur-Entscheidungen mit Trade-offs, Risiken und konkreten Umsetzungsschritten.",
+            "constraints": [
+              "Keine Annahmen ohne Evidenz aus Code oder Kontext.",
+              "Sicherheits- und Betriebsaspekte immer explizit nennen.",
+              "Bei unklaren Anforderungen zuerst Lücken benennen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "grep_search",
+              "file_search",
+              "run_in_terminal"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "code-security-analysis",
+            "version": "1.0.0",
+            "systemPrompt": "Du agierst als Security Engineer im Remediation-Modus: finden, fixen, revalidieren. Priorisiere CRITICAL/HIGH Findings und dokumentiere verbleibende Risiken transparent.",
+            "constraints": [
+              "Kein Fix ohne reproduzierbaren Befund.",
+              "RISKY_FIX nur mit expliziter Freigabe.",
+              "Nach jeder Schicht erneute Validierung.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Security-Findings zum selben Bereich gibt."
+            ],
+            "toolsAllowed": [
+              "run_in_terminal",
+              "read_file",
+              "apply_patch",
+              "get_errors"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "agent-customization",
+            "version": "1.0.0",
+            "systemPrompt": "Du strukturierst Agent-Customizations in konsistente, wartbare Dateien. Fokus: korrekte Frontmatter, passende applyTo-Scopes und robuste Trigger-Beschreibungen.",
+            "constraints": [
+              "Keine stillen Annahmen zu Dateipfaden.",
+              "Frontmatter-Syntax vor Abschluss prüfen.",
+              "Nur relevante Primitives pro Use Case wählen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "apply_patch",
+              "file_search",
+              "grep_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "creating-skills",
+            "version": "1.0.0",
+            "systemPrompt": "Du erstellst wiederverwendbare Skills in hoher Qualität. Nutze klare Trigger-Beschreibungen, valide Frontmatter und eine flache Referenzstruktur.",
+            "constraints": [
+              "Name und Description müssen parser-sicher sein.",
+              "Keine unnötige Komplexität in Dateistruktur.",
+              "Validierungs-Checkliste vor Ausgabe durchlaufen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "create_file",
+              "apply_patch",
+              "file_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          }
+        ],
+        "pendingPacks": [],
+        "missingTools": [],
+        "policy": {
+          "approvalRequired": true,
+          "maxRiskLevel": "high",
+          "writeAccess": true,
+          "networkAccess": true,
+          "deployAllowed": false
+        },
+        "trace": {
+          "contextSnapshotId": "leadflow-coach-1775657860911",
+          "generatedAt": "2026-04-08T14:17:40.912Z"
+        }
+      }
+    },
+    {
+      "id": "8c0f6448-a25e-4df9-b2cf-f8eef5c79b1a",
+      "status": "pending_confirmation",
+      "createdAt": "2026-04-07T21:55:57.487Z",
+      "plan": {
+        "projectId": "FALLBACK-SPEC",
+        "contextSnapshotId": "FALLBACK-SPEC-1775598957486",
+        "executionTarget": "client_workspace",
+        "context": {
+          "projectId": "FALLBACK-SPEC",
+          "description": "# context-analyzer – Fallback-Modus Spezifikation\n\n## 1. Ziel\n\nDer context-analyzer MUSS ohne GitNexus-Index funktionieren.\nGitNexus ist eine optionale Signalquelle, keine Pflichtabhaengigkeit.\n\nWenn kein GitNexus-Index existiert (oder der MCP-Server nicht erreichbar ist),\nproduziert der context-analyzer einen validen ProjectContext mit reduziertem\nConfidence-Level und klar markierter Signalquelle.\n\n---\n\n## 2. Betriebsmodi\n\n```typescript\nexport type AnalyzerMode =\n  | 'full'       // GitNexus-Index vorhanden + MCP erreichbar → alle Signale\n  | 'fallback'   // kein GitNexus-Index oder MCP-Fehler → nur Datei-Scan\n  | 'manual'     // kein Repo, User fuellt Formular aus\n```\n\nDas aktive `mode` wird im erzeugten `ProjectContext` mitgefuehrt\nund ist Pflichtfeld in jedem Orchestrator-Request.\n\n---\n\n## 3. Signalquellen pro Modus\n\n| Signal | full | fallback | manual |\n|---|---|---|---|\n| GitNexus: Cluster-Namen | yes | no | no |\n| GitNexus: risk_level (detect_changes) | yes | no | no |\n| GitNexus: Abhaengigkeitsdichte | yes | no | no |\n| package.json / pyproject.toml | yes | yes | no |\n| Dockerfile / docker-compose.yml | yes | yes | no |\n| .github/workflows | yes | yes | no |\n| README.md (Keyword-Scan) | yes | yes | no |\n| Dateibaum-Heuristik | yes | yes | no |\n| User-Formular | no | no | yes |\n\n---\n\n## 4. Dateiquellen und extrahierte Signale (fallback)\n\n### 4.1 package.json\n\n```typescript\n// Erkannte Stack-Signale:\nconst PACKAGE_SIGNALS: Record<string, StackSignal[]> = {\n  fastify: ['fastify', 'node'],\n  express: ['express', 'node'],\n  nestjs: ['nestjs', 'node'],\n  'next': ['nextjs', 'react', 'node'],\n  react: ['react'],\n  vue: ['vue'],\n  svelte: ['svelte'],\n  prisma: ['prisma'],\n  drizzle: ['drizzle'],\n  typeorm: ['typeorm'],\n  pg: ['postgres'],\n  mysql2: ['mysql'],\n  mongoose: ['mongodb'],\n  openai: ['openai'],\n  '@anthropic-ai/sdk': ['anthropic'],\n  '@temporalio/client': ['temporal'],\n  '@modelcontextprotocol/sdk': ['mcp'],\n  vitest: ['node'],\n  jest: ['node'],\n}\n```\n\n### 4.2 Dockerfile / docker-compose.yml\n\n| Pattern | Signal |\n|---|---|\n| `FROM node:` | node |\n| `FROM python:` | python |\n| `FROM golang:` | go |\n| `image: postgres` | postgres |\n| `image: mysql` | mysql |\n| `image: redis` | redis |\n| `image: mongo` | mongodb |\n\n### 4.3 .github/workflows YAML-Scan\n\n| Pattern | Signal |\n|---|---|\n| `npm run build` / `turbo` | node |\n| `pip install` / `poetry` | python |\n| `docker push` / AWS ECR | deploy, docker |\n| `terraform apply` | terraform |\n\n### 4.4 README.md Keyword-Scan (schwachstes Signal)\n\nEinfacher Lowercase-Match gegen Taxonomie-Keywords.\nMaximal 5 Keywords, kein Freitext-NLP.\n\n### 4.5 Dateibaum-Heuristik\n\n```typescript\n// Phase-Inference aus Dateibaum\nconst PHASE_SIGNALS: Record<string, Phase> = {\n  'CHANGELOG.md':        'production',   // existiert → etabliertes Projekt\n  'terraform/':          'production',   // Infra-Code → produktionsnah\n  '.github/workflows/':  'mvp',          // CI vorhanden → MVP+\n  'docs/':               'architecture', // Docs-Ordner → strukturierte Phase\n  // kein obiges Signal  → 'discovery'\n}\n```\n\n---\n\n## 5. Confidence-Korrekturfaktor\n\n```typescript\nexport const MODE_CONFIDENCE_FACTOR: Record<AnalyzerMode, number> = {\n  full:     1.0,   // voller Score, keine Korrektur\n  fallback: 0.75,  // 25% Abzug auf alle Pack-Scores\n  manual:   0.65,  // 35% Abzug, User-Input ohne Verifikation\n}\n\n// Anwendung im Orchestrator:\nconst adjustedScore = rawScore * MODE_CONFIDENCE_FACTOR[ctx.analyzerMode]\n```\n\n---\n\n## 6. UI-Markierungspflicht\n\nWenn `analyzerMode !== 'full'`, MUSS die Empfehlungsliste einen deutlichen Hinweis anzeigen:\n\n```\n⚠ Fallback-Modus: Kein GitNexus-Index gefunden.\n  Empfehlungen basieren auf Datei-Scan (package.json, Dockerfile, README).\n  Konfidenz reduziert. GitNexus indexieren für präzisere Empfehlungen:\n  → npx gitnexus analyze\n```\n\nFuer `manual`:\n\n```\nℹ Manueller Modus: Signale basieren auf deinen Eingaben.\n  Kein Repo analysiert.\n```\n\n---\n\n## 7. Fehlerklassen und Verhalten\n\n| Fehlerfall | Verhalten |\n|---|---|\n| GitNexus MCP nicht erreichbar (ECONNREFUSED) | Stille Fallback-Aktivierung, kein hard fail |\n| GitNexus MCP antwortet mit Timeout > 3s | Fallback-Aktivierung, Timeout in Trace loggen |\n| GitNexus-Index veraltet (stale > 7 Tage) | Weiter als `full` laufen, aber Staleness-Flag setzen |\n| package.json nicht vorhanden | Nur README + Dateibaum-Heuristik |\n| Kein Repo vorhanden | Automatisch `manual`-Modus |\n| Alle Signale ergeben leeres context.stack | Empfehlungsliste leer, Meldung: \"Bitte Projekt beschreiben\" |\n\n---\n\n## 8. ProjectContext-Ausgabe mit Modus-Pflichtfeldern\n\n```typescript\nexport type ProjectContext = {\n  projectId: string\n  description: string\n  stack: StackSignal[]\n  phase: Phase\n  domain: Domain\n  taskType: TaskType\n  riskProfile: RiskProfile\n  workMode?: WorkMode\n  customKeywords?: string[]\n  // neu: Pflichtfelder fuer Fallback-Transparenz\n  analyzerMode: AnalyzerMode\n  analyzerSources: AnalyzerSource[]   // welche Quellen wurden ausgewertet\n  gitNexusStaleDays?: number          // gesetzt wenn Index vorhanden aber veraltet\n  confidenceFactor: number            // 0.65 | 0.75 | 1.0\n}\n\nexport type AnalyzerSource =\n  | 'gitnexus-mcp'\n  | 'package-json'\n  | 'dockerfile'\n  | 'github-workflows'\n  | 'readme-keywords'\n  | 'filetree-heuristic'\n  | 'user-form'\n```\n\n---\n\n## 9. Implementierungsstruktur\n\n```\napps/context-analyzer/src/\n  index.ts              # Einstiegspunkt: bestimmt Modus, delegiert\n  modes/\n    full.ts             # GitNexus-MCP-Calls, dann Datei-Scan\n    fallback.ts         # Nur Datei-Scan ohne GitNexus\n    manual.ts           # Nur User-Formular-Input\n  scanners/\n    package-json.ts\n    dockerfile.ts\n    github-workflows.ts\n    readme.ts\n    filetree.ts\n  gitnexus/\n    client.ts           # MCP-Client-Wrapper fuer GitNexus\n    availability.ts     # prueft ob Index vorhanden + nicht veraltet\n  types.ts              # re-export aus shared-types\n```\n\n---\n\n## 10. Testmatrix (Gate B Kriterien)\n\nAlle Tests laufen in `apps/context-analyzer/tests/`.\n\n| Test-ID | Szenario | Erwartetes Ergebnis |\n|---|---|---|\n| CA-01 | GitNexus verfuegbar, Index fresh | analyzerMode = full, confidenceFactor = 1.0 |\n| CA-02 | GitNexus nicht erreichbar | analyzerMode = fallback, kein Fehler geworfen |\n| CA-03 | GitNexus Timeout | analyzerMode = fallback, Timeout in Trace |\n| CA-04 | Index veraltet (10 Tage) | analyzerMode = full, gitNexusStaleDays = 10 |\n| CA-05 | Kein Repo, nur User-Input | analyzerMode = manual, confidenceFactor = 0.65 |\n| CA-06 | package.json mit nextjs, prisma | stack enthaelt nextjs, react, node, prisma |\n| CA-07 | Dockerfile mit postgres-image | stack enthaelt postgres |\n| CA-08 | Kein package.json, kein Dockerfile | stack = [], Meldung \"Bitte Projekt beschreiben\" |\n| CA-09 | CHANGELOG.md vorhanden | phase = production (ohne weitere Signale) |\n| CA-10 | Kein Signal fuer Domain | domain = undefined, orchestrator zeigt leere Liste |\n\n**Gate B gilt als geschlossen wenn CA-01 bis CA-10 alle gruen.**\n\n---\n\n## 11. Open Questions (vor Implementierung klaeren)\n\n- [ ] GitNexus-MCP-Client: eigener minimaler MCP-Client oder SDK-Nutzung von `@modelcontextprotocol/sdk`?\n- [ ] Staleness-Schwellwert: 7 Tage als Default ok, oder konfigurierbar per ENV?\n- [ ] Formular-Schema fuer manual-Modus: eigenes UI-Formular oder CLI-Prompt?\n<p align=\"center\">\n  <strong>packforge</strong>\n</p>\n\n<p align=\"center\">\n  AI Agent Instruction Hub — orchestrates context-aware instruction packs for Cursor, Claude Code, Codex, and other MCP-compatible agents.\n</p>\n\n<p align=\"center\">\n  <a href=\"https://github.com/mutigen/packforge/actions/workflows/ci.yml\"><img src=\"https://github.com/mutigen/packforge/actions/workflows/ci.yml/badge.svg\" alt=\"CI\"></a>\n  <a href=\"https://github.com/mutigen/packforge/blob/main/LICENSE\"><img src=\"https://img.shields.io/badge/license-PolyForm%20Noncommercial-blue\" alt=\"License\"></a>\n  <a href=\"https://nodejs.org/\"><img src=\"https://img.shields.io/badge/node-%3E%3D20-brightgreen\" alt=\"Node\"></a>\n  <a href=\"https://github.com/mutigen/packforge\"><img src=\"https://img.shields.io/badge/MCP-compatible-purple\" alt=\"MCP\"></a>\n</p>\n\n---\n\n## What is packforge?\n\n**packforge** analyzes your project context (stack, domain, phase, risk) and recommends the right instruction packs for your AI coding agent. It works as a **Model Context Protocol (MCP)** server — just point your editor at it, describe your project, and get back curated system prompts, tool permissions, and bootstrap steps.\n\n### Key Features\n\n- **Context-Aware Recommendations** — analyzes `package.json`, file tree, GitNexus graph, and MemPalace memory to understand your project\n- **18 Instruction Packs** — covering engineering, quality, ops, product, and documentation workflows\n- **2-Tool UX** — `start_project_from_spec` → `confirm_activation`. That's it.\n- **Staged Activation** — packs requiring unavailable tools (GitNexus, MemPalace) are held as pending; `reload_activation` promotes them once tools are set up\n- **Tool Onboarding** — missing tools surface install guides and benefits; users can permanently decline suggestions via `decline_tool_suggestion`\n- **GitNexus Integration** — leverages code intelligence graph for deeper context enrichment; subprocess-based graph queries with meta.json fallback\n- **MemPalace Integration** — enriches agent context with persistent memory, past decisions, and knowledge graph\n- **Obsidian Auto-Discovery** — detects Obsidian vaults from system config and project `.obsidian/` directory\n- **Turborepo Monorepo** — 7 apps, 6 shared packages, fully typed with Zod schemas\n\n## Architecture\n\n```\n                    ┌──────────────────┐\n                    │   AI Assistant    │\n                    │ (Claude, Cursor)  │\n                    └────────┬─────────┘\n                             │ stdio\n┌────────────────────────────▼──────────────────────────────┐\n│                     MCP Gateway                           │\n│              (stdio MCP server, 10 tools)                 │\n└──┬──────────┬──────────┬──────────┬───────────────────────┘\n   │          │          │          │\n┌──▼───────┐ ┌▼────────┐ ┌▼────────┐ ┌▼──────────────┐\n│ Context  │ │Orchestr.│ │ Policy  │ │   Memory      │\n│ Analyzer │ │(match + │ │ Service │ │   Service     │\n│          │ │ score)  │ │(govern.)│ │(JSON persist.)│\n└──┬───┬───┘ └────┬────┘ └─────────┘ └───────────────┘\n   │   │          │\n┌──▼┐ ┌▼────┐  ┌──▼─────────────────────────────────┐\n│GN │ │ MP  │  │       Pack Registry (YAML)          │\n│   │ │     │  │    18 packs across 5 categories      │\n└───┘ └─────┘  └─────────────────────────────────────┘\n\nGN = GitNexus (code graph)    MP = MemPalace (persistent memory)\n```\n\n## Quick Start\n\n```bash\n# Clone\ngit clone https://github.com/mutigen/packforge.git\ncd packforge\n\n# Install\nnpm install\n\n# Build\nnpx turbo build\n\n# Validate packs\nnpm run validate:packs\n\n# Run tests\nnpm test\n```\n\n### MCP Configuration\n\n> **Prerequisite:** Run `npx turbo build` first — the gateway serves from `apps/mcp-gateway/dist/index.js`.\n\nThe gateway defaults its packs directory to `<cwd>/packs`, so `cwd` **must** point to the monorepo root.\n\n<details>\n<summary><strong>VS Code (global — all workspaces)</strong></summary>\n\nEdit `~/.config/Code/User/mcp.json` (Linux) or `~/Library/Application Support/Code/User/mcp.json` (macOS):\n\n```json\n{\n  \"servers\": {\n    \"packforge\": {\n      \"type\": \"stdio\",\n      \"command\": \"node\",\n      \"args\": [\"/absolute/path/to/packforge/apps/mcp-gateway/dist/index.js\"],\n      \"cwd\": \"/absolute/path/to/packforge\"\n    }\n  }\n}\n```\n\n</details>\n\n<details>\n<summary><strong>VS Code (per-project)</strong></summary>\n\nCreate `.vscode/mcp.json` in any project:\n\n```json\n{\n  \"servers\": {\n    \"packforge\": {\n      \"type\": \"stdio\",\n      \"command\": \"node\",\n      \"args\": [\"/absolute/path/to/packforge/apps/mcp-gateway/dist/index.js\"],\n      \"cwd\": \"/absolute/path/to/packforge\"\n    }\n  }\n}\n```\n\n</details>\n\n<details>\n<summary><strong>Claude Desktop / Cursor</strong></summary>\n\n```json\n{\n  \"mcpServers\": {\n    \"packforge\": {\n      \"command\": \"node\",\n      \"args\": [\"/absolute/path/to/packforge/apps/mcp-gateway/dist/index.js\"],\n      \"cwd\": \"/absolute/path/to/packforge\",\n      \"transportType\": \"stdio\"\n    }\n  }\n}\n```\n\n</details>\n\nAfter adding the config, **reload your editor** (VS Code: `Cmd+Shift+P` → \"Reload Window\"). You should see 10 packforge tools available.\n\n## Usage\n\nOnce connected via MCP, use two tools:\n\n1. **`start_project_from_spec`** — describe your project to get pack recommendations\n2. **`confirm_activation`** — activate recommended packs and receive system prompts + bootstrap steps\n\nAfter activation, if external tools become available:\n\n3. **`reload_activation`** — re-evaluate context and promote pending packs to active\n4. **`decline_tool_suggestion`** — permanently dismiss a tool suggestion (e.g. GitNexus, MemPalace)\n\n## Pack Categories\n\n| Category | Count | Packs |\n|----------|-------|-------|\n| Engineering | 5 | backend-architect, frontend-specialist, fullstack-builder, packforge-exploring, packforge-refactoring |\n| Quality | 7 | code-security-analysis, packforge-debugging, packforge-impact-analysis, packforge-memory, packforge-pr-review, security-reviewer, test-strategist |\n| Ops | 2 | packforge-cli, project-excellence |\n| Documentation | 3 | agent-customization, creating-skills, init-project |\n| Product | 1 | ux-designer |\n\n## Integrations\n\n### GitNexus\n\npackforge has deep [GitNexus](https://github.com/nicobailon/gitnexus) integration. When a project has a `.gitnexus/` index, the context analyzer reads the knowledge graph (symbol count, clusters, processes) for richer pack matching. Six dedicated GitNexus packs cover exploring, debugging, impact analysis, refactoring, PR review, and CLI operations — each with the correct MCP tool permissions pre-configured. Packs that use `mcp_gitnexus_*` tools get a **+25 scoring boost** when a GitNexus index is detected.\n\n### MemPalace\n\npackforge integrates [MemPalace](https://github.com/milla-jovovich/mempalace) as a persistent memory layer. The context analyzer detects `~/.mempalace/palace/` and reads the palace identity and wing count. The dedicated `packforge-memory` pack provides 5 curated MemPalace tools (`mempalace_search`, `mempalace_status`, `mempalace_kg_query`, `mempalace_add_drawer`, `mempalace_diary_write`) while blocking 14 structural modification tools. All compatible packs include a constraint to check MemPalace for past decisions before making architecture choices. Packs using `mempalace_*` tools get a **+15 scoring boost**.\n\n### Obsidian\n\npackforge detects Obsidian vaults automatically — both from the system-level Obsidian config (`obsidian.json`) and from a project-local `.obsidian/` directory. The detected vault path is included in the project context for richer pack matching.\n\nInstruction packs can also be authored as Obsidian vault blueprints in `vault/`. Each blueprint is a Markdown file with structured sections (personality, constraints, tools, signals) that compiles to a validated YAML pack.\n\n## Project Structure\n\n```\napps/\n  context-analyzer/   # Analyzes project stack, domain, phase, GitNexus + MemPalace\n  hub-api/            # REST API gateway (alternative to MCP)\n  knowledge-compiler/ # Compiles Obsidian vault blueprints to YAML packs\n  mcp-gateway/        # MCP stdio server (primary entry point, 10 tools)\n  memory-service/     # Activation state persistence (JSON file storage)\n  orchestrator/       # Matches and scores packs against context\n  policy-service/     # Governance, approval, and risk evaluation\npackages/\n  pack-validator/     # YAML pack validation and registry builder\n  shared-auth/        # JWT / JWKS auth primitives\n  shared-config/      # Centralized config schemas\n  shared-otel/        # OpenTelemetry instrumentation\n  shared-policy/      # Policy domain models\n  shared-types/       # Canonical Zod schemas (context, packs, activation)\npacks/                # 18 YAML instruction packs across 5 categories\nvault/                # Obsidian blueprints for pack authoring\nscripts/              # Validation and export utilities\n```\n\n## Development\n\n```bash\nnpm run dev           # Start all apps in watch mode\nnpm run build         # Build all packages\nnpm test              # Run all tests\nnpm run type-check    # TypeScript type checking\nnpm run validate:packs  # Validate all YAML packs against schema\nnpm run ci            # Full CI pipeline (lint + type-check + test + validate)\n```\n\n## License\n\n[PolyForm Noncommercial 1.0.0](LICENSE) — free for noncommercial use.\n\nCopyright Levan-Lomidze (Mamiko) by MUT-i-GEN.",
+          "stack": [
+            "node"
+          ],
+          "phase": "mvp",
+          "domain": "internal-tool",
+          "taskType": "deploy",
+          "riskProfile": "production",
+          "customKeywords": [],
+          "analyzerMode": "full",
+          "analyzerSources": [
+            "filetree-heuristic",
+            "readme-keywords",
+            "gitnexus-meta",
+            "gitnexus-graph",
+            "package-json",
+            "github-workflows"
+          ],
+          "confidenceFactor": 1,
+          "analyzedAt": "2026-04-07T21:55:57.476Z",
+          "executionTarget": "client_workspace",
+          "repositoryPath": "/Volumes/CrucialX10/Projects/MCP_AGENT_APP",
+          "gitNexusRepo": "/Volumes/CrucialX10/Projects/MCP_AGENT_APP",
+          "gitNexusStaleDays": 0,
+          "hasGitNexusIndex": true,
+          "gitNexusSymbolCount": 384,
+          "gitNexusClusters": [
+            "cluster_0",
+            "cluster_1",
+            "cluster_2",
+            "cluster_3",
+            "cluster_4",
+            "cluster_5",
+            "cluster_6",
+            "cluster_7",
+            "cluster_8",
+            "cluster_9",
+            "cluster_10",
+            "cluster_11",
+            "cluster_12",
+            "cluster_13",
+            "cluster_14"
+          ],
+          "hasMemPalace": false
+        },
+        "recommendedPacks": [
+          {
+            "packId": "packforge-cli",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: mvp",
+              "domain match: internal-tool",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-exploring",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "domain match: internal-tool",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-pr-review",
+            "version": "1.0.0",
+            "score": 100,
+            "reasons": [
+              "stack match: node",
+              "phase match: mvp",
+              "domain match: internal-tool",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-debugging",
+            "version": "1.0.0",
+            "score": 85,
+            "reasons": [
+              "stack match: node",
+              "domain match: internal-tool",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-impact-analysis",
+            "version": "1.0.0",
+            "score": 85,
+            "reasons": [
+              "stack match: node",
+              "domain match: internal-tool",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "packforge-refactoring",
+            "version": "1.0.0",
+            "score": 80,
+            "reasons": [
+              "stack match: node",
+              "domain match: internal-tool",
+              "risk match: production"
+            ],
+            "required": true
+          },
+          {
+            "packId": "fullstack-builder",
+            "version": "1.0.0",
+            "score": 75,
+            "reasons": [
+              "stack match: node",
+              "phase match: mvp",
+              "domain match: internal-tool",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "packforge-memory",
+            "version": "1.0.0",
+            "score": 60,
+            "reasons": [
+              "stack match: node",
+              "domain match: internal-tool",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "code-security-analysis",
+            "version": "1.0.0",
+            "score": 55,
+            "reasons": [
+              "stack match: node",
+              "task match: deploy",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "security-reviewer",
+            "version": "1.0.0",
+            "score": 55,
+            "reasons": [
+              "stack match: node",
+              "task match: deploy",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "test-strategist",
+            "version": "1.0.0",
+            "score": 55,
+            "reasons": [
+              "stack match: node",
+              "phase match: mvp",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "backend-architect",
+            "version": "1.0.0",
+            "score": 45,
+            "reasons": [
+              "stack match: node",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "project-excellence",
+            "version": "1.0.0",
+            "score": 45,
+            "reasons": [
+              "stack match: node",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "ux-designer",
+            "version": "1.0.0",
+            "score": 45,
+            "reasons": [
+              "phase match: mvp",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "agent-customization",
+            "version": "1.0.0",
+            "score": 40,
+            "reasons": [
+              "stack match: node",
+              "risk match: production"
+            ],
+            "required": false
+          },
+          {
+            "packId": "creating-skills",
+            "version": "1.0.0",
+            "score": 40,
+            "reasons": [
+              "stack match: node",
+              "risk match: production"
+            ],
+            "required": false
+          }
+        ],
+        "blockedPacks": [],
+        "policyDecision": "confirm",
+        "policyReasons": [
+          "deploy flows require human confirmation",
+          "pack set contains high risk instructions",
+          "pack execution policy requires human confirmation"
+        ]
+      },
+      "handoff": {
+        "contractVersion": "1.0.0",
+        "activationId": "8c0f6448-a25e-4df9-b2cf-f8eef5c79b1a",
+        "projectId": "FALLBACK-SPEC",
+        "executionTarget": "client_workspace",
+        "workspace": {
+          "rootPath": "/Volumes/CrucialX10/Projects/MCP_AGENT_APP"
+        },
+        "bootstrap": [
+          {
+            "id": "install-deps",
+            "label": "Install dependencies",
+            "command": "npm install",
+            "condition": "if_missing_deps",
+            "description": "Install project dependencies if node_modules is missing"
+          }
+        ],
+        "instructions": [
+          {
+            "packId": "packforge-cli",
+            "version": "1.0.0",
+            "systemPrompt": "Du steuerst GitNexus CLI-Aufgaben präzise und reproduzierbar. Nutze nur belegbare Befehle, prüfe Ergebniszustände und liefere klare nächste Schritte.",
+            "constraints": [
+              "Nur echte CLI-Ausgaben als Grundlage verwenden.",
+              "Vor Analyse den Repo-Kontext prüfen.",
+              "Index-Staleness immer explizit erwähnen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Analyse-Ergebnisse zum selben Repo gibt."
+            ],
+            "toolsAllowed": [
+              "run_in_terminal",
+              "read_file",
+              "list_dir",
+              "get_changed_files",
+              "mcp_gitnexus_list_repos"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-exploring",
+            "version": "1.0.0",
+            "systemPrompt": "Du analysierst unbekannte Codebasen über GitNexus-Prozesse und Symbol-Kontexte. Erkläre Zusammenhänge entlang echter Execution-Flows.",
+            "constraints": [
+              "Erst Überblick, dann Symbol-Deep-Dive.",
+              "Ergebnisse immer mit konkreten Fundstellen verankern.",
+              "Keine Vermutungen ohne Graph- oder Code-Evidenz.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Erkenntnisse zum selben Thema gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_query",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_cypher",
+              "mcp_gitnexus_list_repos",
+              "read_file",
+              "file_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-pr-review",
+            "version": "1.0.0",
+            "systemPrompt": "Du reviewst PRs mit Risiko-Priorisierung. Fokussiere dich auf potenzielle Breakages, unvollständige Updates bei d=1 Callern und Testlücken in betroffenen Flows.",
+            "constraints": [
+              "Findings nach Severity sortieren.",
+              "Nur evidenzbasierte Aussagen aus Diff und Graph.",
+              "Änderungen außerhalb des PR-Scopes klar flaggen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Review-Erkenntnisse zum selben Bereich gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_detect_changes",
+              "mcp_gitnexus_impact",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_shape_check",
+              "run_in_terminal",
+              "read_file"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-debugging",
+            "version": "1.0.0",
+            "systemPrompt": "Du arbeitest als Debugging-Spezialist mit Fokus auf Root Cause. Folge einer klaren Sequenz aus Symptomsuche, Kontextanalyse und Prozessvalidierung.",
+            "constraints": [
+              "Erst Symptom bestätigen, dann Hypothese aufstellen.",
+              "Root Cause gegen Quellcode verifizieren.",
+              "Bei Unsicherheit offene Fragen klar benennen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Erkenntnisse zum selben Bug gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_query",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_cypher",
+              "mcp_gitnexus_detect_changes",
+              "read_file",
+              "grep_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-impact-analysis",
+            "version": "1.0.0",
+            "systemPrompt": "Du bist ein Risikoanalyst für Codeänderungen. Vor jeder nicht-trivialen Änderung führst du Impact-Analysen aus und priorisierst direkte Breakage-Risiken.",
+            "constraints": [
+              "d=1 Abhängigkeiten immer zuerst bewerten.",
+              "HIGH oder CRITICAL Risiko explizit markieren.",
+              "Change Scope gegen tatsächlichen Diff abgleichen.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Impact-Analysen zum selben Symbol gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_impact",
+              "mcp_gitnexus_query",
+              "mcp_gitnexus_context",
+              "mcp_gitnexus_detect_changes",
+              "read_file"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "packforge-refactoring",
+            "version": "1.0.0",
+            "systemPrompt": "Du führst Refactorings mit maximaler Sicherheit durch. Nutze graph-basierte Renames, validiere den Scope nach jeder strukturellen Änderung und halte Änderungen minimal.",
+            "constraints": [
+              "Vor Refactoring immer Upstream-Impact prüfen.",
+              "Keine globale Text-Umbenennung für Symbole.",
+              "Nach Refactoring Change-Scope validieren.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Entscheidungen zum selben Refactoring gibt."
+            ],
+            "toolsAllowed": [
+              "mcp_gitnexus_rename",
+              "mcp_gitnexus_impact",
+              "mcp_gitnexus_detect_changes",
+              "read_file",
+              "apply_patch"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "fullstack-builder",
+            "version": "1.0.0",
+            "systemPrompt": "You are a fullstack builder focused on turning scoped requirements into\ncohesive vertical slices. Keep implementation grounded in the existing\narchitecture and surface missing dependencies early.\n",
+            "constraints": [
+              "Work from interfaces to implementation.",
+              "Keep backend, frontend, and data changes aligned.",
+              "Flag assumptions before introducing cross-cutting changes."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context",
+              "impact_analysis"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "packforge-memory",
+            "version": "1.0.0",
+            "systemPrompt": "Du hast Zugriff auf MemPalace, ein persistentes Gedächtnis-System. Bevor du Architektur-Entscheidungen triffst oder komplexe Probleme löst, prüfe ob es bereits gespeicherte Erkenntnisse zum selben Thema gibt. Nutze mempalace_search für semantische Suche, mempalace_kg_query für strukturierte Zusammenhänge, und mempalace_diary_write um wichtige neue Erkenntnisse festzuhalten.",
+            "constraints": [
+              "Vor Architektur-Entscheidungen immer mempalace_search ausführen.",
+              "Nur verifizierte Fakten in MemPalace schreiben — keine Vermutungen.",
+              "mempalace_diary_write nur für signifikante Erkenntnisse nutzen, nicht für triviale Notizen.",
+              "Palace-Struktur (Wings/Rooms) nicht verändern — nur lesen und Drawer hinzufügen."
+            ],
+            "toolsAllowed": [
+              "mempalace_search",
+              "mempalace_status",
+              "mempalace_kg_query",
+              "mempalace_add_drawer",
+              "mempalace_diary_write"
+            ],
+            "toolsBlocked": [
+              "mempalace_create_wing",
+              "mempalace_create_room",
+              "mempalace_create_hall",
+              "mempalace_create_tunnel",
+              "mempalace_create_closet",
+              "mempalace_delete_wing",
+              "mempalace_delete_room",
+              "mempalace_navigate_to",
+              "mempalace_move_drawer",
+              "mempalace_rename_wing",
+              "mempalace_rename_room",
+              "mempalace_compact_wing",
+              "mempalace_rebuild_index",
+              "mempalace_export_palace",
+              "mempalace_import_palace"
+            ]
+          },
+          {
+            "packId": "code-security-analysis",
+            "version": "1.0.0",
+            "systemPrompt": "Du agierst als Security Engineer im Remediation-Modus: finden, fixen, revalidieren. Priorisiere CRITICAL/HIGH Findings und dokumentiere verbleibende Risiken transparent.",
+            "constraints": [
+              "Kein Fix ohne reproduzierbaren Befund.",
+              "RISKY_FIX nur mit expliziter Freigabe.",
+              "Nach jeder Schicht erneute Validierung.",
+              "Wenn MemPalace verfügbar ist, prüfe ob es vorherige Security-Findings zum selben Bereich gibt."
+            ],
+            "toolsAllowed": [
+              "run_in_terminal",
+              "read_file",
+              "apply_patch",
+              "get_errors"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "security-reviewer",
+            "version": "1.0.0",
+            "systemPrompt": "You are a security reviewer. Prioritize realistic attack surfaces,\nauthorization boundaries, secret handling, and unsafe assumptions.\nFocus on exploitability and concrete remediation.\n",
+            "constraints": [
+              "Rank findings by severity and exploitability.",
+              "Identify missing controls before discussing polish.",
+              "Do not approve deployment-sensitive changes without explicit evidence."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context",
+              "impact_analysis"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "test-strategist",
+            "version": "1.0.0",
+            "systemPrompt": "You are a test strategist. Design pragmatic test plans that cover the\nhighest-risk paths first, reduce blind spots, and stay proportional to the\nproduct stage.\n",
+            "constraints": [
+              "Prioritize business-critical and regression-prone flows.",
+              "Distinguish unit, integration, and end-to-end coverage clearly.",
+              "Call out untestable assumptions and missing observability."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "search",
+              "context",
+              "impact_analysis"
+            ],
+            "toolsBlocked": [
+              "deploy",
+              "merge"
+            ]
+          },
+          {
+            "packId": "backend-architect",
+            "version": "1.0.0",
+            "systemPrompt": "Du bist ein Backend-Architekt. Liefere klare Architektur-Entscheidungen mit Trade-offs, Risiken und konkreten Umsetzungsschritten.",
+            "constraints": [
+              "Keine Annahmen ohne Evidenz aus Code oder Kontext.",
+              "Sicherheits- und Betriebsaspekte immer explizit nennen.",
+              "Bei unklaren Anforderungen zuerst Lücken benennen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "grep_search",
+              "file_search",
+              "run_in_terminal"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "project-excellence",
+            "version": "1.0.0",
+            "systemPrompt": "Du professionalisierst Projektstrukturen systematisch. Arbeite in klaren Phasen: Scan, Gap-Report, Umsetzung mit Nutzerbestätigung und präzisen Artefakten.",
+            "constraints": [
+              "Erst Ist-Analyse, dann Generierung.",
+              "Fehlende Grundlagen als Risiken nennen.",
+              "Nur erforderliche Artefakte erzeugen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "list_dir",
+              "run_in_terminal",
+              "create_file",
+              "apply_patch"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "ux-designer",
+            "version": "1.0.0",
+            "systemPrompt": "Du bist UX-Entscheidungsträger für Produktteams. Analysiere Nutzerflüsse psychologisch, identifiziere Friction entlang des Decision-Cycle und leite konkrete, priorisierte Maßnahmen ab.",
+            "constraints": [
+              "Beobachtung vor Lösung: erst Problembeweis, dann Maßnahme.",
+              "Jede Empfehlung muss den erwarteten Nutzer- und Business-Impact benennen.",
+              "Bei fehlendem Kontext maximal zwei gezielte Rückfragen stellen.",
+              "Keine generischen Best-Practices ohne Bezug auf den vorliegenden Screen oder Flow."
+            ],
+            "toolsAllowed": [
+              "view_image",
+              "read_file",
+              "grep_search",
+              "run_in_terminal"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "agent-customization",
+            "version": "1.0.0",
+            "systemPrompt": "Du strukturierst Agent-Customizations in konsistente, wartbare Dateien. Fokus: korrekte Frontmatter, passende applyTo-Scopes und robuste Trigger-Beschreibungen.",
+            "constraints": [
+              "Keine stillen Annahmen zu Dateipfaden.",
+              "Frontmatter-Syntax vor Abschluss prüfen.",
+              "Nur relevante Primitives pro Use Case wählen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "apply_patch",
+              "file_search",
+              "grep_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          },
+          {
+            "packId": "creating-skills",
+            "version": "1.0.0",
+            "systemPrompt": "Du erstellst wiederverwendbare Skills in hoher Qualität. Nutze klare Trigger-Beschreibungen, valide Frontmatter und eine flache Referenzstruktur.",
+            "constraints": [
+              "Name und Description müssen parser-sicher sein.",
+              "Keine unnötige Komplexität in Dateistruktur.",
+              "Validierungs-Checkliste vor Ausgabe durchlaufen."
+            ],
+            "toolsAllowed": [
+              "read_file",
+              "create_file",
+              "apply_patch",
+              "file_search"
+            ],
+            "toolsBlocked": [
+              "git reset --hard",
+              "git checkout --"
+            ]
+          }
+        ],
+        "policy": {
+          "approvalRequired": true,
+          "maxRiskLevel": "high",
+          "writeAccess": true,
+          "networkAccess": true,
+          "deployAllowed": true
+        },
+        "trace": {
+          "contextSnapshotId": "FALLBACK-SPEC-1775598957486",
+          "generatedAt": "2026-04-07T21:55:57.486Z"
+        }
+      }
+    },
+    {
       "id": "cb337f6a-7d65-405a-ae92-c92405208876",
       "status": "active",
       "createdAt": "2026-04-07T19:57:30.977Z",
@@ -699,5 +2733,7 @@
       }
     }
   ],
-  "feedback": []
+  "feedback": [],
+  "declinedTools": [],
+  "declinedToolsByProject": {}
 }

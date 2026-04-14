@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Staged Activation** — packs requiring unavailable tools (GitNexus, MemPalace) are held as `pendingPacks` with reason and required tool; `reload_activation` MCP tool promotes them once tools become available
+- **Tool Onboarding** — `missingTools` array in handoff contract surfaces install guides, benefits, and impacted packs for GitNexus, MemPalace, and Obsidian
+- **Decline Memory** — `decline_tool_suggestion` MCP tool + `declinedTools` persistence in memory-service; declined tools are permanently hidden from future suggestions
+- **GitNexus Subprocess Graph Access** — `runGitNexusCypher()` subprocess helper for real-time graph queries (clusters, processes, symbol count) with meta.json fallback
+- **Obsidian Auto-Discovery** — `discoverObsidianVaults()` reads macOS/Linux Obsidian config (`obsidian.json`) + project `.obsidian/` directory; adds `hasObsidianVault` and `obsidianVaults` to ProjectContext
+- `reload_activation` MCP tool (re-evaluates context, promotes pending packs)
+- `decline_tool_suggestion` MCP tool (permanently dismisses tool suggestions)
+- `PendingPackSchema` and `MissingToolSchema` in shared-types
+- `gitNexusProcessLabels` field in ProjectContextSchema
+- `updateActivationHandoff()`, `declineToolSuggestion()`, `getDeclinedTools()` in memory-service
+
+### Changed
+
+- `buildHandoffContract` now splits packs into active vs pending based on tool availability
+- `activatePackSet` and `startProjectFromSpec` pass `declinedTools` from memory-service
+- `readGitNexusGraphSummary` uses subprocess-first strategy with meta.json fallback
+- MCP Gateway now exposes 10 tools (was 8)
+
+---
+
+## 0.1.0 — Initial Release
+
+### Added
+
 - Initial monorepo setup with Turborepo
 - Context analyzer for project stack/domain/phase inference
 - Orchestrator with GitNexus-aware pack matching and scoring

@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "15993b90c33bd63b",
+        "id": "46ae79f91a810c61",
         "type": "tabs",
         "children": [
           {
-            "id": "7a2e3f3f68d515d0",
+            "id": "08a0b1fb3630bec4",
             "type": "leaf",
             "state": {
               "type": "graph",
@@ -176,8 +176,13 @@
       "bases:Neue Base erstellen": false
     }
   },
-  "active": "7a2e3f3f68d515d0",
+  "active": "08a0b1fb3630bec4",
   "lastOpenFiles": [
+    "agent-customization-blueprint.md",
+    "init-project-blueprint.md",
+    "creating-skills-blueprint.md",
+    "code-security-analysis-blueprint.md",
+    "backend-architect-blueprint.md",
     "packforge-memory-blueprint.md",
     "packforge-pr-review-blueprint.md",
     "packforge-impact-analysis-blueprint.md",
@@ -189,13 +194,8 @@
     "Unbenannt.canvas",
     "project-excellence-blueprint.md",
     "gitnexus-refactoring-blueprint.md",
-    "backend-architect-blueprint.md",
-    "agent-customization-blueprint.md",
     "gitnexus-debugging-blueprint.md",
     "gitnexus-cli-blueprint.md",
-    "creating-skills-blueprint.md",
-    "code-security-analysis-blueprint.md",
-    "init-project-blueprint.md",
     "gitnexus-pr-review-blueprint.md",
     "gitnexus-impact-analysis-blueprint.md",
     "gitnexus-exploring-blueprint.md",
