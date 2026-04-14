@@ -59,7 +59,7 @@ services:
   mcp-gateway:
     image: node:22-alpine
     working_dir: /workspace
-    command: sh -lc "npm install && npm --workspace @hub/mcp-gateway run start"
+    command: sh -lc "npm install && npm --workspace packforge run start"
     environment:
       NODE_ENV: development
       PACKS_DIR: ${PACKS_DIR:-/workspace/packs}

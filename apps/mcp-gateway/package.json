@@ -1,9 +1,26 @@
 {
-  "name": "@hub/mcp-gateway",
+  "name": "packforge",
   "version": "0.1.0",
-  "private": true,
+  "description": "AI Agent Instruction Hub — orchestrates context-aware instruction packs for Cursor, Claude Code, Codex, and other MCP-compatible agents.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "packforge": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mutigen/packforge.git",
+    "directory": "apps/mcp-gateway"
+  },
+  "keywords": ["mcp", "ai-agents", "instruction-packs", "claude", "cursor", "codex", "packforge"],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",

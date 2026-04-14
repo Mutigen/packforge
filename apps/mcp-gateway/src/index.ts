@@ -773,9 +773,4 @@ export async function startMcpGatewayServer(options?: { packsDir?: string; memor
   return gateway
 }
 
-if (typeof require !== 'undefined' && require.main === module) {
-  startMcpGatewayServer().catch((error) => {
-    console.error(error)
-    process.exitCode = 1
-  })
-}
+// CLI entrypoint moved to ./cli.ts (used by `npx packforge`)

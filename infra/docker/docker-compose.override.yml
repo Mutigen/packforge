@@ -3,4 +3,4 @@ services:
     command: sh -lc "npm --workspace @hub/hub-api run dev"
 
   mcp-gateway:
-    command: sh -lc "npm --workspace @hub/mcp-gateway run dev"
+    command: sh -lc "npm --workspace packforge run dev"
