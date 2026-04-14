@@ -124,7 +124,7 @@ function buildBootstrapSteps(ctx: ProjectContext): BootstrapStep[] {
     steps.push({
       id: 'mempalace-project-init',
       label: 'Index project into MemPalace',
-      command: `mempalace init "${ctx.repositoryPath}" && mempalace mine`,
+      command: `mempalace init "${ctx.repositoryPath}" && mempalace mine "${ctx.repositoryPath}"`,
       condition: 'if_project_not_indexed',
       description:
         'This project has not been mined into MemPalace yet. Run this once to let MemPalace learn the codebase so memory-enriched packs can access past context, decisions, and patterns.',
