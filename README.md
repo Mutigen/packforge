@@ -206,7 +206,7 @@ Edit `~/Library/Application Support/Code/User/mcp.json` (macOS) or `~/.config/Co
   "mcpServers": {
     "packforge": {
       "command": "node",
-      "args": ["/absolute/path/to/packforge/apps/mcp-gateway/dist/index.js"],
+      "args": ["/absolute/path/to/packforge/apps/mcp-gateway/dist/cli.js"],
       "cwd": "/absolute/path/to/packforge",
       "transportType": "stdio"
     }
