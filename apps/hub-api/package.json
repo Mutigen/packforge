@@ -19,7 +19,7 @@
     "@hub/orchestrator": "*",
     "@hub/policy-service": "*",
     "@hub/shared-types": "*",
-    "fastify": "^5.3.2",
+    "fastify": "^5.8.5",
     "js-yaml": "^4.1.0",
     "zod": "^3.24.2"
   },
